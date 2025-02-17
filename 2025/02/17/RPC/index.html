@@ -19,12 +19,12 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="RPC 1. 什么是RPC？RPC原理是什么？什么是RPC？RPC（Remote Procedure Call） 即远程过程调用，通过名字我们就能看出 RPC 关注的是远程调用而非本地调用。 为什么要 RPC ？ 因为，两个不同的服务器上的服务提供的方法不在一个内存空间，所以，需要通过网络编程才能传递方法调用所需要的参数。并且，方法调用的结果也需要通过网络编程来接收。但是，如果我们自己手动网络编程">
+    <meta name="description" content="RPC1. 什么是RPC？RPC原理是什么？什么是RPC？RPC（Remote Procedure Call） 即远程过程调用，通过名字我们就能看出 RPC 关注的是远程调用而非本地调用。 为什么要 RPC ？ 因为，两个不同的服务器上的服务提供的方法不在一个内存空间，所以，需要通过网络编程才能传递方法调用所需要的参数。并且，方法调用的结果也需要通过网络编程来接收。但是，如果我们自己手动网络编程来">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RPC">
 <meta property="og:url" content="http://example.com/2025/02/17/RPC/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="RPC 1. 什么是RPC？RPC原理是什么？什么是RPC？RPC（Remote Procedure Call） 即远程过程调用，通过名字我们就能看出 RPC 关注的是远程调用而非本地调用。 为什么要 RPC ？ 因为，两个不同的服务器上的服务提供的方法不在一个内存空间，所以，需要通过网络编程才能传递方法调用所需要的参数。并且，方法调用的结果也需要通过网络编程来接收。但是，如果我们自己手动网络编程">
+<meta property="og:description" content="RPC1. 什么是RPC？RPC原理是什么？什么是RPC？RPC（Remote Procedure Call） 即远程过程调用，通过名字我们就能看出 RPC 关注的是远程调用而非本地调用。 为什么要 RPC ？ 因为，两个不同的服务器上的服务提供的方法不在一个内存空间，所以，需要通过网络编程才能传递方法调用所需要的参数。并且，方法调用的结果也需要通过网络编程来接收。但是，如果我们自己手动网络编程来">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502171154285.jpg">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502171154286.png">
@@ -37,7 +37,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502171154293.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502171154294.png">
 <meta property="article:published_time" content="2025-02-17T03:48:02.000Z">
-<meta property="article:modified_time" content="2025-02-17T03:57:02.290Z">
+<meta property="article:modified_time" content="2025-02-17T03:59:34.983Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502171154285.jpg">
@@ -290,8 +290,7 @@
             
               <div class="markdown-body">
                 
-                <h1 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a><strong>RPC</strong></h1><hr>
-<h1 id="1-什么是RPC？RPC原理是什么？"><a href="#1-什么是RPC？RPC原理是什么？" class="headerlink" title="1. 什么是RPC？RPC原理是什么？"></a><strong>1. 什么是RPC？RPC原理是什么？</strong></h1><h2 id="什么是RPC？"><a href="#什么是RPC？" class="headerlink" title="什么是RPC？"></a>什么是RPC？</h2><p><strong>RPC（Remote Procedure Call）</strong> 即远程过程调用，通过名字我们就能看出 RPC 关注的是远程调用而非本地调用。</p>
+                <h1 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a><strong>RPC</strong></h1><h1 id="1-什么是RPC？RPC原理是什么？"><a href="#1-什么是RPC？RPC原理是什么？" class="headerlink" title="1. 什么是RPC？RPC原理是什么？"></a><strong>1. 什么是RPC？RPC原理是什么？</strong></h1><h2 id="什么是RPC？"><a href="#什么是RPC？" class="headerlink" title="什么是RPC？"></a>什么是RPC？</h2><p><strong>RPC（Remote Procedure Call）</strong> 即远程过程调用，通过名字我们就能看出 RPC 关注的是远程调用而非本地调用。</p>
 <p><strong>为什么要 RPC ？</strong> 因为，两个不同的服务器上的服务提供的方法不在一个内存空间，所以，需要通过网络编程才能传递方法调用所需要的参数。并且，方法调用的结果也需要通过网络编程来接收。但是，如果我们自己手动网络编程来实现这个调用过程的话工作量是非常大的，因为，我们需要考虑底层传输方式（TCP 还是 UDP）、序列化方式等等方面。</p>
 <p><strong>RPC 能帮助我们做什么呢？</strong>  简单来说，通过 RPC 可以帮助我们调用远程计算机上某个服务的方法，这个过程就像调用本地方法一样简单。并且！我们不需要了解底层网络编程的具体细节。举个例子：两个不同的服务 A、B 部署在两台不同的机器上，服务 A 如果想要调用服务 B 中的某个方法的话就可以通过 RPC 来做。</p>
 <p>一言蔽之：<strong>RPC 的出现就是为了让你调用远程方法像调用本地方法一样简单。</strong></p>
@@ -313,7 +312,6 @@
 <li>服务端 Stub（桩）得到方法执行结果并将组装成能够进行网络传输的消息体：<code>RpcResponse</code>（序列化）发送至消费方；</li>
 <li>客户端 Stub（client stub）接收到消息并将消息反序列化为 Java 对象:<code>RpcResponse</code> ，这样也就得到了最终结果。over!</li>
 </ol>
-<hr>
 <h1 id="2-有了HTTP协议，为什么还要有RPC？"><a href="#2-有了HTTP协议，为什么还要有RPC？" class="headerlink" title="2. 有了HTTP协议，为什么还要有RPC？"></a><strong>2. 有了HTTP协议，为什么还要有RPC？</strong></h1><h2 id="从TCP聊起"><a href="#从TCP聊起" class="headerlink" title="从TCP聊起"></a><strong>从TCP聊起</strong></h2><p>假设我们需要在 A 电脑的进程发一段数据到 B 电脑的进程，我们一般会在代码里使用 socket 进行编程。这时候，我们可选项一般也就<strong>TCP 和 UDP 二选一。TCP 可靠，UDP 不可靠。</strong></p>
 <p>类似下面这样。</p>
 <figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">fd</span> = socket(AF_INET,SOCK_STREAM,<span class="hljs-number">0</span>)<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure>
@@ -326,7 +324,6 @@
 <p>因此，纯裸TCP是不能直接拿来用的，你需要在这个基础上加入一些 <strong>自定义的规则</strong> ，用于区分 <strong>消息边界</strong> 。于是我们会把每条要发送的数据都包装一下，比如加入 <strong>消息头</strong> ，消息头里写清楚一个完整的包长度是多少，根据这个长度可以继续接收数据，截取出来后它们就是我们真正要传输的 <strong>消息体</strong> 。</p>
 <p>而这里头提到的 <strong>消息头</strong> ，还可以放各种东西，比如消息体是否被压缩过和消息体格式之类的，只要上下游都约定好了，互相都认就可以了，这就是所谓的 **协议。**每个使用 TCP 的项目都可能会定义一套类似这样的协议解析标准，他们可能 <strong>有区别，但原理都类似</strong>。</p>
 <p><strong>于是基于 TCP，就衍生了非常多的协议，比如 HTTP 和 RPC。</strong></p>
-<hr>
 <h2 id="HTTP和RPC"><a href="#HTTP和RPC" class="headerlink" title="HTTP和RPC"></a><strong>HTTP和RPC</strong></h2><h3 id="RPC其实是一直调用方式"><a href="#RPC其实是一直调用方式" class="headerlink" title="RPC其实是一直调用方式"></a><strong>RPC其实是一直调用方式</strong></h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502171154287.png" srcset="/img/loading.gif" lazyload alt="04b603b5bd2443209233deea87816161~tplv-k3u1fbpfcp-zoom-in-crop-mark_3024_0_0_0.awebp"></p>
 <p><strong>TCP 是传输层的协议</strong> ，而基于 TCP 造出来的 HTTP 和各类 RPC 协议，它们都只是定义了不同消息格式的 <strong>应用层协议</strong> 而已。</p>
 <p><strong>HTTP</strong>（<strong>H</strong>yper <strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol）协议又叫做 <strong>超文本传输协议</strong> 。我们用的比较多，平时上网在浏览器上敲个网址就能访问网页，这里用到的就是 HTTP 协议。</p>
@@ -368,19 +365,13 @@
 <p>当然上面说的 HTTP，其实 <strong>特指的是现在主流使用的 HTTP1.1</strong>，<code>HTTP2</code>在前者的基础上做了很多改进，所以 <strong>性能可能比很多 RPC 协议还要好</strong>，甚至连<code>gRPC</code>底层都直接用的<code>HTTP2</code>。</p>
 <h5 id="为什么既然有了HTTP2，还要有RPC"><a href="#为什么既然有了HTTP2，还要有RPC" class="headerlink" title="为什么既然有了HTTP2，还要有RPC"></a><strong>为什么既然有了HTTP2，还要有RPC</strong></h5><p>这个是由于 HTTP2 是 2015 年出来的。那时候很多公司内部的 RPC 协议都已经跑了好些年了，基于历史原因，一般也没必要去换了。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><ul>
-<li><p>纯裸 TCP 是能收发数据，但它是个无边界的数据流，上层需要定义消息格式用于定义 <strong>消息边界</strong> 。于是就有了各种协议，HTTP 和各类 RPC 协议就是在 TCP 之上定义的应用层协议。</p>
-</li>
-<li><p><strong>RPC 本质上不算是协议，而是一种调用方式</strong>，而像 gRPC 和 Thrift 这样的具体实现，才是协议，它们是实现了 RPC 调用的协议。目的是希望程序员能像调用本地方法那样去调用远端的服务方法。同时 RPC 有很多种实现方式，<strong>不一定非得基于 TCP 协议</strong>。</p>
-</li>
-<li><p>从发展历史来说，<strong>HTTP 主要用于 B&#x2F;S 架构，而 RPC 更多用于 C&#x2F;S 架构。但现在其实已经没分那么清了，B&#x2F;S 和 C&#x2F;S 在慢慢融合。</strong> 很多软件同时支持多端，所以对外一般用 HTTP 协议，而内部集群的微服务之间则采用 RPC 协议进行通讯。</p>
-</li>
-<li><p>RPC 其实比 HTTP 出现的要早，且比目前主流的 HTTP1.1 性能要更好，所以大部分公司内部都还在使用 RPC。</p>
-</li>
-<li><p><strong>HTTP2.0</strong> 在 <strong>HTTP1.1</strong> 的基础上做了优化，性能可能比很多 RPC 协议都要好，但由于是这几年才出来的，所以也不太可能取代掉 RPC。</p>
-</li>
+<li>纯裸 TCP 是能收发数据，但它是个无边界的数据流，上层需要定义消息格式用于定义 <strong>消息边界</strong> 。于是就有了各种协议，HTTP 和各类 RPC 协议就是在 TCP 之上定义的应用层协议。</li>
+<li><strong>RPC 本质上不算是协议，而是一种调用方式</strong>，而像 gRPC 和 Thrift 这样的具体实现，才是协议，它们是实现了 RPC 调用的协议。目的是希望程序员能像调用本地方法那样去调用远端的服务方法。同时 RPC 有很多种实现方式，<strong>不一定非得基于 TCP 协议</strong>。</li>
+<li>从发展历史来说，<strong>HTTP 主要用于 B&#x2F;S 架构，而 RPC 更多用于 C&#x2F;S 架构。但现在其实已经没分那么清了，B&#x2F;S 和 C&#x2F;S 在慢慢融合。</strong> 很多软件同时支持多端，所以对外一般用 HTTP 协议，而内部集群的微服务之间则采用 RPC 协议进行通讯。</li>
+<li>RPC 其实比 HTTP 出现的要早，且比目前主流的 HTTP1.1 性能要更好，所以大部分公司内部都还在使用 RPC。</li>
+<li><strong>HTTP2.0</strong> 在 <strong>HTTP1.1</strong> 的基础上做了优化，性能可能比很多 RPC 协议都要好，但由于是这几年才出来的，所以也不太可能取代掉 RPC。</li>
 </ul>
-<hr>
-<h1 id="3-如何自己实现一个RPC框架"><a href="#3-如何自己实现一个RPC框架" class="headerlink" title="3. 如何自己实现一个RPC框架"></a><strong>3. 如何自己实现一个RPC框架</strong></h1>
+<h1 id="3-如何自己实现一个RPC框架"><a href="#3-如何自己实现一个RPC框架" class="headerlink" title="3.如何自己实现一个RPC框架"></a><strong>3.如何自己实现一个RPC框架</strong></h1>
                 
               </div>
             
