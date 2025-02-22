@@ -30,8 +30,10 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502221957403.jpg">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502221935459.png">
 <meta property="article:published_time" content="2025-02-21T02:30:03.000Z">
-<meta property="article:modified_time" content="2025-02-22T12:23:14.320Z">
+<meta property="article:modified_time" content="2025-02-22T12:27:24.574Z">
 <meta property="article:author" content="Kon4tsu">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="数据库">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502211203817.jpg">
   
@@ -741,7 +743,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">delete</span><span class="hljs-params">(<span class="hljs-type">long</span> xid, <span class="hljs-type">long</span> uid)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>    lock.lock();<br>    <span class="hljs-type">Transaction</span> <span class="hljs-variable">t</span> <span class="hljs-operator">=</span> activeTransaction.get(xid);<br>    lock.unlock();<br><br>    <span class="hljs-keyword">if</span>(t.err != <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">throw</span> t.err;<br>    &#125;<br>    <span class="hljs-type">Entry</span> <span class="hljs-variable">entry</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">super</span>.get(uid);<br>    <span class="hljs-keyword">try</span> &#123;<br>      	<span class="hljs-comment">// 要删除的资源对这个事务不可见，无法删除</span><br>        <span class="hljs-keyword">if</span>(!Visibility.isVisible(tm, t, entry)) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>        &#125;<br>        <span class="hljs-type">Lock</span> <span class="hljs-variable">l</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>          	<span class="hljs-comment">// 可见，就让xid去获取uid</span><br>            l = lt.add(xid, uid);<br>        &#125; <span class="hljs-keyword">catch</span>(Exception e) &#123;<br>            t.err = Error.ConcurrentUpdateException;<br>            internAbort(xid, <span class="hljs-literal">true</span>);<br>            t.autoAborted = <span class="hljs-literal">true</span>;<br>            <span class="hljs-keyword">throw</span> t.err;<br>        &#125;<br>      	<span class="hljs-comment">// 获取非空，是一把锁</span><br>        <span class="hljs-keyword">if</span>(l != <span class="hljs-literal">null</span>) &#123;<br>          	<span class="hljs-comment">// ⚠️由于l是一把可重入锁，当获取到一把已上锁的锁时，再在这里上锁也能上锁成功，不会发生阻塞。。。</span><br>          	<span class="hljs-comment">// 而我们这段代码的思路就是要让程序阻塞在这里。。。</span><br>            l.lock();<br>            l.unlock();<br>        &#125;<br>      	<span class="hljs-comment">// 本事务已经删除过了（同一个事务，前面删除过了，这次再删当然删不了）</span><br>        <span class="hljs-keyword">if</span>(entry.getXmax() == xid) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>        &#125;<br>      	<span class="hljs-comment">// 发生版本跳跃，抛出异常</span><br>        <span class="hljs-keyword">if</span>(Visibility.isVersionSkip(tm, t, entry)) &#123;<br>            t.err = Error.ConcurrentUpdateException;<br>            internAbort(xid, <span class="hljs-literal">true</span>);<br>            t.autoAborted = <span class="hljs-literal">true</span>;<br>            <span class="hljs-keyword">throw</span> t.err;<br>        &#125;<br>      	<span class="hljs-comment">// 设置XMAX为本事务的xid，表明事务xid已删除这条数据</span><br>        entry.setXmax(xid);<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        entry.release();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>实际上主要是前置的三件事：<strong>一是可见性判断，二是获取资源的锁，三是版本跳跃判断。删除的操作只有一个设置 <code>XMAX</code>。</strong></p>
-
+<h1 id="5-Index-Manager"><a href="#5-Index-Manager" class="headerlink" title="5. Index Manager"></a>5. Index Manager</h1><h2 id="二叉树索引"><a href="#二叉树索引" class="headerlink" title="二叉树索引"></a>二叉树索引</h2>
                 
               </div>
             
@@ -749,6 +751,56 @@
             <div>
               <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java/" class="category-chain-item">Java</a>
+  
+  
+
+      </span>
+    
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+
+      </span>
+    
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/MySQL/" class="category-chain-item">MySQL</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Java/" class="print-no-link">#Java</a>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+      
+    </div>
   
 </div>
 
