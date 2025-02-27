@@ -1,0 +1,844 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kon4tsu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="笔记来源：尚硅谷 JVM 全套教程，百万播放，全网巅峰（宋红康详解 java 虚拟机） 同步更新：https:&#x2F;&#x2F;gitee.com&#x2F;vectorx&#x2F;NOTE_JVM https:&#x2F;&#x2F;codechina.csdn.net&#x2F;qq_35925558&#x2F;NOTE_JVM https:&#x2F;&#x2F;github.com&#x2F;uxiahnan&#x2F;NOTE_JVM  [toc] 2. 类加载子系统2.1. 内存结构概述 Cl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM上02_类加载子系统">
+<meta property="og:url" content="http://example.com/2025/02/27/JVM%E4%B8%8A02-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="Kon4tsu Blog">
+<meta property="og:description" content="笔记来源：尚硅谷 JVM 全套教程，百万播放，全网巅峰（宋红康详解 java 虚拟机） 同步更新：https:&#x2F;&#x2F;gitee.com&#x2F;vectorx&#x2F;NOTE_JVM https:&#x2F;&#x2F;codechina.csdn.net&#x2F;qq_35925558&#x2F;NOTE_JVM https:&#x2F;&#x2F;github.com&#x2F;uxiahnan&#x2F;NOTE_JVM  [toc] 2. 类加载子系统2.1. 内存结构概述 Cl">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052152.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052153.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052154.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052155.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052156.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052157.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052158.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052159.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052160.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052161.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052162.png">
+<meta property="article:published_time" content="2025-02-27T02:50:48.000Z">
+<meta property="article:modified_time" content="2025-02-27T02:52:17.483Z">
+<meta property="article:author" content="Kon4tsu">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052152.png">
+  
+  
+  
+  <title>JVM上02_类加载子系统 - Kon4tsu Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/macpanel.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kon4tsu&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JVM上02_类加载子系统"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-27 10:50" pubdate>
+          2025年2月27日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          27 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">JVM上02_类加载子系统</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>笔记来源：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1PJ411n7xZ" title="尚硅谷JVM全套教程，百万播放，全网巅峰（宋红康详解java虚拟机）">尚硅谷 JVM 全套教程，百万播放，全网巅峰（宋红康详解 java 虚拟机）</a></p>
+<p>同步更新：<a target="_blank" rel="noopener" href="https://gitee.com/vectorx/NOTE_JVM">https://gitee.com/vectorx/NOTE_JVM</a></p>
+<p><a target="_blank" rel="noopener" href="https://codechina.csdn.net/qq_35925558/NOTE_JVM">https://codechina.csdn.net/qq_35925558/NOTE_JVM</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/uxiahnan/NOTE_JVM">https://github.com/uxiahnan/NOTE_JVM</a></p>
+</blockquote>
+<p>[toc]</p>
+<h1 id="2-类加载子系统"><a href="#2-类加载子系统" class="headerlink" title="2. 类加载子系统"></a>2. 类加载子系统</h1><h2 id="2-1-内存结构概述"><a href="#2-1-内存结构概述" class="headerlink" title="2.1. 内存结构概述"></a>2.1. 内存结构概述</h2><ul>
+<li>Class 文件</li>
+<li><mark>类加载子系统</mark></li>
+<li>运行时数据区<ul>
+<li>方法区</li>
+<li>堆</li>
+<li>程序计数器</li>
+<li>虚拟机栈</li>
+<li>本地方法栈</li>
+</ul>
+</li>
+<li>执行引擎</li>
+<li>本地方法接口</li>
+<li>本地方法库</li>
+</ul>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052152.png" srcset="/img/loading.gif" lazyload alt="image-20200705080719531"></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052153.png" srcset="/img/loading.gif" lazyload alt="image-20200705080911284"></p>
+<p>如果自己想手写一个 Java 虚拟机的话，主要考虑哪些结构呢？</p>
+<ul>
+<li>类加载器</li>
+<li>执行引擎</li>
+</ul>
+<h2 id="2-2-类加载器与类的加载过程"><a href="#2-2-类加载器与类的加载过程" class="headerlink" title="2.2. 类加载器与类的加载过程"></a>2.2. 类加载器与类的加载过程</h2><p><strong>类加载器子系统作用</strong></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052154.png" srcset="/img/loading.gif" lazyload alt="image-20200705081813409"></p>
+<ul>
+<li>类加载器子系统负责从文件系统或者网络中加载 Class 文件，class 文件在文件开头有特定的文件标识。</li>
+<li>ClassLoader 只负责 class 文件的加载，至于它是否可以运行，则由 Execution Engine 决定。</li>
+<li>加载的类信息存放于一块称为方法区的内存空间。除了类的信息外，方法区中还会存放运行时常量池信息，可能还包括字符串字面量和数字常量（这部分常量信息是 Class 文件中常量池部分的内存映射）</li>
+</ul>
+<p><strong>类加载器 ClasLoader 角色</strong></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052155.png" srcset="/img/loading.gif" lazyload alt="image-20200705081913538"></p>
+<ul>
+<li>class file 存在于本地硬盘上，可以理解为设计师画在纸上的模板，而最终这个模板在执行的时候是要加载到 JVM 当中来根据这个文件实例化出 n 个一模一样的实例。</li>
+<li>class file 加载到 JVM 中，被称为 DNA 元数据模板，放在方法区。</li>
+<li>在.class 文件-&gt;JVM-&gt;最终成为元数据模板，此过程就要一个运输工具（类装载器 Class Loader），扮演一个快递员的角色。</li>
+</ul>
+<p><strong>类的加载过程</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> *示例代码</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HelloLoader</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;Hello World!&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>用流程图表示上述示例代码：</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052156.png" srcset="/img/loading.gif" lazyload alt="image-20200705082255746"></p>
+<h3 id="加载阶段"><a href="#加载阶段" class="headerlink" title="加载阶段"></a>加载阶段</h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052157.png" srcset="/img/loading.gif" lazyload alt="image-20200705082601441"></p>
+<ul>
+<li><ol>
+<li>通过一个类的全限定名获取定义此类的二进制字节流</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>在内存中生成一个代表这个类的 java.lang.Class 对象，作为方法区这个类的各种数据的访问入口</li>
+</ol>
+</li>
+</ul>
+<p><strong>补充：加载 class 文件的方式</strong></p>
+<ul>
+<li>从<mark>本地系统</mark>中直接加载</li>
+<li>通过<mark>网络</mark>获取，典型场景：Web Applet</li>
+<li>从 zip<mark>压缩包</mark>中读取，成为日后 jar、war 格式的基础</li>
+<li>运行时计算生成，使用最多的是：<mark>动态代理技术</mark></li>
+<li>由其他文件生成，典型场景：<mark>JSP 应用</mark></li>
+<li>从专有<mark>数据库</mark>中提取.class 文件，比较少见</li>
+<li>从<mark>加密文件</mark>中获取，典型的防 Class 文件被反编译的保护措施</li>
+</ul>
+<h3 id="链接阶段"><a href="#链接阶段" class="headerlink" title="链接阶段"></a>链接阶段</h3><ul>
+<li><strong>验证（Verify）</strong>：<ul>
+<li>目的在子确保 Class 文件的字节流中包含信息符合当前虚拟机要求，保证被加载类的正确性，不会危害虚拟机自身安全。</li>
+<li>主要包括四种验证，<mark>文件格式验证，元数据验证，字节码验证，符号引用验证。</mark></li>
+</ul>
+</li>
+<li><strong>准备（Prepare）</strong>：<ul>
+<li>为类变量分配内存并且设置该类变量的默认初始值，即零值。</li>
+<li><mark>这里不包含用 final 修饰的 static，因为 final 在编译的时候就会分配了，准备阶段会显式初始化；</mark></li>
+<li><mark>这里不会为实例变量分配初始化</mark>，类变量会分配在方法区中，而实例变量是会随着对象一起分配到 Java 堆中。</li>
+</ul>
+</li>
+<li><strong>解析（Resolve）</strong>：<ul>
+<li>将常量池内的<mark>符号引用转换为直接引用</mark>的过程。</li>
+<li>事实上，解析操作往往会伴随着 JVM 在执行完初始化之后再执行。</li>
+<li>符号引用就是一组符号来描述所引用的目标。符号引用的字面量形式明确定义在《java 虚拟机规范》的 Class 文件格式中。直接引用就是直接指向目标的指针、相对偏移量或一个间接定位到目标的句柄。</li>
+<li>解析动作主要针对类或接口、字段、类方法、接口方法、方法类型等。对应常量池中的 CONSTANT_Class_info，CONSTANT_Fieldref_info、CONSTANT_Methodref_info 等。</li>
+</ul>
+</li>
+</ul>
+<h3 id="初始化阶段"><a href="#初始化阶段" class="headerlink" title="初始化阶段"></a>初始化阶段</h3><ul>
+<li><mark>初始化阶段就是执行类构造器方法&lt;clinit&gt;()的过程。</mark></li>
+<li>此方法不需定义，是 javac 编译器自动收集类中的所有类变量的赋值动作和静态代码块中的语句合并而来。</li>
+<li>构造器方法中指令按语句在源文件中出现的顺序执行。</li>
+<li><mark>&lt;clinit&gt;()不同于类的构造器。</mark>（关联：构造器是虚拟机视角下的&lt;init&gt;()）</li>
+<li>若该类具有父类，JVM 会保证子类的&lt;clinit&gt;()执行前，父类的&lt;clinit&gt;()已经执行完毕。</li>
+<li>虚拟机必须保证一个类的&lt;clinit&gt;()方法在多线程下被同步加锁。</li>
+</ul>
+<h2 id="2-3-类加载器分类"><a href="#2-3-类加载器分类" class="headerlink" title="2.3. 类加载器分类"></a>2.3. 类加载器分类</h2><p>JVM 支持两种类型的类加载器 。分别为<mark>引导类加载器（Bootstrap ClassLoader）</mark>和<mark>自定义类加载器（User-Defined ClassLoader）</mark>。</p>
+<p>从概念上来讲，自定义类加载器一般指的是程序中由开发人员自定义的一类类加载器，但是 Java 虚拟机规范却没有这么定义，而是将<mark>所有派生于抽象类 ClassLoader 的类加载器都划分为自定义类加载器</mark>。</p>
+<p>无论类加载器的类型如何划分，在程序中我们最常见的类加载器始终只有 3 个，如下所示：</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052158.png" srcset="/img/loading.gif" lazyload alt="image-20200705094149223"></p>
+<p>这里的四者之间的关系是包含关系。不是上层下层，也不是子父类的继承关系。</p>
+<h3 id="2-3-1-虚拟机自带的加载器"><a href="#2-3-1-虚拟机自带的加载器" class="headerlink" title="2.3.1. 虚拟机自带的加载器"></a>2.3.1. 虚拟机自带的加载器</h3><p><strong>启动类加载器（引导类加载器，Bootstrap ClassLoader）</strong></p>
+<ul>
+<li>这个类加载使用 C&#x2F;C++语言实现的，嵌套在 JVM 内部。</li>
+<li>它用来加载 Java 的核心库（JAVA_HOME&#x2F;jre&#x2F;lib&#x2F;rt.jar、resources.jar 或 sun.boot.class.path 路径下的内容），用于提供 JVM 自身需要的类</li>
+<li>并不继承自 ava.lang.ClassLoader，没有父加载器。</li>
+<li>加载扩展类和应用程序类加载器，并指定为他们的父类加载器。</li>
+<li>出于安全考虑，Bootstrap 启动类加载器只加载包名为 java、javax、sun 等开头的类</li>
+</ul>
+<p><strong>扩展类加载器（Extension ClassLoader）</strong></p>
+<ul>
+<li>Java 语言编写，由 sun.misc.Launcher$ExtClassLoader 实现。</li>
+<li>派生于 ClassLoader 类</li>
+<li>父类加载器为启动类加载器</li>
+<li>从 java.ext.dirs 系统属性所指定的目录中加载类库，或从 JDK 的安装目录的 jre&#x2F;1ib&#x2F;ext 子目录（扩展目录）下加载类库。如果用户创建的 JAR 放在此目录下，也会自动由扩展类加载器加载。</li>
+</ul>
+<p><strong>应用程序类加载器（系统类加载器，AppClassLoader）</strong></p>
+<ul>
+<li>java 语言编写，由 sun.misc.LaunchersAppClassLoader 实现</li>
+<li>派生于 ClassLoader 类</li>
+<li>父类加载器为扩展类加载器</li>
+<li>它负责加载环境变量 classpath 或系统属性 java.class.path 指定路径下的类库</li>
+<li><mark>该类加载是程序中默认的类加载器</mark>，一般来说，Java 应用的类都是由它来完成加载</li>
+<li>通过 ClassLoader#getSystemclassLoader() 方法可以获取到该类加载器</li>
+</ul>
+<h3 id="2-3-2-用户自定义类加载器"><a href="#2-3-2-用户自定义类加载器" class="headerlink" title="2.3.2. 用户自定义类加载器"></a>2.3.2. 用户自定义类加载器</h3><p>在 Java 的日常应用程序开发中，类的加载几乎是由上述 3 种类加载器相互配合执行的，在必要时，我们还可以自定义类加载器，来定制类的加载方式。 为什么要自定义类加载器？</p>
+<ul>
+<li>隔离加载类</li>
+<li>修改类加载的方式</li>
+<li>扩展加载源</li>
+<li>防止源码泄漏</li>
+</ul>
+<p>用户自定义类加载器实现步骤：</p>
+<ol>
+<li>开发人员可以通过继承抽象类 ava.lang.ClassLoader 类的方式，实现自己的类加载器，以满足一些特殊的需求</li>
+<li>在 JDK1.2 之前，在自定义类加载器时，总会去继承 ClassLoader 类并重写 loadClass() 方法，从而实现自定义的类加载类，但是在 JDK1.2 之后已不再建议用户去覆盖 loadclass() 方法，而是建议把自定义的类加载逻辑写在 findClass()方法中</li>
+<li>在编写自定义类加载器时，如果没有太过于复杂的需求，可以直接继承 URLClassLoader 类，这样就可以避免自己去编写 findClass() 方法及其获取字节码流的方式，使自定义类加载器编写更加简洁。</li>
+</ol>
+<h2 id="2-4-ClassLoader-的使用说明"><a href="#2-4-ClassLoader-的使用说明" class="headerlink" title="2.4. ClassLoader 的使用说明"></a>2.4. ClassLoader 的使用说明</h2><p>ClassLoader 类是一个抽象类，其后所有的类加载器都继承自 ClassLoader（不包括启动类加载器）</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052159.png" srcset="/img/loading.gif" lazyload alt="image-20200705103516138"></p>
+<p>sun.misc.Launcher 它是一个 java 虚拟机的入口应用</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052160.png" srcset="/img/loading.gif" lazyload alt="image-20200705103636003"></p>
+<p><strong>获取 ClassLoader 的途径</strong></p>
+<ul>
+<li><p>方式一：获取当前 ClassLoader</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">clazz.getClassLoader()<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>方式二：获取当前线程上下文的 ClassLoader</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">Thread.currentThread().getContextClassLoader()<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>方式三：获取系统的 ClassLoader</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">ClassLoader.getSystemClassLoader()<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>方式四：获取调用者的 ClassLoader</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">DriverManager.getCallerClassLoader()<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="2-5-双亲委派机制"><a href="#2-5-双亲委派机制" class="headerlink" title="2.5. 双亲委派机制"></a>2.5. 双亲委派机制</h2><p>Java 虚拟机对 class 文件采用的是<mark>按需加载</mark>的方式，也就是说当需要使用该类时才会将它的 class 文件加载到内存生成 class 对象。而且加载某个类的 class 文件时，Java 虚拟机采用的是<mark>双亲委派模式</mark>，即把请求交由父类处理，它是一种任务委派模式。</p>
+<p><strong>工作原理</strong></p>
+<ul>
+<li>1）如果一个类加载器收到了类加载请求，它并不会自己先去加载，而是把这个请求委托给父类的加载器去执行；</li>
+<li>2）如果父类加载器还存在其父类加载器，则进一步向上委托，依次递归，请求最终将到达顶层的启动类加载器；</li>
+<li>3）如果父类加载器可以完成类加载任务，就成功返回，倘若父类加载器无法完成此加载任务，子加载器才会尝试自己去加载，这就是双亲委派模式。</li>
+</ul>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052161.png" srcset="/img/loading.gif" lazyload alt="image-20200705105151258"></p>
+<p><strong>举例</strong></p>
+<p>当我们加载 jdbc.jar 用于实现数据库连接的时候，首先我们需要知道的是 jdbc.jar 是基于 SPI 接口进行实现的，所以在加载的时候，会进行双亲委派，最终从根加载器中加载 SPI 核心类，然后在加载 SPI 接口类，接着在进行反向委派，通过线程上下文类加载器进行实现类 jdbc.jar 的加载。</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271052162.png" srcset="/img/loading.gif" lazyload alt="image-20200705105810107"></p>
+<p><strong>优势</strong></p>
+<ul>
+<li>避免类的重复加载</li>
+<li>保护程序安全，防止核心 API 被随意篡改<ul>
+<li>自定义类：java.lang.String</li>
+<li>自定义类：java.lang.ShkStart（报错：阻止创建 java.lang 开头的类）</li>
+</ul>
+</li>
+</ul>
+<p><strong>沙箱安全机制</strong></p>
+<p>自定义 String 类，但是在加载自定义 String 类的时候会率先使用引导类加载器加载，而引导类加载器在加载的过程中会先加载 jdk 自带的文件（rt.jar 包中 java\lang\String.class），报错信息说没有 main 方法，就是因为加载的是 rt.jar 包中的 string 类。这样可以保证对 java 核心源代码的保护，这就是沙箱安全机制。</p>
+<h2 id="2-6-其他"><a href="#2-6-其他" class="headerlink" title="2.6. 其他"></a>2.6. 其他</h2><p><strong>如何判断两个 class 对象是否相同</strong></p>
+<p>在 JVM 中表示两个 class 对象是否为同一个类存在两个必要条件：</p>
+<ul>
+<li>类的完整类名必须一致，包括包名。</li>
+<li>加载这个类的 ClassLoader（指 ClassLoader 实例对象）必须相同。</li>
+</ul>
+<p>换句话说，在 JVM 中，即使这两个类对象（class 对象）来源同一个 Class 文件，被同一个虚拟机所加载，但只要加载它们的 ClassLoader 实例对象不同，那么这两个类对象也是不相等的。</p>
+<p><strong>对类加载器的引用</strong></p>
+<p>JVM 必须知道一个类型是由启动加载器加载的还是由用户类加载器加载的。如果一个类型是由用户类加载器加载的，那么 JVM 会<mark>将这个类加载器的一个引用作为类型信息的一部分保存在方法区中</mark>。当解析一个类型到另一个类型的引用的时候，JVM 需要保证这两个类型的类加载器是相同的。</p>
+<p><strong>类的主动使用和被动使用</strong></p>
+<p>Java 程序对类的使用方式分为：主动使用和被动使用。</p>
+<p>主动使用，又分为七种情况：</p>
+<ul>
+<li><p>创建类的实例</p>
+</li>
+<li><p>访问某个类或接口的静态变量，或者对该静态变量赋值</p>
+</li>
+<li><p>调用类的静态方法</p>
+</li>
+<li><p>反射（比如：Class.forName（”com.atguigu.Test”））</p>
+</li>
+<li><p>初始化一个类的子类</p>
+</li>
+<li><p>Java 虚拟机启动时被标明为启动类的类</p>
+</li>
+<li><p>JDK 7 开始提供的动态语言支持：</p>
+<p>java.lang.invoke.MethodHandle 实例的解析结果</p>
+<p>REF_getStatic、REF_putStatic、REF_invokeStatic 句柄对应的类没有初始化，则初始化</p>
+</li>
+</ul>
+<p>除了以上七种情况，其他使用 Java 类的方式都被看作是对<mark>类的被动使用</mark>，都<mark>不会导致类的初始化</mark>。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JVM上02_类加载子系统</div>
+      <div>http://example.com/2025/02/27/JVM上02-类加载子系统/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kon4tsu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E4%B8%8A03-%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%8F%8A%E7%A8%8B%E5%BA%8F%E8%AE%A1%E6%95%B0%E5%99%A8/" title="JVM上03_运行时数据区及程序计数器">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JVM上03_运行时数据区及程序计数器</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E4%B8%8A01-JVM%E4%B8%8EJava%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" title="JVM上01_JVM与Java体系结构">
+                        <span class="hidden-mobile">JVM上01_JVM与Java体系结构</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
