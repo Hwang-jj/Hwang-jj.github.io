@@ -1,0 +1,1293 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kon4tsu">
+  <meta name="keywords" content="JVM，虚拟机。">
+  
+    <meta name="description" content="JVM系列-第6章-方法区。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM系列-第6章-方法区">
+<meta property="og:url" content="http://example.com/2025/02/27/JVM%E7%B3%BB%E5%88%97-%E7%AC%AC6%E7%AB%A0-%E6%96%B9%E6%B3%95%E5%8C%BA/index.html">
+<meta property="og:site_name" content="Kon4tsu Blog">
+<meta property="og:description" content="JVM系列-第6章-方法区。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816037.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816039.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816040.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816041.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816042.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816043.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816044.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816045.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816046.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816047.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816048.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816049.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816050.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816051.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816052.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816053.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816054.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816055.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816056.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816057.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816058.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816059.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816060.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816061.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816062.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816063.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816064.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816065.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816066.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816067.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816068.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816069.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816070.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816071.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816072.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816073.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816074.jpg">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816075.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816076.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816077.jpg">
+<meta property="article:published_time" content="2025-02-27T03:00:00.000Z">
+<meta property="article:modified_time" content="2025-02-27T10:17:08.721Z">
+<meta property="article:author" content="Kon4tsu">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="虚拟机">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816037.png">
+  
+  
+  
+  <title>JVM系列-第6章-方法区 - Kon4tsu Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/macpanel.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kon4tsu&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JVM系列-第6章-方法区"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-27 11:00" pubdate>
+          2025年2月27日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          74 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">JVM系列-第6章-方法区</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h1><h2 id="栈、堆、方法区的交互关系"><a href="#栈、堆、方法区的交互关系" class="headerlink" title="栈、堆、方法区的交互关系"></a>栈、堆、方法区的交互关系</h2><p><strong>从线程共享与否的角度来看</strong></p>
+<p>ThreadLocal：如何保证多个线程在并发环境下的安全性？典型场景就是数据库连接管理，以及会话管理。</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816037.png" srcset="/img/loading.gif" lazyload>
+
+<p><strong>栈、堆、方法区的交互关系</strong></p>
+<p><strong>下面涉及了对象的访问定位</strong></p>
+<ol>
+<li>Person 类的 .class 信息存放在方法区中</li>
+<li>person 变量存放在 Java 栈的局部变量表中</li>
+<li>真正的 person 对象存放在 Java 堆中</li>
+<li>在 person 对象中，有个指针指向方法区中的 person 类型数据，表明这个 person 对象是用方法区中的 Person 类 new 出来的</li>
+</ol>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816039.png" srcset="/img/loading.gif" lazyload>
+
+<h2 id="方法区的理解"><a href="#方法区的理解" class="headerlink" title="方法区的理解"></a>方法区的理解</h2><blockquote>
+<p><strong>官方文档</strong>：<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.5.4">https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.5.4</a></p>
+</blockquote>
+<h3 id="方法区在哪里？"><a href="#方法区在哪里？" class="headerlink" title="方法区在哪里？"></a>方法区在哪里？</h3><ol>
+<li>《Java虚拟机规范》中明确说明：尽管所有的方法区在逻辑上是属于堆的一部分，但一些简单的实现可能不会选择去进行垃圾收集或者进行压缩。但对于HotSpotJVM而言，方法区还有一个别名叫做Non-Heap（非堆），目的就是要和堆分开。</li>
+<li>所以，<strong>方法区可以看作是一块独立于Java堆的内存空间</strong>。</li>
+</ol>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816040.png" srcset="/img/loading.gif" lazyload>
+
+
+
+<h3 id="方法区的基本理解"><a href="#方法区的基本理解" class="headerlink" title="方法区的基本理解"></a>方法区的基本理解</h3><p><strong>方法区主要存放的是 Class，而堆中主要存放的是实例化的对象</strong></p>
+<ol>
+<li>方法区（Method Area）与Java堆一样，是各个线程共享的内存区域。多个线程同时加载统一个类时，只能有一个线程能加载该类，其他线程只能等等待该线程加载完毕，然后直接使用该类，即类只能加载一次。</li>
+<li>方法区在JVM启动的时候被创建，并且它的实际的物理内存空间中和Java堆区一样都可以是不连续的。</li>
+<li>方法区的大小，跟堆空间一样，可以选择固定大小或者可扩展。</li>
+<li>方法区的大小决定了系统可以保存多少个类，如果系统定义了太多的类，导致方法区溢出，虚拟机同样会抛出内存溢出错误：<code>java.lang.OutofMemoryError:PermGen space</code>或者<code>java.lang.OutOfMemoryError:Metaspace</code><ul>
+<li>加载大量的第三方的jar包</li>
+<li>Tomcat部署的工程过多（30~50个）</li>
+<li>大量动态的生成反射类</li>
+</ul>
+</li>
+<li>关闭JVM就会释放这个区域的内存。</li>
+</ol>
+<p><strong>代码举例</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MethodAreaDemo</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;start...&quot;</span>);<br>        <span class="hljs-keyword">try</span> &#123;<br>            Thread.sleep(<span class="hljs-number">1000000</span>);<br>        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br><br>        System.out.println(<span class="hljs-string">&quot;end...&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p>简单的程序，加载了1600多个类</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816041.png" srcset="/img/loading.gif" lazyload>
+
+
+
+<h3 id="HotSpot方法区演进"><a href="#HotSpot方法区演进" class="headerlink" title="HotSpot方法区演进"></a>HotSpot方法区演进</h3><ol>
+<li>在 JDK7 及以前，习惯上把方法区，称为永久代。JDK8开始，使用元空间取代了永久代。我们可以将方法区类比为Java中的接口，将永久代或元空间类比为Java中具体的实现类</li>
+<li>本质上，方法区和永久代并不等价。仅是对Hotspot而言的可以看作等价。《Java虚拟机规范》对如何实现方法区，不做统一要求。例如：BEAJRockit &#x2F; IBM J9 中不存在永久代的概念。<ul>
+<li>现在来看，当年使用永久代，不是好的idea。导致Java程序更容易OOm（超过-XX:MaxPermsize上限）</li>
+</ul>
+</li>
+<li>而到了JDK8，终于完全废弃了永久代的概念，改用与JRockit、J9一样在本地内存中实现的元空间（Metaspace）来代替</li>
+<li>元空间的本质和永久代类似，都是对JVM规范中方法区的实现。不过元空间与永久代最大的区别在于：<strong>元空间不在虚拟机设置的内存中，而是使用本地内存</strong>。</li>
+<li>永久代、元空间二者并不只是名字变了，内部结构也调整了</li>
+<li>根据《Java虚拟机规范》的规定，如果方法区无法满足新的内存分配需求时，将抛出OOM异常</li>
+</ol>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816042.png" srcset="/img/loading.gif" lazyload>
+
+
+
+<h2 id="设置方法区大小与-OOM"><a href="#设置方法区大小与-OOM" class="headerlink" title="设置方法区大小与 OOM"></a>设置方法区大小与 OOM</h2><p>方法区的大小不必是固定的，JVM可以根据应用的需要动态调整。</p>
+<h3 id="JDK7及以前-永久代"><a href="#JDK7及以前-永久代" class="headerlink" title="JDK7及以前(永久代)"></a>JDK7及以前(永久代)</h3><ol>
+<li>通过-XX:Permsize来设置永久代初始分配空间。默认值是20.75M</li>
+<li>-XX:MaxPermsize来设定永久代最大可分配空间。32位机器默认是64M，64位机器模式是82M</li>
+<li>当JVM加载的类信息容量超过了这个值，会报异常OutofMemoryError:PermGen space。</li>
+</ol>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816043.png" srcset="/img/loading.gif" lazyload>
+
+<h3 id="JDK8及以后-元空间"><a href="#JDK8及以后-元空间" class="headerlink" title="JDK8及以后(元空间)"></a>JDK8及以后(元空间)</h3><blockquote>
+<p><strong>JDK8 版本设置元空间大小</strong></p>
+</blockquote>
+<ol>
+<li><p>元数据区大小可以使用参数 <strong>-XX:MetaspaceSize</strong> 和 <strong>-XX:MaxMetaspaceSize</strong> 指定</p>
+</li>
+<li><p>默认值依赖于平台，Windows下，-XX:MetaspaceSize 约为21M，-XX:MaxMetaspaceSize的值是-1，即没有限制。</p>
+</li>
+<li><p>与永久代不同，如果不指定大小，默认情况下，虚拟机会耗尽所有的可用系统内存。如果元数据区发生溢出，虚拟机一样会抛出异常OutOfMemoryError:Metaspace</p>
+</li>
+<li><p>-XX:MetaspaceSize：设置初始的元空间大小。对于一个 64位 的服务器端 JVM 来说，其默认的 -XX:MetaspaceSize值为21MB。这就是初始的高水位线，一旦触及这个水位线，Full GC将会被触发并卸载没用的类（即这些类对应的类加载器不再存活），然后这个高水位线将会重置。新的高水位线的值取决于GC后释放了多少元空间。如果释放的空间不足，那么在不超过MaxMetaspaceSize时，适当提高该值。如果释放空间过多，则适当降低该值。</p>
+</li>
+<li><p>如果初始化的高水位线设置过低，上述高水位线调整情况会发生很多次。通过垃圾回收器的日志可以观察到Full GC多次调用。为了避免频繁地GC，建议将-XX:MetaspaceSize设置为一个相对较高的值。</p>
+</li>
+</ol>
+<h3 id="方法区OOM"><a href="#方法区OOM" class="headerlink" title="方法区OOM"></a>方法区OOM</h3><p>举例：</p>
+<p>代码：OOMTest 类继承 ClassLoader 类，获得 defineClass() 方法，可自己进行类的加载</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * jdk6/7中：</span><br><span class="hljs-comment"> * -XX:PermSize=10m -XX:MaxPermSize=10m</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * jdk8中：</span><br><span class="hljs-comment"> * -XX:MetaspaceSize=10m -XX:MaxMetaspaceSize=10m</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OOMTest</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">ClassLoader</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">j</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">OOMTest</span> <span class="hljs-variable">test</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OOMTest</span>();<br>            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10000</span>; i++) &#123;<br>                <span class="hljs-comment">//创建ClassWriter对象，用于生成类的二进制字节码</span><br>                <span class="hljs-type">ClassWriter</span> <span class="hljs-variable">classWriter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ClassWriter</span>(<span class="hljs-number">0</span>);<br>                <span class="hljs-comment">//指明版本号，修饰符，类名，包名，父类，接口</span><br>                classWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, <span class="hljs-string">&quot;Class&quot;</span> + i, <span class="hljs-literal">null</span>, <span class="hljs-string">&quot;java/lang/Object&quot;</span>, <span class="hljs-literal">null</span>);<br>                <span class="hljs-comment">//返回byte[]</span><br>                <span class="hljs-type">byte</span>[] code = classWriter.toByteArray();<br>                <span class="hljs-comment">//类的加载</span><br>                test.defineClass(<span class="hljs-string">&quot;Class&quot;</span> + i, code, <span class="hljs-number">0</span>, code.length);<span class="hljs-comment">//Class对象</span><br>                j++;<br>            &#125;<br>        &#125; <span class="hljs-keyword">finally</span> &#123;<br>            System.out.println(j);<br>        &#125;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>不设置元空间的上限</strong></p>
+<p>使用默认的 JVM 参数，元空间不设置上限</p>
+<p>输出结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-number">10000</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>设置元空间的上限</strong></p>
+<p>JVM 参数</p>
+<p>-XX:MetaspaceSize&#x3D;10m -XX:MaxMetaspaceSize&#x3D;10m</p>
+<p>输出结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-number">8531</span><br>Exception in thread <span class="hljs-string">&quot;main&quot;</span> java.lang.OutOfMemoryError: Metaspace<br>	at java.lang.ClassLoader.defineClass1(Native Method)<br>	at java.lang.ClassLoader.defineClass(ClassLoader.java:<span class="hljs-number">763</span>)<br>	at java.lang.ClassLoader.defineClass(ClassLoader.java:<span class="hljs-number">642</span>)<br>	at com.atguigu.java.OOMTest.main(OOMTest.java:<span class="hljs-number">29</span>)<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="如何解决OOM"><a href="#如何解决OOM" class="headerlink" title="如何解决OOM"></a>如何解决OOM</h3><blockquote>
+<p>这个属于调优的问题，这里先简单的说一下</p>
+</blockquote>
+<ol>
+<li>要解决OOM异常或heap space的异常，一般的手段是首先通过内存映像分析工具（如Ec1ipse Memory Analyzer）对dump出来的堆转储快照进行分析，重点是确认内存中的对象是否是必要的，也就是要先分清楚到底是出现了内存泄漏（Memory Leak）还是内存溢出（Memory Overflow）</li>
+<li><strong>内存泄漏</strong>就是有大量的引用指向某些对象，但是这些对象以后不会使用了，但是因为它们还和GC ROOT有关联，所以导致以后这些对象也不会被回收，这就是内存泄漏的问题</li>
+<li>如果是内存泄漏，可进一步通过工具查看泄漏对象到GC Roots的引用链。于是就能找到泄漏对象是通过怎样的路径与GC Roots相关联并导致垃圾收集器无法自动回收它们的。掌握了泄漏对象的类型信息，以及GC Roots引用链的信息，就可以比较准确地定位出泄漏代码的位置。</li>
+<li>如果不存在内存泄漏，换句话说就是内存中的对象确实都还必须存活着，那就应当检查虚拟机的堆参数（-Xmx与-Xms），与机器物理内存对比看是否还可以调大，从代码上检查是否存在某些对象生命周期过长、持有状态时间过长的情况，尝试减少程序运行期的内存消耗。</li>
+</ol>
+<h2 id="方法区的内部结构"><a href="#方法区的内部结构" class="headerlink" title="方法区的内部结构"></a>方法区的内部结构</h2><h3 id="方法区存储什么？"><a href="#方法区存储什么？" class="headerlink" title="方法区存储什么？"></a>方法区存储什么？</h3><h4 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h4><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816044.png" srcset="/img/loading.gif" lazyload>
+
+<p>《深入理解Java虚拟机》书中对方法区（Method Area）存储内容描述如下：它用于存储已被虚拟机加载的<strong>类型信息、常量、静态变量、即时编译器编译后的代码缓存</strong>等。</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816045.png" srcset="/img/loading.gif" lazyload>
+
+
+
+<p><strong>类型信息</strong></p>
+<p>对每个加载的类型（类class、接口interface、枚举enum、注解annotation），JVM必须在方法区中存储以下类型信息：</p>
+<ol>
+<li>这个类型的完整有效名称（全名&#x3D;包名.类名）</li>
+<li>这个类型直接父类的完整有效名（对于interface或是java.lang.Object，都没有父类）</li>
+<li>这个类型的修饰符（public，abstract，final的某个子集）</li>
+<li>这个类型直接接口的一个有序列表</li>
+</ol>
+<p><strong>域（Field）信息</strong></p>
+<blockquote>
+<p>也就是我们常说的成员变量，域信息是比较官方的称呼</p>
+</blockquote>
+<ol>
+<li><p>JVM必须在方法区中保存类型的所有域的相关信息以及域的声明顺序。</p>
+</li>
+<li><p>域的相关信息包括：域名称，域类型，域修饰符（public，private，protected，static，final，volatile，transient的某个子集）</p>
+</li>
+</ol>
+<p><strong>方法（Method）信息</strong></p>
+<p>JVM必须保存所有方法的以下信息，同域信息一样包括声明顺序：</p>
+<ol>
+<li>方法名称</li>
+<li>方法的返回类型（包括 void 返回类型），void 在 Java 中对应的为 void.class</li>
+<li>方法参数的数量和类型（按顺序）</li>
+<li>方法的修饰符（public，private，protected，static，final，synchronized，native，abstract的一个子集）</li>
+<li>方法的字节码（bytecodes）、操作数栈、局部变量表及大小（abstract和native方法除外）</li>
+<li>异常表（abstract和native方法除外），异常表记录每个异常处理的开始位置、结束位置、代码处理在程序计数器中的偏移地址、被捕获的异常类的常量池索引</li>
+</ol>
+<h4 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs java">**<br> * 测试方法区的内部构成<br> */<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MethodInnerStrucTest</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Object</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Comparable</span>&lt;String&gt;,Serializable &#123;<br>    <span class="hljs-comment">//属性</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-variable">num</span> <span class="hljs-operator">=</span> <span class="hljs-number">10</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">String</span> <span class="hljs-variable">str</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;测试方法的内部结构&quot;</span>;<br>    <span class="hljs-comment">//构造器</span><br>    <span class="hljs-comment">//方法</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test1</span><span class="hljs-params">()</span>&#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">20</span>;<br>        System.out.println(<span class="hljs-string">&quot;count = &quot;</span> + count);<br>    &#125;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">test2</span><span class="hljs-params">(<span class="hljs-type">int</span> cal)</span>&#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">int</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> <span class="hljs-number">30</span>;<br>            result = value / cal;<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>        <span class="hljs-keyword">return</span> result;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">compareTo</span><span class="hljs-params">(String o)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+
+
+<p><code>javap -v -p MethodInnerStrucTest.class &gt; test.txt</code></p>
+<ul>
+<li>反编译字节码文件，并输出值文本文件中，便于查看。参数 -p 确保能查看 private 权限类型的字段或方法</li>
+</ul>
+<p>字节码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br></pre></td><td class="code"><pre><code class="hljs java">Classfile /F:/IDEAWorkSpaceSourceCode/JVMDemo/out/production/chapter09/com/atguigu/java/MethodInnerStrucTest.<span class="hljs-keyword">class</span><br>  <span class="hljs-title class_">Last</span> modified <span class="hljs-number">2020</span>-<span class="hljs-number">11</span>-<span class="hljs-number">13</span>; size <span class="hljs-number">1626</span> bytes<br>  MD5 checksum 0d0fcb54854d4ce183063df985141ad0<br>  Compiled from <span class="hljs-string">&quot;MethodInnerStrucTest.java&quot;</span><br><span class="hljs-comment">//类型信息      </span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">com</span>.atguigu.java.MethodInnerStrucTest <span class="hljs-keyword">extends</span> <span class="hljs-title class_">java</span>.lang.Object <span class="hljs-keyword">implements</span> <span class="hljs-title class_">java</span>.lang.Comparable&lt;java.lang.String&gt;, java.io.Serializable<br>  minor version: <span class="hljs-number">0</span><br>  major version: <span class="hljs-number">52</span><br>  flags: ACC_PUBLIC, ACC_SUPER<br>Constant pool:<br>   #<span class="hljs-number">1</span> = Methodref          #<span class="hljs-number">18.</span>#<span class="hljs-number">52</span>        <span class="hljs-comment">// java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br>   #<span class="hljs-number">2</span> = Fieldref           #<span class="hljs-number">17.</span>#<span class="hljs-number">53</span>        <span class="hljs-comment">// com/atguigu/java/MethodInnerStrucTest.num:I</span><br>   #<span class="hljs-number">3</span> = Fieldref           #<span class="hljs-number">54.</span>#<span class="hljs-number">55</span>        <span class="hljs-comment">// java/lang/System.out:Ljava/io/PrintStream;</span><br>   #<span class="hljs-number">4</span> = Class              #<span class="hljs-number">56</span>            <span class="hljs-comment">// java/lang/StringBuilder</span><br>   #<span class="hljs-number">5</span> = Methodref          #<span class="hljs-number">4.</span>#<span class="hljs-number">52</span>         <span class="hljs-comment">// java/lang/StringBuilder.&quot;&lt;init&gt;&quot;:()V</span><br>   #<span class="hljs-number">6</span> = String             #<span class="hljs-number">57</span>            <span class="hljs-comment">// count =</span><br>   #<span class="hljs-number">7</span> = Methodref          #<span class="hljs-number">4.</span>#<span class="hljs-number">58</span>         <span class="hljs-comment">// java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;</span><br>   #<span class="hljs-number">8</span> = Methodref          #<span class="hljs-number">4.</span>#<span class="hljs-number">59</span>         <span class="hljs-comment">// java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;</span><br>   #<span class="hljs-number">9</span> = Methodref          #<span class="hljs-number">4.</span>#<span class="hljs-number">60</span>         <span class="hljs-comment">// java/lang/StringBuilder.toString:()Ljava/lang/String;</span><br>  #<span class="hljs-number">10</span> = Methodref          #<span class="hljs-number">61.</span>#<span class="hljs-number">62</span>        <span class="hljs-comment">// java/io/PrintStream.println:(Ljava/lang/String;)V</span><br>  #<span class="hljs-number">11</span> = Class              #<span class="hljs-number">63</span>            <span class="hljs-comment">// java/lang/Exception</span><br>  #<span class="hljs-number">12</span> = Methodref          #<span class="hljs-number">11.</span>#<span class="hljs-number">64</span>        <span class="hljs-comment">// java/lang/Exception.printStackTrace:()V</span><br>  #<span class="hljs-number">13</span> = Class              #<span class="hljs-number">65</span>            <span class="hljs-comment">// java/lang/String</span><br>  #<span class="hljs-number">14</span> = Methodref          #<span class="hljs-number">17.</span>#<span class="hljs-number">66</span>        <span class="hljs-comment">// com/atguigu/java/MethodInnerStrucTest.compareTo:(Ljava/lang/String;)I</span><br>  #<span class="hljs-number">15</span> = String             #<span class="hljs-number">67</span>            <span class="hljs-comment">// 测试方法的内部结构</span><br>  #<span class="hljs-number">16</span> = Fieldref           #<span class="hljs-number">17.</span>#<span class="hljs-number">68</span>        <span class="hljs-comment">// com/atguigu/java/MethodInnerStrucTest.str:Ljava/lang/String;</span><br>  #<span class="hljs-number">17</span> = Class              #<span class="hljs-number">69</span>            <span class="hljs-comment">// com/atguigu/java/MethodInnerStrucTest</span><br>  #<span class="hljs-number">18</span> = Class              #<span class="hljs-number">70</span>            <span class="hljs-comment">// java/lang/Object</span><br>  #<span class="hljs-number">19</span> = Class              #<span class="hljs-number">71</span>            <span class="hljs-comment">// java/lang/Comparable</span><br>  #<span class="hljs-number">20</span> = Class              #<span class="hljs-number">72</span>            <span class="hljs-comment">// java/io/Serializable</span><br>  #<span class="hljs-number">21</span> = Utf8               num<br>  #<span class="hljs-number">22</span> = Utf8               I<br>  #<span class="hljs-number">23</span> = Utf8               str<br>  #<span class="hljs-number">24</span> = Utf8               Ljava/lang/String;<br>  #<span class="hljs-number">25</span> = Utf8               &lt;init&gt;<br>  #<span class="hljs-number">26</span> = Utf8               ()V<br>  #<span class="hljs-number">27</span> = Utf8               Code<br>  #<span class="hljs-number">28</span> = Utf8               LineNumberTable<br>  #<span class="hljs-number">29</span> = Utf8               LocalVariableTable<br>  #<span class="hljs-number">30</span> = Utf8               <span class="hljs-built_in">this</span><br>  #<span class="hljs-number">31</span> = Utf8               Lcom/atguigu/java/MethodInnerStrucTest;<br>  #<span class="hljs-number">32</span> = Utf8               test1<br>  #<span class="hljs-number">33</span> = Utf8               count<br>  #<span class="hljs-number">34</span> = Utf8               test2<br>  #<span class="hljs-number">35</span> = Utf8               (I)I<br>  #<span class="hljs-number">36</span> = Utf8               value<br>  #<span class="hljs-number">37</span> = Utf8               e<br>  #<span class="hljs-number">38</span> = Utf8               Ljava/lang/Exception;<br>  #<span class="hljs-number">39</span> = Utf8               cal<br>  #<span class="hljs-number">40</span> = Utf8               result<br>  #<span class="hljs-number">41</span> = Utf8               StackMapTable<br>  #<span class="hljs-number">42</span> = Class              #<span class="hljs-number">63</span>            <span class="hljs-comment">// java/lang/Exception</span><br>  #<span class="hljs-number">43</span> = Utf8               compareTo<br>  #<span class="hljs-number">44</span> = Utf8               (Ljava/lang/String;)I<br>  #<span class="hljs-number">45</span> = Utf8               o<br>  #<span class="hljs-number">46</span> = Utf8               (Ljava/lang/Object;)I<br>  #<span class="hljs-number">47</span> = Utf8               &lt;clinit&gt;<br>  #<span class="hljs-number">48</span> = Utf8               Signature<br>  #<span class="hljs-number">49</span> = Utf8               Ljava/lang/Object;Ljava/lang/Comparable&lt;Ljava/lang/String;&gt;;Ljava/io/Serializable;<br>  #<span class="hljs-number">50</span> = Utf8               SourceFile<br>  #<span class="hljs-number">51</span> = Utf8               MethodInnerStrucTest.java<br>  #<span class="hljs-number">52</span> = NameAndType        #<span class="hljs-number">25</span>:#<span class="hljs-number">26</span>        <span class="hljs-comment">// &quot;&lt;init&gt;&quot;:()V</span><br>  #<span class="hljs-number">53</span> = NameAndType        #<span class="hljs-number">21</span>:#<span class="hljs-number">22</span>        <span class="hljs-comment">// num:I</span><br>  #<span class="hljs-number">54</span> = Class              #<span class="hljs-number">73</span>            <span class="hljs-comment">// java/lang/System</span><br>  #<span class="hljs-number">55</span> = NameAndType        #<span class="hljs-number">74</span>:#<span class="hljs-number">75</span>        <span class="hljs-comment">// out:Ljava/io/PrintStream;</span><br>  #<span class="hljs-number">56</span> = Utf8               java/lang/StringBuilder<br>  #<span class="hljs-number">57</span> = <span class="hljs-type">Utf8</span>               <span class="hljs-variable">count</span> <span class="hljs-operator">=</span><br>  #<span class="hljs-number">58</span> = NameAndType        #<span class="hljs-number">76</span>:#<span class="hljs-number">77</span>        <span class="hljs-comment">// append:(Ljava/lang/String;)Ljava/lang/StringBuilder;</span><br>  #<span class="hljs-number">59</span> = NameAndType        #<span class="hljs-number">76</span>:#<span class="hljs-number">78</span>        <span class="hljs-comment">// append:(I)Ljava/lang/StringBuilder;</span><br>  #<span class="hljs-number">60</span> = NameAndType        #<span class="hljs-number">79</span>:#<span class="hljs-number">80</span>        <span class="hljs-comment">// toString:()Ljava/lang/String;</span><br>  #<span class="hljs-number">61</span> = Class              #<span class="hljs-number">81</span>            <span class="hljs-comment">// java/io/PrintStream</span><br>  #<span class="hljs-number">62</span> = NameAndType        #<span class="hljs-number">82</span>:#<span class="hljs-number">83</span>        <span class="hljs-comment">// println:(Ljava/lang/String;)V</span><br>  #<span class="hljs-number">63</span> = Utf8               java/lang/Exception<br>  #<span class="hljs-number">64</span> = NameAndType        #<span class="hljs-number">84</span>:#<span class="hljs-number">26</span>        <span class="hljs-comment">// printStackTrace:()V</span><br>  #<span class="hljs-number">65</span> = Utf8               java/lang/String<br>  #<span class="hljs-number">66</span> = NameAndType        #<span class="hljs-number">43</span>:#<span class="hljs-number">44</span>        <span class="hljs-comment">// compareTo:(Ljava/lang/String;)I</span><br>  #<span class="hljs-number">67</span> = Utf8               测试方法的内部结构<br>  #<span class="hljs-number">68</span> = NameAndType        #<span class="hljs-number">23</span>:#<span class="hljs-number">24</span>        <span class="hljs-comment">// str:Ljava/lang/String;</span><br>  #<span class="hljs-number">69</span> = Utf8               com/atguigu/java/MethodInnerStrucTest<br>  #<span class="hljs-number">70</span> = Utf8               java/lang/Object<br>  #<span class="hljs-number">71</span> = Utf8               java/lang/Comparable<br>  #<span class="hljs-number">72</span> = Utf8               java/io/Serializable<br>  #<span class="hljs-number">73</span> = Utf8               java/lang/System<br>  #<span class="hljs-number">74</span> = Utf8               out<br>  #<span class="hljs-number">75</span> = Utf8               Ljava/io/PrintStream;<br>  #<span class="hljs-number">76</span> = Utf8               append<br>  #<span class="hljs-number">77</span> = Utf8               (Ljava/lang/String;)Ljava/lang/StringBuilder;<br>  #<span class="hljs-number">78</span> = Utf8               (I)Ljava/lang/StringBuilder;<br>  #<span class="hljs-number">79</span> = Utf8               toString<br>  #<span class="hljs-number">80</span> = Utf8               ()Ljava/lang/String;<br>  #<span class="hljs-number">81</span> = Utf8               java/io/PrintStream<br>  #<span class="hljs-number">82</span> = Utf8               println<br>  #<span class="hljs-number">83</span> = Utf8               (Ljava/lang/String;)V<br>  #<span class="hljs-number">84</span> = Utf8               printStackTrace<br>&#123;<br><span class="hljs-comment">//域信息</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> num;<br>    descriptor: I<br>    flags: ACC_PUBLIC<br><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> java.lang.String str;<br>    descriptor: Ljava/lang/String;<br>    flags: ACC_PRIVATE, ACC_STATIC<br><br>  <span class="hljs-comment">//方法信息</span><br>  <span class="hljs-keyword">public</span> com.atguigu.java.MethodInnerStrucTest();<br>    descriptor: ()V<br>    flags: ACC_PUBLIC<br>    Code:<br>      stack=<span class="hljs-number">2</span>, locals=<span class="hljs-number">1</span>, args_size=<span class="hljs-number">1</span><br>         <span class="hljs-number">0</span>: aload_0<br>         <span class="hljs-number">1</span>: invokespecial #<span class="hljs-number">1</span>                  <span class="hljs-comment">// Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br>         <span class="hljs-number">4</span>: aload_0<br>         <span class="hljs-number">5</span>: bipush        <span class="hljs-number">10</span><br>         <span class="hljs-number">7</span>: putfield      #<span class="hljs-number">2</span>                  <span class="hljs-comment">// Field num:I</span><br>        <span class="hljs-number">10</span>: <span class="hljs-keyword">return</span><br>      LineNumberTable:<br>        line <span class="hljs-number">10</span>: <span class="hljs-number">0</span><br>        line <span class="hljs-number">12</span>: <span class="hljs-number">4</span><br>      LocalVariableTable:<br>        Start  Length  Slot  Name   Signature<br>            <span class="hljs-number">0</span>      <span class="hljs-number">11</span>     <span class="hljs-number">0</span>  <span class="hljs-built_in">this</span>   Lcom/atguigu/java/MethodInnerStrucTest;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test1</span><span class="hljs-params">()</span>;<br>    descriptor: ()V<br>    flags: ACC_PUBLIC<br>    Code:<br>      stack=<span class="hljs-number">3</span>, locals=<span class="hljs-number">2</span>, args_size=<span class="hljs-number">1</span><br>         <span class="hljs-number">0</span>: bipush        <span class="hljs-number">20</span><br>         <span class="hljs-number">2</span>: istore_1<br>         <span class="hljs-number">3</span>: getstatic     #<span class="hljs-number">3</span>                  <span class="hljs-comment">// Field java/lang/System.out:Ljava/io/PrintStream;</span><br>         <span class="hljs-number">6</span>: <span class="hljs-keyword">new</span>           #<span class="hljs-number">4</span>                  <span class="hljs-comment">// class java/lang/StringBuilder</span><br>         <span class="hljs-number">9</span>: dup<br>        <span class="hljs-number">10</span>: invokespecial #<span class="hljs-number">5</span>                  <span class="hljs-comment">// Method java/lang/StringBuilder.&quot;&lt;init&gt;&quot;:()V</span><br>        <span class="hljs-number">13</span>: ldc           #<span class="hljs-number">6</span>                  <span class="hljs-comment">// String count =</span><br>        <span class="hljs-number">15</span>: invokevirtual #<span class="hljs-number">7</span>                  <span class="hljs-comment">// Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;</span><br>        <span class="hljs-number">18</span>: iload_1<br>        <span class="hljs-number">19</span>: invokevirtual #<span class="hljs-number">8</span>                  <span class="hljs-comment">// Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;</span><br>        <span class="hljs-number">22</span>: invokevirtual #<span class="hljs-number">9</span>                  <span class="hljs-comment">// Method java/lang/StringBuilder.toString:()Ljava/lang/String;</span><br>        <span class="hljs-number">25</span>: invokevirtual #<span class="hljs-number">10</span>                 <span class="hljs-comment">// Method java/io/PrintStream.println:(Ljava/lang/String;)V</span><br>        <span class="hljs-number">28</span>: <span class="hljs-keyword">return</span><br>      LineNumberTable:<br>        line <span class="hljs-number">17</span>: <span class="hljs-number">0</span><br>        line <span class="hljs-number">18</span>: <span class="hljs-number">3</span><br>        line <span class="hljs-number">19</span>: <span class="hljs-number">28</span><br>      LocalVariableTable:<br>        Start  Length  Slot  Name   Signature<br>            <span class="hljs-number">0</span>      <span class="hljs-number">29</span>     <span class="hljs-number">0</span>  <span class="hljs-built_in">this</span>   Lcom/atguigu/java/MethodInnerStrucTest;<br>            <span class="hljs-number">3</span>      <span class="hljs-number">26</span>     <span class="hljs-number">1</span> count   I<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">test2</span><span class="hljs-params">(<span class="hljs-type">int</span>)</span>;<br>    descriptor: (I)I<br>    flags: ACC_PUBLIC, ACC_STATIC<br>    Code:<br>      stack=<span class="hljs-number">2</span>, locals=<span class="hljs-number">3</span>, args_size=<span class="hljs-number">1</span><br>         <span class="hljs-number">0</span>: iconst_0<br>         <span class="hljs-number">1</span>: istore_1<br>         <span class="hljs-number">2</span>: bipush        <span class="hljs-number">30</span><br>         <span class="hljs-number">4</span>: istore_2<br>         <span class="hljs-number">5</span>: iload_2<br>         <span class="hljs-number">6</span>: iload_0<br>         <span class="hljs-number">7</span>: idiv<br>         <span class="hljs-number">8</span>: istore_1<br>         <span class="hljs-number">9</span>: <span class="hljs-keyword">goto</span>          <span class="hljs-number">17</span><br>        <span class="hljs-number">12</span>: astore_2<br>        <span class="hljs-number">13</span>: aload_2<br>        <span class="hljs-number">14</span>: invokevirtual #<span class="hljs-number">12</span>                 <span class="hljs-comment">// Method java/lang/Exception.printStackTrace:()V</span><br>        <span class="hljs-number">17</span>: iload_1<br>        <span class="hljs-number">18</span>: ireturn<br>      Exception table:<br>         from    to  target type<br>             <span class="hljs-number">2</span>     <span class="hljs-number">9</span>    <span class="hljs-number">12</span>   Class java/lang/Exception<br>      LineNumberTable:<br>        line <span class="hljs-number">21</span>: <span class="hljs-number">0</span><br>        line <span class="hljs-number">23</span>: <span class="hljs-number">2</span><br>        line <span class="hljs-number">24</span>: <span class="hljs-number">5</span><br>        line <span class="hljs-number">27</span>: <span class="hljs-number">9</span><br>        line <span class="hljs-number">25</span>: <span class="hljs-number">12</span><br>        line <span class="hljs-number">26</span>: <span class="hljs-number">13</span><br>        line <span class="hljs-number">28</span>: <span class="hljs-number">17</span><br>      LocalVariableTable:<br>        Start  Length  Slot  Name   Signature<br>            <span class="hljs-number">5</span>       <span class="hljs-number">4</span>     <span class="hljs-number">2</span> value   I<br>           <span class="hljs-number">13</span>       <span class="hljs-number">4</span>     <span class="hljs-number">2</span>     e   Ljava/lang/Exception;<br>            <span class="hljs-number">0</span>      <span class="hljs-number">19</span>     <span class="hljs-number">0</span>   cal   I<br>            <span class="hljs-number">2</span>      <span class="hljs-number">17</span>     <span class="hljs-number">1</span> result   I<br>      StackMapTable: number_of_entries = <span class="hljs-number">2</span><br>        frame_type = <span class="hljs-number">255</span> <span class="hljs-comment">/* full_frame */</span><br>          offset_delta = <span class="hljs-number">12</span><br>          locals = [ <span class="hljs-type">int</span>, <span class="hljs-type">int</span> ]<br>          stack = [ <span class="hljs-keyword">class</span> <span class="hljs-title class_">java</span>/lang/Exception ]<br>        frame_type = <span class="hljs-number">4</span> <span class="hljs-comment">/* same */</span><br><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">compareTo</span><span class="hljs-params">(java.lang.String)</span>;<br>    descriptor: (Ljava/lang/String;)I<br>    flags: ACC_PUBLIC<br>    Code:<br>      stack=<span class="hljs-number">1</span>, locals=<span class="hljs-number">2</span>, args_size=<span class="hljs-number">2</span><br>         <span class="hljs-number">0</span>: iconst_0<br>         <span class="hljs-number">1</span>: ireturn<br>      LineNumberTable:<br>        line <span class="hljs-number">33</span>: <span class="hljs-number">0</span><br>      LocalVariableTable:<br>        Start  Length  Slot  Name   Signature<br>            <span class="hljs-number">0</span>       <span class="hljs-number">2</span>     <span class="hljs-number">0</span>  <span class="hljs-built_in">this</span>   Lcom/atguigu/java/MethodInnerStrucTest;<br>            <span class="hljs-number">0</span>       <span class="hljs-number">2</span>     <span class="hljs-number">1</span>     o   Ljava/lang/String;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">compareTo</span><span class="hljs-params">(java.lang.Object)</span>;<br>    descriptor: (Ljava/lang/Object;)I<br>    flags: ACC_PUBLIC, ACC_BRIDGE, ACC_SYNTHETIC<br>    Code:<br>      stack=<span class="hljs-number">2</span>, locals=<span class="hljs-number">2</span>, args_size=<span class="hljs-number">2</span><br>         <span class="hljs-number">0</span>: aload_0<br>         <span class="hljs-number">1</span>: aload_1<br>         <span class="hljs-number">2</span>: checkcast     #<span class="hljs-number">13</span>                 <span class="hljs-comment">// class java/lang/String</span><br>         <span class="hljs-number">5</span>: invokevirtual #<span class="hljs-number">14</span>                 <span class="hljs-comment">// Method compareTo:(Ljava/lang/String;)I</span><br>         <span class="hljs-number">8</span>: ireturn<br>      LineNumberTable:<br>        line <span class="hljs-number">10</span>: <span class="hljs-number">0</span><br>      LocalVariableTable:<br>        Start  Length  Slot  Name   Signature<br>            <span class="hljs-number">0</span>       <span class="hljs-number">9</span>     <span class="hljs-number">0</span>  <span class="hljs-built_in">this</span>   Lcom/atguigu/java/MethodInnerStrucTest;<br><br>  <span class="hljs-keyword">static</span> &#123;&#125;;<br>    descriptor: ()V<br>    flags: ACC_STATIC<br>    Code:<br>      stack=<span class="hljs-number">1</span>, locals=<span class="hljs-number">0</span>, args_size=<span class="hljs-number">0</span><br>         <span class="hljs-number">0</span>: ldc           #<span class="hljs-number">15</span>                 <span class="hljs-comment">// String 测试方法的内部结构</span><br>         <span class="hljs-number">2</span>: putstatic     #<span class="hljs-number">16</span>                 <span class="hljs-comment">// Field str:Ljava/lang/String;</span><br>         <span class="hljs-number">5</span>: <span class="hljs-keyword">return</span><br>      LineNumberTable:<br>        line <span class="hljs-number">13</span>: <span class="hljs-number">0</span><br>&#125;<br>Signature: #<span class="hljs-number">49</span>                          <span class="hljs-comment">// Ljava/lang/Object;Ljava/lang/Comparable&lt;Ljava/lang/String;&gt;;Ljava/io/Serializable;</span><br>SourceFile: <span class="hljs-string">&quot;MethodInnerStrucTest.java&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>类型信息</strong></p>
+<p>在运行时方法区中，类信息中记录了哪个加载器加载了该类，同时类加载器也记录了它加载了哪些类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//类型信息      </span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">com</span>.atguigu.java.MethodInnerStrucTest <span class="hljs-keyword">extends</span> <span class="hljs-title class_">java</span>.lang.Object <span class="hljs-keyword">implements</span> <span class="hljs-title class_">java</span>.lang.Comparable&lt;java.lang.String&gt;, java.io.Serializable<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p><strong>域信息</strong></p>
+<ol>
+<li>descriptor: I 表示字段类型为 Integer</li>
+<li>flags: ACC_PUBLIC 表示字段权限修饰符为 public</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//域信息</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> num;<br>    descriptor: I<br>    flags: ACC_PUBLIC<br><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> java.lang.String str;<br>    descriptor: Ljava/lang/String;<br>    flags: ACC_PRIVATE, ACC_STATIC<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p><strong>方法信息</strong></p>
+<ol>
+<li>descriptor: ()V 表示方法返回值类型为 void</li>
+<li>flags: ACC_PUBLIC 表示方法权限修饰符为 public</li>
+<li>stack&#x3D;3 表示操作数栈深度为 3</li>
+<li>locals&#x3D;2 表示局部变量个数为 2 个（实力方法包含 this）</li>
+<li>test1() 方法虽然没有参数，但是其 args_size&#x3D;1 ，这时因为将 this 作为了参数</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test1</span><span class="hljs-params">()</span>;<br>    descriptor: ()V<br>    flags: ACC_PUBLIC<br>    Code:<br>      stack=<span class="hljs-number">3</span>, locals=<span class="hljs-number">2</span>, args_size=<span class="hljs-number">1</span><br>         <span class="hljs-number">0</span>: bipush        <span class="hljs-number">20</span><br>         <span class="hljs-number">2</span>: istore_1<br>         <span class="hljs-number">3</span>: getstatic     #<span class="hljs-number">3</span>                  <span class="hljs-comment">// Field java/lang/System.out:Ljava/io/PrintStream;</span><br>         <span class="hljs-number">6</span>: <span class="hljs-keyword">new</span>           #<span class="hljs-number">4</span>                  <span class="hljs-comment">// class java/lang/StringBuilder</span><br>         <span class="hljs-number">9</span>: dup<br>        <span class="hljs-number">10</span>: invokespecial #<span class="hljs-number">5</span>                  <span class="hljs-comment">// Method java/lang/StringBuilder.&quot;&lt;init&gt;&quot;:()V</span><br>        <span class="hljs-number">13</span>: ldc           #<span class="hljs-number">6</span>                  <span class="hljs-comment">// String count =</span><br>        <span class="hljs-number">15</span>: invokevirtual #<span class="hljs-number">7</span>                  <span class="hljs-comment">// Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;</span><br>        <span class="hljs-number">18</span>: iload_1<br>        <span class="hljs-number">19</span>: invokevirtual #<span class="hljs-number">8</span>                  <span class="hljs-comment">// Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;</span><br>        <span class="hljs-number">22</span>: invokevirtual #<span class="hljs-number">9</span>                  <span class="hljs-comment">// Method java/lang/StringBuilder.toString:()Ljava/lang/String;</span><br>        <span class="hljs-number">25</span>: invokevirtual #<span class="hljs-number">10</span>                 <span class="hljs-comment">// Method java/io/PrintStream.println:(Ljava/lang/String;)V</span><br>        <span class="hljs-number">28</span>: <span class="hljs-keyword">return</span><br>      LineNumberTable:<br>        line <span class="hljs-number">17</span>: <span class="hljs-number">0</span><br>        line <span class="hljs-number">18</span>: <span class="hljs-number">3</span><br>        line <span class="hljs-number">19</span>: <span class="hljs-number">28</span><br>      LocalVariableTable:<br>        Start  Length  Slot  Name   Signature<br>            <span class="hljs-number">0</span>      <span class="hljs-number">29</span>     <span class="hljs-number">0</span>  <span class="hljs-built_in">this</span>   Lcom/atguigu/java/MethodInnerStrucTest;<br>            <span class="hljs-number">3</span>      <span class="hljs-number">26</span>     <span class="hljs-number">1</span> count   I<br><br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="non-final-类型的类变量"><a href="#non-final-类型的类变量" class="headerlink" title="non-final 类型的类变量"></a>non-final 类型的类变量</h3><ol>
+<li><p>静态变量和类关联在一起，随着类的加载而加载，他们成为类数据在逻辑上的一部分</p>
+</li>
+<li><p>类变量被类的所有实例共享，即使没有类实例时，你也可以访问它</p>
+</li>
+</ol>
+<p><strong>举例</strong></p>
+<ol>
+<li>如下代码所示，即使我们把order设置为null，也不会出现空指针异常</li>
+<li>这更加表明了 static 类型的字段和方法随着类的加载而加载，并不属于特定的类实例</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MethodAreaTest</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">Order</span> <span class="hljs-variable">order</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>        order.hello();<br>        System.out.println(order.count);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Order</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">number</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>;<br><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">hello</span><span class="hljs-params">()</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;hello!&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs erlang-repl">hello!<br><span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="全局常量：static-final"><a href="#全局常量：static-final" class="headerlink" title="全局常量：static final"></a>全局常量：static final</h4><ol>
+<li><p>全局常量就是使用 static final 进行修饰</p>
+</li>
+<li><p>被声明为final的类变量的处理方法则不同，每个全局常量在编译的时候就会被分配了。</p>
+</li>
+</ol>
+<p>查看上面代码，这部分的字节码指令</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Order</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">number</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>;<br>    ...<br>&#125;    <br></code></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> count;<br>    descriptor: I<br>    flags: ACC_PUBLIC, ACC_STATIC<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> number;<br>    descriptor: I<br>    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL<br>    ConstantValue: <span class="hljs-type">int</span> <span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+
+<p>可以发现 staitc和final同时修饰的number 的值在编译上的时候已经写死在字节码文件中了。</p>
+<h3 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h3><h4 id="运行时常量池-VS-常量池"><a href="#运行时常量池-VS-常量池" class="headerlink" title="运行时常量池 VS 常量池"></a>运行时常量池 VS 常量池</h4><blockquote>
+<p><strong>官方文档</strong>：<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html">https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html</a></p>
+<p>后面会细讲常量池，这里为了讲清楚方法区，简单带一下。</p>
+</blockquote>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816046.png" srcset="/img/loading.gif" lazyload>
+
+<ol>
+<li>方法区，内部包含了运行时常量池</li>
+<li>字节码文件，内部包含了常量池。（之前的字节码文件中已经看到了很多Constant pool的东西，这个就是常量池）</li>
+<li>要弄清楚方法区，需要理解清楚ClassFile，因为加载类的信息都在方法区。</li>
+<li>要弄清楚方法区的运行时常量池，需要理解清楚ClassFile中的常量池。</li>
+</ol>
+<h4 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h4><ol>
+<li>一个有效的字节码文件中除了包含类的版本信息、字段、方法以及接口等描述符信息外。还包含一项信息就是<strong>常量池表</strong>（<strong>Constant Pool Table</strong>），包括各种字面量和对类型、域和方法的符号引用。</li>
+<li>字面量： 10 ， “我是某某”这种数字和字符串都是字面量</li>
+</ol>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816047.png" srcset="/img/loading.gif" lazyload>
+
+<p><strong>为什么需要常量池？</strong></p>
+<ol>
+<li>一个java源文件中的类、接口，编译后产生一个字节码文件。而Java中的字节码需要数据支持，通常这种数据会很大以至于不能直接存到字节码里，换另一种方式，可以存到常量池。这个字节码包含了指向常量池的引用。在动态链接的时候会用到运行时常量池，之前有介绍</li>
+</ol>
+<p>比如：如下的代码：</p>
+<pre><code class="hljs">public class SimpleClass &#123;
+    public void sayHello() &#123;
+        System.out.println(&quot;hello&quot;);
+    &#125;
+&#125;
+</code></pre>
+<ol>
+<li>虽然上述代码只有194字节，但是里面却使用了String、System、PrintStream及Object等结构。</li>
+<li>比如说我们这个文件中有6个地方用到了”hello”这个字符串，如果不用常量池，就需要在6个地方全写一遍，造成臃肿。我们可以将”hello”等所需用到的结构信息记录在常量池中，并通过<strong>引用的方式</strong>，来加载、调用所需的结构</li>
+<li>这里的代码量其实很少了，如果代码多的话，引用的结构将会更多，这里就需要用到常量池了。</li>
+</ol>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816048.png" srcset="/img/loading.gif" lazyload>
+
+<p><strong>常量池中有啥？</strong></p>
+<ol>
+<li>数量值</li>
+<li>字符串值</li>
+<li>类引用</li>
+<li>字段引用</li>
+<li>方法引用</li>
+</ol>
+<p>MethodInnerStrucTest 的 test1方法的字节码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"> <span class="hljs-number">0</span> bipush <span class="hljs-number">20</span><br> <span class="hljs-number">2</span> istore_1<br> <span class="hljs-number">3</span> getstatic #<span class="hljs-number">3</span> &lt;java/lang/System.out&gt;<br> <span class="hljs-number">6</span> <span class="hljs-keyword">new</span> #<span class="hljs-number">4</span> &lt;java/lang/StringBuilder&gt;<br> <span class="hljs-number">9</span> dup<br><span class="hljs-number">10</span> invokespecial #<span class="hljs-number">5</span> &lt;java/lang/StringBuilder.&lt;init&gt;&gt;<br><span class="hljs-number">13</span> ldc #<span class="hljs-number">6</span> &lt;count = &gt;<br><span class="hljs-number">15</span> invokevirtual #<span class="hljs-number">7</span> &lt;java/lang/StringBuilder.append&gt;<br><span class="hljs-number">18</span> iload_1<br><span class="hljs-number">19</span> invokevirtual #<span class="hljs-number">8</span> &lt;java/lang/StringBuilder.append&gt;<br><span class="hljs-number">22</span> invokevirtual #<span class="hljs-number">9</span> &lt;java/lang/StringBuilder.toString&gt;<br><span class="hljs-number">25</span> invokevirtual #<span class="hljs-number">10</span> &lt;java/io/PrintStream.println&gt;<br><span class="hljs-number">28</span> <span class="hljs-keyword">return</span><br></code></pre></td></tr></table></figure>
+
+<p>1、#3，#5等等这些带# 的，都是引用了常量池。</p>
+<p><strong>常量池总结</strong></p>
+<p>常量池、可以看做是一张表，虚拟机指令根据这张常量表找到要执行的类名、方法名、参数类型、字面量等类型。</p>
+<h4 id="运行时常量池-1"><a href="#运行时常量池-1" class="headerlink" title="运行时常量池"></a>运行时常量池</h4><ol>
+<li>运行时常量池（Runtime Constant Pool）是方法区的一部分。</li>
+<li>常量池表（Constant Pool Table）是Class字节码文件的一部分，用于存放编译期生成的各种字面量与符号引用，<strong>这部分内容将在类加载后存放到方法区的运行时常量池中</strong>。（运行时常量池就是常量池在程序运行时的称呼）</li>
+<li>运行时常量池，在加载类和接口到虚拟机后，就会创建对应的运行时常量池。</li>
+<li>JVM为每个已加载的类型（类或接口）都维护一个常量池。池中的数据项像数组项一样，是通过索引访问的。</li>
+<li>运行时常量池中包含多种不同的常量，包括编译期就已经明确的数值字面量，也包括到运行期解析后才能够获得的方法或者字段引用。<strong>此时不再是常量池中的符号地址了，这里换为真实地址</strong>。</li>
+</ol>
+<ul>
+<li>运行时常量池，相对于Class文件常量池的另一重要特征是：具备动态性。</li>
+</ul>
+<ol start="6">
+<li>运行时常量池类似于传统编程语言中的符号表（symbol table），但是它所包含的数据却比符号表要更加丰富一些。</li>
+<li>当创建类或接口的运行时常量池时，如果构造运行时常量池所需的内存空间超过了方法区所能提供的最大值，则JVM会抛OutofMemoryError异常。</li>
+</ol>
+<h2 id="方法区的使用举例"><a href="#方法区的使用举例" class="headerlink" title="方法区的使用举例"></a>方法区的使用举例</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MethodAreaDemo</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">x</span> <span class="hljs-operator">=</span> <span class="hljs-number">500</span>;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">y</span> <span class="hljs-operator">=</span> <span class="hljs-number">100</span>;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">a</span> <span class="hljs-operator">=</span> x / y;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">b</span> <span class="hljs-operator">=</span> <span class="hljs-number">50</span>;<br>        System.out.println(a + b);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p>字节码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">com</span>.atguigu.java1.MethodAreaDemo<br>  minor version: <span class="hljs-number">0</span><br>  major version: <span class="hljs-number">51</span><br>  flags: ACC_PUBLIC, ACC_SUPER<br>Constant pool:<br>   #<span class="hljs-number">1</span> = Methodref          #<span class="hljs-number">5.</span>#<span class="hljs-number">24</span>         <span class="hljs-comment">// java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br>   #<span class="hljs-number">2</span> = Fieldref           #<span class="hljs-number">25.</span>#<span class="hljs-number">26</span>        <span class="hljs-comment">// java/lang/System.out:Ljava/io/PrintStream;</span><br>   #<span class="hljs-number">3</span> = Methodref          #<span class="hljs-number">27.</span>#<span class="hljs-number">28</span>        <span class="hljs-comment">// java/io/PrintStream.println:(I)V</span><br>   #<span class="hljs-number">4</span> = Class              #<span class="hljs-number">29</span>            <span class="hljs-comment">// com/atguigu/java1/MethodAreaDemo</span><br>   #<span class="hljs-number">5</span> = Class              #<span class="hljs-number">30</span>            <span class="hljs-comment">// java/lang/Object</span><br>   #<span class="hljs-number">6</span> = Utf8               &lt;init&gt;<br>   #<span class="hljs-number">7</span> = Utf8               ()V<br>   #<span class="hljs-number">8</span> = Utf8               Code<br>   #<span class="hljs-number">9</span> = Utf8               LineNumberTable<br>  #<span class="hljs-number">10</span> = Utf8               LocalVariableTable<br>  #<span class="hljs-number">11</span> = Utf8               <span class="hljs-built_in">this</span><br>  #<span class="hljs-number">12</span> = Utf8               Lcom/atguigu/java1/MethodAreaDemo;<br>  #<span class="hljs-number">13</span> = Utf8               main<br>  #<span class="hljs-number">14</span> = Utf8               ([Ljava/lang/String;)V<br>  #<span class="hljs-number">15</span> = Utf8               args<br>  #<span class="hljs-number">16</span> = Utf8               [Ljava/lang/String;<br>  #<span class="hljs-number">17</span> = Utf8               x<br>  #<span class="hljs-number">18</span> = Utf8               I<br>  #<span class="hljs-number">19</span> = Utf8               y<br>  #<span class="hljs-number">20</span> = Utf8               a<br>  #<span class="hljs-number">21</span> = Utf8               b<br>  #<span class="hljs-number">22</span> = Utf8               SourceFile<br>  #<span class="hljs-number">23</span> = Utf8               MethodAreaDemo.java<br>  #<span class="hljs-number">24</span> = NameAndType        #<span class="hljs-number">6</span>:#<span class="hljs-number">7</span>          <span class="hljs-comment">// &quot;&lt;init&gt;&quot;:()V</span><br>  #<span class="hljs-number">25</span> = Class              #<span class="hljs-number">31</span>            <span class="hljs-comment">// java/lang/System</span><br>  #<span class="hljs-number">26</span> = NameAndType        #<span class="hljs-number">32</span>:#<span class="hljs-number">33</span>        <span class="hljs-comment">// out:Ljava/io/PrintStream;</span><br>  #<span class="hljs-number">27</span> = Class              #<span class="hljs-number">34</span>            <span class="hljs-comment">// java/io/PrintStream</span><br>  #<span class="hljs-number">28</span> = NameAndType        #<span class="hljs-number">35</span>:#<span class="hljs-number">36</span>        <span class="hljs-comment">// println:(I)V</span><br>  #<span class="hljs-number">29</span> = Utf8               com/atguigu/java1/MethodAreaDemo<br>  #<span class="hljs-number">30</span> = Utf8               java/lang/Object<br>  #<span class="hljs-number">31</span> = Utf8               java/lang/System<br>  #<span class="hljs-number">32</span> = Utf8               out<br>  #<span class="hljs-number">33</span> = Utf8               Ljava/io/PrintStream;<br>  #<span class="hljs-number">34</span> = Utf8               java/io/PrintStream<br>  #<span class="hljs-number">35</span> = Utf8               println<br>  #<span class="hljs-number">36</span> = Utf8               (I)V<br>&#123;<br>  <span class="hljs-keyword">public</span> com.atguigu.java1.MethodAreaDemo();<br>    descriptor: ()V<br>    flags: ACC_PUBLIC<br>    Code:<br>      stack=<span class="hljs-number">1</span>, locals=<span class="hljs-number">1</span>, args_size=<span class="hljs-number">1</span><br>         <span class="hljs-number">0</span>: aload_0<br>         <span class="hljs-number">1</span>: invokespecial #<span class="hljs-number">1</span>                  <span class="hljs-comment">// Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br>         <span class="hljs-number">4</span>: <span class="hljs-keyword">return</span><br>      LineNumberTable:<br>        line <span class="hljs-number">7</span>: <span class="hljs-number">0</span><br>      LocalVariableTable:<br>        Start  Length  Slot  Name   Signature<br>            <span class="hljs-number">0</span>       <span class="hljs-number">5</span>     <span class="hljs-number">0</span>  <span class="hljs-built_in">this</span>   Lcom/atguigu/java1/MethodAreaDemo;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(java.lang.String[])</span>;<br>    descriptor: ([Ljava/lang/String;)V<br>    flags: ACC_PUBLIC, ACC_STATIC<br>    Code:<br>      stack=<span class="hljs-number">3</span>, locals=<span class="hljs-number">5</span>, args_size=<span class="hljs-number">1</span><br>         <span class="hljs-number">0</span>: sipush        <span class="hljs-number">500</span><br>         <span class="hljs-number">3</span>: istore_1<br>         <span class="hljs-number">4</span>: bipush        <span class="hljs-number">100</span><br>         <span class="hljs-number">6</span>: istore_2<br>         <span class="hljs-number">7</span>: iload_1<br>         <span class="hljs-number">8</span>: iload_2<br>         <span class="hljs-number">9</span>: idiv<br>        <span class="hljs-number">10</span>: istore_3<br>        <span class="hljs-number">11</span>: bipush        <span class="hljs-number">50</span><br>        <span class="hljs-number">13</span>: istore        <span class="hljs-number">4</span><br>        <span class="hljs-number">15</span>: getstatic     #<span class="hljs-number">2</span>                  <span class="hljs-comment">// Field java/lang/System.out:Ljava/io/PrintStream;</span><br>        <span class="hljs-number">18</span>: iload_3<br>        <span class="hljs-number">19</span>: iload         <span class="hljs-number">4</span><br>        <span class="hljs-number">21</span>: iadd<br>        <span class="hljs-number">22</span>: invokevirtual #<span class="hljs-number">3</span>                  <span class="hljs-comment">// Method java/io/PrintStream.println:(I)V</span><br>        <span class="hljs-number">25</span>: <span class="hljs-keyword">return</span><br>      LineNumberTable:<br>        line <span class="hljs-number">9</span>: <span class="hljs-number">0</span><br>        line <span class="hljs-number">10</span>: <span class="hljs-number">4</span><br>        line <span class="hljs-number">11</span>: <span class="hljs-number">7</span><br>        line <span class="hljs-number">12</span>: <span class="hljs-number">11</span><br>        line <span class="hljs-number">13</span>: <span class="hljs-number">15</span><br>        line <span class="hljs-number">14</span>: <span class="hljs-number">25</span><br>      LocalVariableTable:<br>        Start  Length  Slot  Name   Signature<br>            <span class="hljs-number">0</span>      <span class="hljs-number">26</span>     <span class="hljs-number">0</span>  args   [Ljava/lang/String;<br>            <span class="hljs-number">4</span>      <span class="hljs-number">22</span>     <span class="hljs-number">1</span>     x   I<br>            <span class="hljs-number">7</span>      <span class="hljs-number">19</span>     <span class="hljs-number">2</span>     y   I<br>           <span class="hljs-number">11</span>      <span class="hljs-number">15</span>     <span class="hljs-number">3</span>     a   I<br>           <span class="hljs-number">15</span>      <span class="hljs-number">11</span>     <span class="hljs-number">4</span>     b   I<br>&#125;<br>SourceFile: <span class="hljs-string">&quot;MethodAreaDemo.java&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="图解字节码指令执行流程"><a href="#图解字节码指令执行流程" class="headerlink" title="图解字节码指令执行流程"></a>图解字节码指令执行流程</h4><p>1、初始状态</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816049.png" srcset="/img/loading.gif" lazyload>
+
+<p>2、首先将操作数500压入操作数栈中</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816050.png" srcset="/img/loading.gif" lazyload>
+
+<p>3、然后操作数 500 从操作数栈中取出，存储到局部变量表中索引为 1 的位置</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816051.png" srcset="/img/loading.gif" lazyload>
+
+<p>4、</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816052.png" srcset="/img/loading.gif" lazyload>
+
+<p>5、</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816053.png" srcset="/img/loading.gif" lazyload>
+
+
+
+<p>6、</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816054.png" srcset="/img/loading.gif" lazyload>
+
+<p>7、</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816055.png" srcset="/img/loading.gif" lazyload>
+
+<p>8、</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816056.png" srcset="/img/loading.gif" lazyload>
+
+<p>9、</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816057.png" srcset="/img/loading.gif" lazyload>
+
+<p>10、</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816058.png" srcset="/img/loading.gif" lazyload>
+
+<p>11、图片写错了是#25和#26（获得System类）</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816059.png" srcset="/img/loading.gif" lazyload>
+
+<p>12、</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816060.png" srcset="/img/loading.gif" lazyload>
+
+<p>13、</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816061.png" srcset="/img/loading.gif" lazyload>
+
+<p>15、执行加法运算后，将计算结果放在操作数栈顶</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816062.png" srcset="/img/loading.gif" lazyload>
+
+<p>16、就是真正的打印</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816063.png" srcset="/img/loading.gif" lazyload>
+
+<p>17、</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816064.png" srcset="/img/loading.gif" lazyload>
+
+
+
+<p><strong>符号引用 –&gt; 直接饮用</strong></p>
+<ol>
+<li>上面代码调用 System.out.println() 方法时，首先需要看看 System 类有没有加载，再看看 PrintStream 类有没有加载</li>
+<li>如果没有加载，则执行加载，执行时，将常量池中的符号引用（字面量）转换为运行时常量池的直接引用（真正的地址值）</li>
+</ol>
+<h2 id="方法区演进细节"><a href="#方法区演进细节" class="headerlink" title="方法区演进细节"></a>方法区演进细节</h2><h3 id="永久代演进过程"><a href="#永久代演进过程" class="headerlink" title="永久代演进过程"></a>永久代演进过程</h3><ol>
+<li><p>首先明确：只有Hotspot才有永久代。BEA JRockit、IBMJ9等来说，是不存在永久代的概念的。原则上如何实现方法区属于虚拟机实现细节，不受《Java虚拟机规范》管束，并不要求统一</p>
+</li>
+<li><p>Hotspot中方法区的变化：</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>JDK1.6及以前</th>
+<th>有永久代（permanent generation），静态变量存储在永久代上</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JDK1.7</td>
+<td>有永久代，但已经逐步 “去永久代”，<strong>字符串常量池，静态变量移除，保存在堆中</strong></td>
+</tr>
+<tr>
+<td>JDK1.8</td>
+<td>无永久代，类型信息，字段，方法，常量保存在本地内存的元空间，但字符串常量池、静态变量仍然在堆中。</td>
+</tr>
+</tbody></table>
+<p><strong>JDK6</strong></p>
+<p>方法区由永久代实现，使用 JVM 虚拟机内存（虚拟的内存）</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816065.png" srcset="/img/loading.gif" lazyload>
+
+
+
+<p><strong>JDK7</strong></p>
+<p>方法区由永久代实现，使用 JVM 虚拟机内存</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816066.png" srcset="/img/loading.gif" lazyload>
+
+
+
+<p><strong>JDK8</strong></p>
+<p>方法区由元空间实现，使用物理机本地内存</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816067.png" srcset="/img/loading.gif" lazyload>
+
+
+
+
+
+<h3 id="永久代为什么要被元空间替代？"><a href="#永久代为什么要被元空间替代？" class="headerlink" title="永久代为什么要被元空间替代？"></a>永久代为什么要被元空间替代？</h3><blockquote>
+<p><strong>官方文档</strong>：<a target="_blank" rel="noopener" href="http://openjdk.java.net/jeps/122">http://openjdk.java.net/jeps/122</a></p>
+</blockquote>
+<ol>
+<li>随着Java8的到来，HotSpot VM中再也见不到永久代了。但是这并不意味着类的元数据信息也消失了。这些数据被移到了一个与堆不相连的本地内存区域，这个区域叫做元空间（Metaspace）。</li>
+<li>由于类的元数据分配在本地内存中，元空间的最大可分配空间就是系统可用内存空间。</li>
+<li>这项改动是很有必要的，原因有：<ol>
+<li>为永久代设置空间大小是很难确定的。在某些场景下，如果动态加载类过多，容易产生Perm区的OOM。比如某个实际Web工程中，因为功能点比较多，在运行过程中，要不断动态加载很多类，经常出现致命错误。<code>Exception in thread &#39;dubbo client x.x connector&#39; java.lang.OutOfMemoryError:PermGen space</code>而元空间和永久代之间最大的区别在于：元空间并不在虚拟机中，而是使用本地内存。 因此，默认情况下，元空间的大小仅受本地内存限制。</li>
+<li>对永久代进行调优是很困难的。方法区的垃圾收集主要回收两部分内容：常量池中废弃的常量和不再用的类型，方法区的调优主要是为了降低<strong>Full GC</strong><ol>
+<li>有些人认为方法区（如HotSpot虚拟机中的元空间或者永久代）是没有垃圾收集行为的，其实不然。《Java虚拟机规范》对方法区的约束是非常宽松的，提到过可以不要求虚拟机在方法区中实现垃圾收集。事实上也确实有未实现或未能完整实现方法区类型卸载的收集器存在（如JDK11时期的ZGC收集器就不支持类卸载）。</li>
+<li>一般来说这个区域的回收效果比较难令人满意，尤其是类型的卸载，条件相当苛刻**。但是这部分区域的回收有时又确实是必要的。以前Sun公司的Bug列表中，曾出现过的若干个严重的Bug就是由于低版本的HotSpot虚拟机对此区域未完全回收而导致内存泄漏。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="字符串常量池"><a href="#字符串常量池" class="headerlink" title="字符串常量池"></a>字符串常量池</h3><p><strong>字符串常量池 StringTable 为什么要调整位置？</strong></p>
+<ul>
+<li><p>JDK7中将StringTable放到了堆空间中。因为永久代的回收效率很低，在Full GC的时候才会执行永久代的垃圾回收，而Full GC是老年代的空间不足、永久代不足时才会触发。</p>
+</li>
+<li><p>这就导致StringTable回收效率不高，而我们开发中会有大量的字符串被创建，回收效率低，导致永久代内存不足。放到堆里，能及时回收内存。</p>
+</li>
+</ul>
+<h3 id="静态变量放在哪里"><a href="#静态变量放在哪里" class="headerlink" title="静态变量放在哪里"></a>静态变量放在哪里</h3><h4 id="对象实体在哪里放着？"><a href="#对象实体在哪里放着？" class="headerlink" title="对象实体在哪里放着？"></a>对象实体在哪里放着？</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 结论：</span><br><span class="hljs-comment"> * 1、静态引用对应的对象实体(也就是这个new byte[1024 * 1024 * 100])始终都存在堆空间，</span><br><span class="hljs-comment"> * 2、只是那个变量(相当于下面的arr变量名)在JDK6,JDK7,JDK8存放位置中有所变化</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * jdk7：</span><br><span class="hljs-comment"> * -Xms200m -Xmx200m -XX:PermSize=300m -XX:MaxPermSize=300m -XX:+PrintGCDetails</span><br><span class="hljs-comment"> * jdk 8：</span><br><span class="hljs-comment"> * -Xms200m -Xmx200m -XX:MetaspaceSize=300m -XX:MaxMetaspaceSize=300m -XX:+PrintGCDetails</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StaticFieldTest</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">byte</span>[] arr = <span class="hljs-keyword">new</span> <span class="hljs-title class_">byte</span>[<span class="hljs-number">1024</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">100</span>];<span class="hljs-comment">//100MB</span><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        System.out.println(StaticFieldTest.arr);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p>JDK6环境下</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816068.png" srcset="/img/loading.gif" lazyload alt="image-20201113224231761" />
+
+<p>JDK7环境下</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816069.png" srcset="/img/loading.gif" lazyload>
+
+<p>JDK8环境</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816070.png" srcset="/img/loading.gif" lazyload>
+
+
+
+<h4 id="变量-名-存放在哪里？"><a href="#变量-名-存放在哪里？" class="headerlink" title="变量(名)存放在哪里？"></a>变量(名)存放在哪里？</h4><p>这个问题需要用JHSDB工具来进行分析，这个工具是JDK9开始自带的(JDK9以前没有)，在bin目录下可以找到</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.atguigu.java1;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 《深入理解Java虚拟机》中的案例：</span><br><span class="hljs-comment"> * staticObj、instanceObj、localObj存放在哪里？</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StaticObjTest</span> &#123;<br>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Test</span> &#123;<br>        <span class="hljs-keyword">static</span> <span class="hljs-type">ObjectHolder</span> <span class="hljs-variable">staticObj</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectHolder</span>();<br>        <span class="hljs-type">ObjectHolder</span> <span class="hljs-variable">instanceObj</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectHolder</span>();<br><br>        <span class="hljs-keyword">void</span> <span class="hljs-title function_">foo</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-type">ObjectHolder</span> <span class="hljs-variable">localObj</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectHolder</span>();<br>            System.out.println(<span class="hljs-string">&quot;done&quot;</span>);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ObjectHolder</span> &#123;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">Test</span> <span class="hljs-variable">test</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StaticObjTest</span>.Test();<br>        test.foo();<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p><strong>JDK6环境下</strong></p>
+<p>1、staticObj随着Test的类型信息存放在方法区</p>
+<p>2、instanceObj随着Test的对象实例存放在Java堆</p>
+<p>3、localObject则是存放在foo()方法栈帧的局部变量表中。</p>
+<p>4、测试发现：三个对象的数据在内存中的地址都落在Eden区范围内，所以结论：<strong>只要是对象实例必然会在Java堆中分配</strong>。</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816071.png" srcset="/img/loading.gif" lazyload>
+
+<blockquote>
+<p>1、0x00007f32c7800000(Eden区的起始地址)    —-   0x00007f32c7b50000(Eden区的终止地址)  </p>
+<p>2、可以发现三个变量都在这个范围内</p>
+<p>3、所以可以得到上面结论</p>
+</blockquote>
+<p>5、接着，找到了一个引用该staticObj对象的地方，是在一个java.lang.Class的实例里，并且给出了这个实例的地址，通过Inspector查看该对象实例，可以清楚看到这确实是一个java.lang.Class类型的对象实例，里面有一个名为staticobj的实例字段：</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816072.png" srcset="/img/loading.gif" lazyload>
+
+<p>从《Java虚拟机规范》所定义的概念模型来看，所有Class相关的信息都应该存放在方法区之中，但方法区该如何实现，《Java虚拟机规范》并未做出规定，这就成了一件允许不同虚拟机自己灵活把握的事情。JDK7及其以后版本的HotSpot虚拟机选择把静态变量与类型在Java语言一端的映射Class对象存放在一起，<strong>存储于Java堆之中</strong>，从我们的实验中也明确验证了这一点</p>
+<h2 id="方法区的垃圾回收"><a href="#方法区的垃圾回收" class="headerlink" title="方法区的垃圾回收"></a>方法区的垃圾回收</h2><ol>
+<li><p>有些人认为方法区（如Hotspot虚拟机中的元空间或者永久代）是没有垃圾收集行为的，其实不然。《Java虚拟机规范》对方法区的约束是非常宽松的，提到过可以不要求虚拟机在方法区中实现垃圾收集。事实上也确实有未实现或未能完整实现方法区<strong>类型卸载</strong>的收集器存在（如JDK11时期的ZGC收集器就不支持类卸载）。</p>
+</li>
+<li><p>一般来说这个区域的回收效果比较难令人满意，尤其是类型的卸载，条件相当苛刻。但是这部分区域的回收有时又确实是必要的。以前sun公司的Bug列表中，曾出现过的若干个严重的Bug就是由于低版本的HotSpot虚拟机对此区域未完全回收而导致内存泄漏。</p>
+</li>
+<li><p>方法区的垃圾收集主要回收两部分内容：<strong>常量池中废弃的常量和不再使用的类型</strong>。</p>
+</li>
+<li><p>先来说说方法区内常量池之中主要存放的两大类常量：字面量和符号引用。字面量比较接近Java语言层次的常量概念，如文本字符串、被声明为final的常量值等。而符号引用则属于编译原理方面的概念，包括下面三类常量：</p>
+<ul>
+<li>类和接口的全限定名</li>
+<li>字段的名称和描述符</li>
+<li>方法的名称和描述符</li>
+</ul>
+</li>
+<li><p>HotSpot虚拟机对常量池的回收策略是很明确的，只要常量池中的常量没有被任何地方引用，就可以被回收。</p>
+</li>
+<li><p>回收废弃常量与回收Java堆中的对象非常类似。（关于常量的回收比较简单，重点是类的回收）</p>
+</li>
+</ol>
+<p>下面也称作<strong>类卸载</strong></p>
+<p>1、判定一个常量是否“废弃”还是相对简单，而要判定一个类型是否属于“不再被使用的类”的条件就比较苛刻了。需要同时满足下面三个条件：</p>
+<ul>
+<li><p>该类所有的实例都已经被回收，也就是Java堆中不存在该类及其任何派生子类的实例。</p>
+</li>
+<li><p>加载该类的类加载器已经被回收，这个条件除非是经过精心设计的可替换类加载器的场景，如OSGi、JSP的重加载等，否则通常是很难达成的。</p>
+</li>
+<li><p>该类对应的java.lang.Class对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。</p>
+</li>
+</ul>
+<p>2、Java虚拟机被允许对满足上述三个条件的无用类进行回收，这里说的仅仅是“被允许”，而并不是和对象一样，没有引用了就必然会回收。关于是否要对类型进行回收，HotSpot虚拟机提供了<code>-Xnoclassgc</code>参数进行控制，还可以使用<code>-verbose:class</code> 以及 <code>-XX：+TraceClass-Loading</code>、<code>-XX：+TraceClassUnLoading</code>查看类加载和卸载信息</p>
+<p>3、在大量使用反射、动态代理、CGLib等字节码框架，动态生成JSP以及OSGi这类频繁自定义类加载器的场景中，通常都需要Java虚拟机具备类型卸载的能力，以保证不会对方法区造成过大的内存压力。</p>
+<h2 id="运行时数据区总结"><a href="#运行时数据区总结" class="headerlink" title="运行时数据区总结"></a>运行时数据区总结</h2><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816073.png" srcset="/img/loading.gif" lazyload>
+
+
+
+<h2 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h2><h3 id="直接内存概述"><a href="#直接内存概述" class="headerlink" title="直接内存概述"></a>直接内存概述</h3><ol>
+<li><p>不是虚拟机运行时数据区的一部分，也不是《Java虚拟机规范》中定义的内存区域。</p>
+</li>
+<li><p>直接内存是在Java堆外的、直接向系统申请的内存区间。</p>
+</li>
+<li><p>来源于NIO，通过存在堆中的DirectByteBuffer操作Native内存</p>
+</li>
+<li><p>通常，访问直接内存的速度会优于Java堆。即读写性能高。</p>
+</li>
+<li><p>因此出于性能考虑，读写频繁的场合可能会考虑使用直接内存。</p>
+</li>
+<li><p>Java的NIO库允许Java程序使用直接内存，用于数据缓冲区</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> *  IO                  NIO (New IO / Non-Blocking IO)</span><br><span class="hljs-comment"> *  byte[] / char[]     Buffer</span><br><span class="hljs-comment"> *  Stream              Channel</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * 查看直接内存的占用与释放</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BufferTest</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">BUFFER</span> <span class="hljs-operator">=</span> <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>;<span class="hljs-comment">//1GB</span><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span>&#123;<br>        <span class="hljs-comment">//直接分配本地内存空间</span><br>        <span class="hljs-type">ByteBuffer</span> <span class="hljs-variable">byteBuffer</span> <span class="hljs-operator">=</span> ByteBuffer.allocateDirect(BUFFER);<br>        System.out.println(<span class="hljs-string">&quot;直接内存分配完毕，请求指示！&quot;</span>);<br><br>        <span class="hljs-type">Scanner</span> <span class="hljs-variable">scanner</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Scanner</span>(System.in);<br>        scanner.next();<br><br>        System.out.println(<span class="hljs-string">&quot;直接内存开始释放！&quot;</span>);<br>        byteBuffer = <span class="hljs-literal">null</span>;<br>        System.gc();<br>        scanner.next();<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>直接占用了 1G 的本地内存</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816074.jpg" srcset="/img/loading.gif" lazyload>
+
+
+
+<h3 id="BIO-与-NIO"><a href="#BIO-与-NIO" class="headerlink" title="BIO 与 NIO"></a>BIO 与 NIO</h3><p><strong>非直接缓存区（BIO）</strong></p>
+<p>原来采用BIO的架构，在读写本地文件时，我们需要从用户态切换成内核态</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816075.png" srcset="/img/loading.gif" lazyload>
+
+<p><strong>直接缓冲区（NIO）</strong></p>
+<p>NIO 直接操作物理磁盘，省去了中间过程</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816076.png" srcset="/img/loading.gif" lazyload>
+
+<h3 id="直接内存与-OOM"><a href="#直接内存与-OOM" class="headerlink" title="直接内存与 OOM"></a>直接内存与 OOM</h3><ol>
+<li><p>直接内存也可能导致OutofMemoryError异常</p>
+</li>
+<li><p>由于直接内存在Java堆外，因此它的大小不会直接受限于-Xmx指定的最大堆大小，但是系统内存是有限的，Java堆和直接内存的总和依然受限于操作系统能给出的最大内存。</p>
+</li>
+<li><p>直接内存的缺点为：</p>
+<ul>
+<li>分配回收成本较高</li>
+<li>不受JVM内存回收管理</li>
+</ul>
+</li>
+<li><p>直接内存大小可以通过MaxDirectMemorySize设置</p>
+</li>
+<li><p>如果不指定，默认与堆的最大值-Xmx参数值一致</p>
+</li>
+</ol>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 本地内存的OOM:  OutOfMemoryError: Direct buffer memory</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> BufferTest2 &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> BUFFER = <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">20</span>;<span class="hljs-comment">//20MB</span><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> main(String[] args) &#123;<br>        ArrayList&lt;ByteBuffer&gt; list = <span class="hljs-keyword">new</span> ArrayList&lt;&gt;();<br><br>        <span class="hljs-keyword">int</span> <span class="hljs-keyword">count</span> = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-keyword">while</span>(<span class="hljs-keyword">true</span>)&#123;<br>                ByteBuffer byteBuffer = ByteBuffer.allocateDirect(BUFFER);<br>                list.add(byteBuffer);<br>                <span class="hljs-keyword">count</span>++;<br>                <span class="hljs-keyword">try</span> &#123;<br>                    Thread.sleep(<span class="hljs-number">100</span>);<br>                &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>                    e.printStackTrace();<br>                &#125;<br>            &#125;<br>        &#125; <span class="hljs-keyword">finally</span> &#123;<br>            System.out.<span class="hljs-keyword">println</span>(<span class="hljs-keyword">count</span>);<br>        &#125;<br><br><br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java">Exception in thread <span class="hljs-string">&quot;main&quot;</span> java.lang.OutOfMemoryError: Direct buffer memory<br>	at java.nio.Bits.reserveMemory(Bits.java:<span class="hljs-number">694</span>)<br>	at java.nio.DirectByteBuffer.&lt;init&gt;(DirectByteBuffer.java:<span class="hljs-number">123</span>)<br>	at java.nio.ByteBuffer.allocateDirect(ByteBuffer.java:<span class="hljs-number">311</span>)<br>	at com.atguigu.java.BufferTest2.main(BufferTest2.java:<span class="hljs-number">21</span>)<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271816077.jpg" srcset="/img/loading.gif" lazyload>
+
+
+
+
+
+<h2 id="常见面试题"><a href="#常见面试题" class="headerlink" title="常见面试题"></a>常见面试题</h2><ol>
+<li>百度<ul>
+<li>三面：说一下JVM内存模型吧，有哪些区？分别干什么的？</li>
+</ul>
+</li>
+<li>蚂蚁金服：<ul>
+<li>Java8的内存分代改进</li>
+<li>JVM内存分哪几个区，每个区的作用是什么？</li>
+<li>一面：JVM内存分布&#x2F;内存结构？栈和堆的区别？堆的结构？为什么两个survivor区？</li>
+<li>二面：Eden和survior的比例分配</li>
+</ul>
+</li>
+<li>小米：<ul>
+<li>jvm内存分区，为什么要有新生代和老年代</li>
+</ul>
+</li>
+<li>字节跳动：<ul>
+<li>二面：Java的内存分区</li>
+<li>二面：讲讲vm运行时数据库区</li>
+<li>什么时候对象会进入老年代？</li>
+</ul>
+</li>
+<li>京东：<ul>
+<li>JVM的内存结构，Eden和Survivor比例。</li>
+<li>JVM内存为什么要分成新生代，老年代，持久代。新生代中为什么要分为Eden和survivor。</li>
+</ul>
+</li>
+<li>天猫：<ul>
+<li>一面：Jvm内存模型以及分区，需要详细到每个区放什么。</li>
+<li>一面：JVM的内存模型，Java8做了什么改</li>
+</ul>
+</li>
+<li>拼多多：<ul>
+<li>JVM内存分哪几个区，每个区的作用是什么？</li>
+</ul>
+</li>
+<li>美团：<ul>
+<li>java内存分配</li>
+<li>jvm的永久代中会发生垃圾回收吗？</li>
+<li>一面：jvm内存分区，为什么要有新生代和老年代？</li>
+</ul>
+</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JVM/" class="category-chain-item">JVM</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/JVM/1-%E5%86%85%E5%AD%98%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AF%87/" class="category-chain-item">1.内存与垃圾回收篇</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/JVM/" class="print-no-link">#JVM</a>
+      
+        <a href="/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/" class="print-no-link">#虚拟机</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JVM系列-第6章-方法区</div>
+      <div>http://example.com/2025/02/27/JVM系列-第6章-方法区/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kon4tsu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E7%B3%BB%E5%88%97-%E7%AC%AC5%E7%AB%A0-%E5%A0%86/" title="JVM系列-第5章-堆">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JVM系列-第5章-堆</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E7%B3%BB%E5%88%97-%E7%AC%AC4%E7%AB%A0-%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A0%88/" title="JVM系列-第4章-虚拟机栈">
+                        <span class="hidden-mobile">JVM系列-第4章-虚拟机栈</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
