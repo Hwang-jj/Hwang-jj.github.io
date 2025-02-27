@@ -1,0 +1,824 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kon4tsu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="[toc] 10. StringTable10.1. String 的基本特性 String：字符串，使用一对””引起来表示 String 声明为 final 的，不可被继承 String 实现了 Serializable 接口：表示字符串是支持序列化的。 String 实现了 Comparable 接口：表示 string 可以比较大小 String 在 jdk8 及以前内部定义了 final">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM上10_StringTable">
+<meta property="og:url" content="http://example.com/2025/02/27/JVM%E4%B8%8A10-StringTable/index.html">
+<meta property="og:site_name" content="Kon4tsu Blog">
+<meta property="og:description" content="[toc] 10. StringTable10.1. String 的基本特性 String：字符串，使用一对””引起来表示 String 声明为 final 的，不可被继承 String 实现了 Serializable 接口：表示字符串是支持序列化的。 String 实现了 Comparable 接口：表示 string 可以比较大小 String 在 jdk8 及以前内部定义了 final">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106669.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106670.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106671.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106672.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106673.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106674.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106675.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106676.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106677.png">
+<meta property="article:published_time" content="2025-02-27T03:05:24.000Z">
+<meta property="article:modified_time" content="2025-02-27T03:06:27.659Z">
+<meta property="article:author" content="Kon4tsu">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106669.png">
+  
+  
+  
+  <title>JVM上10_StringTable - Kon4tsu Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/macpanel.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kon4tsu&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JVM上10_StringTable"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-27 11:05" pubdate>
+          2025年2月27日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          39 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">JVM上10_StringTable</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>[toc]</p>
+<h1 id="10-StringTable"><a href="#10-StringTable" class="headerlink" title="10. StringTable"></a>10. StringTable</h1><h2 id="10-1-String-的基本特性"><a href="#10-1-String-的基本特性" class="headerlink" title="10.1. String 的基本特性"></a>10.1. String 的基本特性</h2><ul>
+<li>String：字符串，使用一对””引起来表示</li>
+<li>String 声明为 final 的，不可被继承</li>
+<li>String 实现了 Serializable 接口：表示字符串是支持序列化的。</li>
+<li>String 实现了 Comparable 接口：表示 string 可以比较大小</li>
+<li>String 在 jdk8 及以前内部定义了 final char[] value 用于存储字符串数据。JDK9 时改为 byte[]</li>
+</ul>
+<h3 id="10-1-1-String-在-jdk9-中存储结构变更"><a href="#10-1-1-String-在-jdk9-中存储结构变更" class="headerlink" title="10.1.1. String 在 jdk9 中存储结构变更"></a>10.1.1. String 在 jdk9 中存储结构变更</h3><p>官网地址：<a target="_blank" rel="noopener" href="http://openjdk.java.net/jeps/254">JEP 254: Compact Strings (java.net)</a></p>
+<blockquote>
+<h2 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h2><p>The current implementation of the <code>String</code> class stores characters in a <code>char</code> array, using two bytes (sixteen bits) for each character. Data gathered from many different applications indicates that strings are a major component of heap usage and, moreover, that most <code>String</code> objects contain only Latin-1 characters. Such characters require only one byte of storage, hence half of the space in the internal <code>char</code> arrays of such <code>String</code> objects is going unused.</p>
+<h2 id="Description"><a href="#Description" class="headerlink" title="Description"></a>Description</h2><p>We propose to change the internal representation of the <code>String</code> class from a UTF-16 <code>char</code> array to a <code>byte</code> array plus an encoding-flag field. The new <code>String</code> class will store characters encoded either as ISO-8859-1&#x2F;Latin-1 (one byte per character), or as UTF-16 (two bytes per character), based upon the contents of the string. The encoding flag will indicate which encoding is used.</p>
+<p>String-related classes such as <code>AbstractStringBuilder</code>, <code>StringBuilder</code>, and <code>StringBuffer</code> will be updated to use the same representation, as will the HotSpot VM’s intrinsic string operations.</p>
+<p>This is purely an implementation change, with no changes to existing public interfaces. There are no plans to add any new public APIs or other interfaces.</p>
+<p>The prototyping work done to date confirms the expected reduction in memory footprint, substantial reductions of GC activity, and minor performance regressions in some corner cases.</p>
+</blockquote>
+<p><strong>动机</strong></p>
+<p>目前 String 类的实现将字符存储在一个 char 数组中，每个字符使用两个字节（16 位）。从许多不同的应用中收集到的数据表明，字符串是堆使用的主要组成部分，此外，大多数字符串对象只包含 Latin-1 字符。这些字符只需要一个字节的存储空间，因此这些字符串对象的内部字符数组中有一半的空间没有被使用。</p>
+<p><strong>说明</strong></p>
+<p>我们建议将 String 类的内部表示方法从 UTF-16 字符数组改为字节数组加编码标志域。新的 String 类将根据字符串的内容，以 ISO-8859-1&#x2F;Latin-1（每个字符一个字节）或 UTF-16（每个字符两个字节）的方式存储字符编码。编码标志将表明使用的是哪种编码。</p>
+<hr>
+<p>与字符串相关的类，如<mark>AbstractStringBuilder、StringBuilder 和 StringBuffer 将被更新以使用相同的表示方法，HotSpot VM 的内在字符串操作也是如此</mark>。</p>
+<p>这纯粹是一个实现上的变化，对现有的公共接口没有变化。目前没有计划增加任何新的公共 API 或其他接口。</p>
+<p>迄今为止所做的原型设计工作证实了内存占用的预期减少，GC 活动的大幅减少，以及在某些角落情况下的轻微性能倒退。</p>
+<p>结论：String 再也不用 char[] 来存储了，改成了 byte [] 加上编码标记，节约了一些空间</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">String</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">java</span>.io.Serializable, Comparable&lt;String&gt;, CharSequence &#123;<br>    <span class="hljs-meta">@Stable</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">byte</span>[] value;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="10-1-2-String-的基本特性"><a href="#10-1-2-String-的基本特性" class="headerlink" title="10.1.2. String 的基本特性"></a>10.1.2. String 的基本特性</h3><p>String：代表不可变的字符序列。简称：不可变性。</p>
+<ul>
+<li>当对字符串重新赋值时，需要重写指定内存区域赋值，不能使用原有的 value 进行赋值。</li>
+<li>当对现有的字符串进行连接操作时，也需要重新指定内存区域赋值，不能使用原有的 value 进行赋值。</li>
+<li>当调用 string 的 replace()方法修改指定字符或字符串时，也需要重新指定内存区域赋值，不能使用原有的 value 进行赋值。</li>
+</ul>
+<p>通过字面量的方式（区别于 new）给一个字符串赋值，此时的字符串值声明在字符串常量池中。</p>
+<p><mark>字符串常量池是不会存储相同内容的字符串的</mark></p>
+<p>String 的 String Pool 是一个固定大小的 Hashtable，默认值大小长度是 1009。如果放进 String Pool 的 String 非常多，就会造成 Hash 冲突严重，从而导致链表会很长，而链表长了后直接会造成的影响就是当调用 String.intern 时性能会大幅下降。</p>
+<p>使用<code>-XX:StringTablesize</code>可设置 StringTable 的长度</p>
+<ul>
+<li><p>在 jdk6 中 StringTable 是固定的，就是 1009 的长度，所以如果常量池中的字符串过多就会导致效率下降很快。StringTablesize 设置没有要求</p>
+</li>
+<li><p>在 jdk7 中，StringTable 的长度默认值是 60013，StringTablesize 设置没有要求</p>
+</li>
+<li><p>在 JDK8 中，设置 StringTable 长度的话，1009 是可以设置的最小值</p>
+</li>
+</ul>
+<h2 id="10-2-String-的内存分配"><a href="#10-2-String-的内存分配" class="headerlink" title="10.2. String 的内存分配"></a>10.2. String 的内存分配</h2><p>在 Java 语言中有 8 种基本数据类型和一种比较特殊的类型 String。这些类型为了使它们在运行过程中速度更快、更节省内存，都提供了一种常量池的概念。</p>
+<p>常量池就类似一个 Java 系统级别提供的缓存。8 种基本数据类型的常量池都是系统协调的，<mark>String 类型的常量池比较特殊。它的主要使用方法有两种。</mark></p>
+<ul>
+<li><p>直接使用双引号声明出来的 String 对象会直接存储在常量池中。</p>
+</li>
+<li><p>如果不是用双引号声明的 String 对象，可以使用 String 提供的 intern()方法。这个后面重点谈</p>
+</li>
+</ul>
+<p>Java 6 及以前，字符串常量池存放在永久代</p>
+<p>Java 7 中 Oracle 的工程师对字符串池的逻辑做了很大的改变，即将<mark>字符串常量池的位置调整到 Java 堆内</mark></p>
+<ul>
+<li><p>所有的字符串都保存在堆（Heap）中，和其他普通对象一样，这样可以让你在进行调优应用时仅需要调整堆大小就可以了。</p>
+</li>
+<li><p>字符串常量池概念原本使用得比较多，但是这个改动使得我们有足够的理由让我们重新考虑在 Java 7 中使用<code>String.intern()</code>。</p>
+</li>
+</ul>
+<p>Java8 元空间，字符串常量在堆</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106669.png" srcset="/img/loading.gif" lazyload alt="image-20200711093546398"></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106670.png" srcset="/img/loading.gif" lazyload alt="image-20200711093558709"></p>
+<p><strong>StringTable 为什么要调整？</strong></p>
+<p>官网地址：<a target="_blank" rel="noopener" href="https://www.oracle.com/java/technologies/javase/jdk7-relnotes.html#jdk7changes">Java SE 7 Features and Enhancements (oracle.com)</a></p>
+<blockquote>
+<p><strong>Synopsis:</strong> In JDK 7, interned strings are no longer allocated in the permanent generation of the Java heap, but are instead allocated in the main part of the Java heap (known as the young and old generations), along with the other objects created by the application. This change will result in more data residing in the main Java heap, and less data in the permanent generation, and thus may require heap sizes to be adjusted. Most applications will see only relatively small differences in heap usage due to this change, but larger applications that load many classes or make heavy use of the <code>String.intern()</code> method will see more significant differences.</p>
+</blockquote>
+<p>简介：在 JDK 7 中，内部字符串不再分配在 Java 堆的永久代中，而是分配在 Java 堆的主要部分（称为年轻代和老年代），与应用程序创建的其他对象一起。这种变化将导致更多的数据驻留在主 Java 堆中，而更少的数据在永久代中，因此可能需要调整堆的大小。大多数应用程序将看到由于这一变化而导致的堆使用的相对较小的差异，但<mark>加载许多类或大量使用 String.intern()方法的大型应用程序将看到更明显的差异</mark>。</p>
+<h2 id="10-3-String-的基本操作"><a href="#10-3-String-的基本操作" class="headerlink" title="10.3. String 的基本操作"></a>10.3. String 的基本操作</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Test</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test1</span><span class="hljs-params">()</span> &#123;<br>    System.out.print1n(<span class="hljs-string">&quot;1&quot;</span>); <span class="hljs-comment">//2321</span><br>    System.out.println(<span class="hljs-string">&quot;2&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;3&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;4&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;5&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;6&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;7&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;8&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;9&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;10&quot;</span>); <span class="hljs-comment">//2330</span><br>    System.out.println(<span class="hljs-string">&quot;1&quot;</span>); <span class="hljs-comment">//2321</span><br>    System.out.println(<span class="hljs-string">&quot;2&quot;</span>); <span class="hljs-comment">//2322</span><br>    System.out.println(<span class="hljs-string">&quot;3&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;4&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;5&quot;</span>);<br>    System.out.print1n(<span class="hljs-string">&quot;6&quot;</span>);<br>    System.out.print1n(<span class="hljs-string">&quot;7&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;8&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;9&quot;</span>);<br>    System.out.println(<span class="hljs-string">&quot;10&quot;</span>);<span class="hljs-comment">//2330</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Java 语言规范里要求完全相同的字符串字面量，应该包含同样的 Unicode 字符序列（包含同一份码点序列的常量），并且必须是指向同一个 String 类实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Memory</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<span class="hljs-comment">//line 1</span><br>        <span class="hljs-type">int</span> i= <span class="hljs-number">1</span>;<span class="hljs-comment">//line 2</span><br>        <span class="hljs-type">Object</span> <span class="hljs-variable">obj</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>();<span class="hljs-comment">//line 3</span><br>        <span class="hljs-type">Memory</span> <span class="hljs-variable">mem</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Memory</span>();<span class="hljs-comment">//Line 4</span><br>        mem.foo(obj);<span class="hljs-comment">//Line 5</span><br>    &#125;<span class="hljs-comment">//Line 9</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">foo</span><span class="hljs-params">(Object param)</span> &#123;<span class="hljs-comment">//line 6</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">str</span> <span class="hljs-operator">=</span> param.toString();<span class="hljs-comment">//line 7</span><br>        System.out.println(str);<br>    &#125;<span class="hljs-comment">//Line 8</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106671.png" srcset="/img/loading.gif" lazyload alt="image-20210511111607132"></p>
+<h2 id="10-4-字符串拼接操作"><a href="#10-4-字符串拼接操作" class="headerlink" title="10.4. 字符串拼接操作"></a>10.4. 字符串拼接操作</h2><ul>
+<li>常量与常量的拼接结果在常量池，原理是编译期优化</li>
+<li>常量池中不会存在相同内容的变量</li>
+<li>只要其中有一个是变量，结果就在堆中。变量拼接的原理是 StringBuilder</li>
+<li>如果拼接的结果调用 intern()方法，则主动将常量池中还没有的字符串对象放入池中，并返回此对象地址</li>
+</ul>
+<p><strong>举例 1</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test1</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">// 都是常量，前端编译期会进行代码优化</span><br>    <span class="hljs-comment">// 通过idea直接看对应的反编译的class文件，会显示 String s1 = &quot;abc&quot;; 说明做了代码优化</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">s1</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;a&quot;</span> + <span class="hljs-string">&quot;b&quot;</span> + <span class="hljs-string">&quot;c&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s2</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;abc&quot;</span>;<br><br>    <span class="hljs-comment">// true，有上述可知，s1和s2实际上指向字符串常量池中的同一个值</span><br>    System.out.println(s1 == s2);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>举例 2</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test5</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s1</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;javaEE&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s2</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;hadoop&quot;</span>;<br><br>    <span class="hljs-type">String</span> <span class="hljs-variable">s3</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;javaEEhadoop&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s4</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;javaEE&quot;</span> + <span class="hljs-string">&quot;hadoop&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s5</span> <span class="hljs-operator">=</span> s1 + <span class="hljs-string">&quot;hadoop&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s6</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;javaEE&quot;</span> + s2;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s7</span> <span class="hljs-operator">=</span> s1 + s2;<br><br>    System.out.println(s3 == s4); <span class="hljs-comment">// true 编译期优化</span><br>    System.out.println(s3 == s5); <span class="hljs-comment">// false s1是变量，不能编译期优化</span><br>    System.out.println(s3 == s6); <span class="hljs-comment">// false s2是变量，不能编译期优化</span><br>    System.out.println(s3 == s7); <span class="hljs-comment">// false s1、s2都是变量</span><br>    System.out.println(s5 == s6); <span class="hljs-comment">// false s5、s6 不同的对象实例</span><br>    System.out.println(s5 == s7); <span class="hljs-comment">// false s5、s7 不同的对象实例</span><br>    System.out.println(s6 == s7); <span class="hljs-comment">// false s6、s7 不同的对象实例</span><br><br>    <span class="hljs-type">String</span> <span class="hljs-variable">s8</span> <span class="hljs-operator">=</span> s6.intern();<br>    System.out.println(s3 == s8); <span class="hljs-comment">// true intern之后，s8和s3一样，指向字符串常量池中的&quot;javaEEhadoop&quot;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>举例 3</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test6</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s0</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;beijing&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s1</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;bei&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s2</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;jing&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s3</span> <span class="hljs-operator">=</span> s1 + s2;<br>    System.out.println(s0 == s3); <span class="hljs-comment">// false s3指向对象实例，s0指向字符串常量池中的&quot;beijing&quot;</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">s7</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;shanxi&quot;</span>;<br>    <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">s4</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;shan&quot;</span>;<br>    <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">s5</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;xi&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s6</span> <span class="hljs-operator">=</span> s4 + s5;<br>    System.out.println(s6 == s7); <span class="hljs-comment">// true s4和s5是final修饰的，编译期就能确定s6的值了</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>不使用 final 修饰，即为变量。如 s3 行的 s1 和 s2，会通过 new StringBuilder 进行拼接</li>
+<li>使用 final 修饰，即为常量。会在编译器进行代码优化。<mark>在实际开发中，能够使用 final 的，尽量使用</mark></li>
+</ul>
+<p><strong>举例 4</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test3</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s1</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;a&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s2</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;b&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s3</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;ab&quot;</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">s4</span> <span class="hljs-operator">=</span> s1 + s2;<br>    System.out.println(s3==s4);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>字节码</strong></p>
+<p>我们拿例 4 的字节码进行查看，可以发现<code>s1 + s2</code>实际上是 new 了一个 StringBuilder 对象，并使用了 append 方法将 s1 和 s2 添加进来，最后调用了 toString 方法赋给 s4</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs shell"> 0 ldc #2 &lt;a&gt;<br> 2 astore_1<br> 3 ldc #3 &lt;b&gt;<br> 5 astore_2<br> 6 ldc #4 &lt;ab&gt;<br> 8 astore_3<br> 9 new #5 &lt;java/lang/StringBuilder&gt;<br>12 dup<br>13 invokespecial #6 &lt;java/lang/StringBuilder.&lt;init&gt;&gt;<br>16 aload_1<br>17 invokevirtual #7 &lt;java/lang/StringBuilder.append&gt;<br>20 aload_2<br>21 invokevirtual #7 &lt;java/lang/StringBuilder.append&gt;<br>24 invokevirtual #8 &lt;java/lang/StringBuilder.toString&gt;<br>27 astore 4<br>29 getstatic #9 &lt;java/lang/System.out&gt;<br>32 aload_3<br>33 aload 4<br>35 if_acmpne 42 (+7)<br>38 iconst_1<br>39 goto 43 (+4)<br>42 iconst_0<br>43 invokevirtual #10 &lt;java/io/PrintStream.println&gt;<br>46 return<br></code></pre></td></tr></table></figure>
+
+<p><strong>字符串拼接操作性能对比</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Test</span>&#123;    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;        <span class="hljs-type">int</span> <span class="hljs-variable">times</span> <span class="hljs-operator">=</span> <span class="hljs-number">50000</span>;        <span class="hljs-comment">// String        long start = System.currentTimeMillis();        testString(times);        long end = System.currentTimeMillis();        System.out.println(&quot;String: &quot; + (end-start) + &quot;ms&quot;);        // StringBuilder        start = System.currentTimeMillis();        testStringBuilder(times);        end = System.currentTimeMillis();        System.out.println(&quot;StringBuilder: &quot; + (end-start) + &quot;ms&quot;);        // StringBuffer        start = System.currentTimeMillis();        testStringBuffer(times);        end = System.currentTimeMillis();        System.out.println(&quot;StringBuffer: &quot; + (end-start) + &quot;ms&quot;);    &#125;    public static void testString(int times) &#123;        String str = &quot;&quot;;        for (int i = 0; i &lt; times; i++) &#123;            str += &quot;test&quot;;        &#125;    &#125;    public static void testStringBuilder(int times) &#123;        StringBuilder sb = new StringBuilder();        for (int i = 0; i &lt; times; i++) &#123;            sb.append(&quot;test&quot;);        &#125;    &#125;    public static void testStringBuffer(int times) &#123;        StringBuffer sb = new StringBuffer();        for (int i = 0; i &lt; times; i++) &#123;            sb.append(&quot;test&quot;);        &#125;    &#125;&#125;// 结果String: 7963msStringBuilder: 1msStringBuffer: 4ms</span><br></code></pre></td></tr></table></figure>
+
+<p>本实验进行 5 万次循环，String 拼接方式的时间是 StringBuilder.append 方式的约 8000 倍，StringBuffer.append()方式的时间是 StringBuilder.append()方式的约 4 倍</p>
+<p>可以看到，通过 StringBuilder 的 append 方式的速度，要比直接对 String 使用“+”拼接的方式<mark>快的不是一点半点</mark></p>
+<p>那么，在实际开发中，对于需要<mark>多次或大量拼接</mark>的操作，在不考虑线程安全问题时，我们就应该尽可能<mark>使用 StringBuilder 进行 append 操作</mark></p>
+<p>除此之外，还有那些操作能够帮助我们提高字符串方面的运行效率呢？</p>
+<p>StringBuilder 空参构造器的初始化大小为 16。那么，如果提前知道需要拼接 String 的个数，就应该直接使用<mark>带参构造器</mark>指定 capacity，以减少扩容的次数（扩容的逻辑可以自行查看源代码）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/** * Constructs a string builder with no characters in it and an * initial capacity of 16 characters. */</span><span class="hljs-keyword">public</span> <span class="hljs-title function_">StringBuilder</span><span class="hljs-params">()</span> &#123;    <span class="hljs-built_in">super</span>(<span class="hljs-number">16</span>);&#125;<span class="hljs-comment">/** * Constructs a string builder with no characters in it and an * initial capacity specified by the &#123;<span class="hljs-doctag">@code</span> capacity&#125; argument. * * <span class="hljs-doctag">@param</span>      capacity  the initial capacity. * <span class="hljs-doctag">@throws</span>     NegativeArraySizeException  if the &#123;<span class="hljs-doctag">@code</span> capacity&#125; *               argument is less than &#123;<span class="hljs-doctag">@code</span> 0&#125;. */</span><span class="hljs-keyword">public</span> <span class="hljs-title function_">StringBuilder</span><span class="hljs-params">(<span class="hljs-type">int</span> capacity)</span> &#123;    <span class="hljs-built_in">super</span>(capacity);&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="10-5-intern-的使用"><a href="#10-5-intern-的使用" class="headerlink" title="10.5. intern()的使用"></a>10.5. intern()的使用</h2><p>官方 API 文档中的解释</p>
+<blockquote>
+<p>public String intern()</p>
+<p>Returns a canonical representation for the string object.</p>
+<p>A pool of strings, initially empty, is maintained privately by the class <code>String</code>.</p>
+<p>When the intern method is invoked, if the pool already contains a string equal to this <code>String</code> object as determined by the <a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#equals-java.lang.Object-"><code>equals(Object)</code></a> method, then the string from the pool is returned. Otherwise, this <code>String</code> object is added to the pool and a reference to this <code>String</code> object is returned.</p>
+<p>It follows that for any two strings <code>s</code> and <code>t</code>, <code>s.intern() == t.intern()</code> is <code>true</code> if and only if <code>s.equals(t)</code> is <code>true</code>.</p>
+<p>All literal strings and string-valued constant expressions are interned. String literals are defined in section 3.10.5 of the The Java™ Language Specification.</p>
+<ul>
+<li><p><strong>Returns:</strong></p>
+<p>a string that has the same contents as this string, but is guaranteed to be from a pool of unique strings.</p>
+</li>
+</ul>
+</blockquote>
+<p>当调用 intern 方法时，如果池子里已经包含了一个与这个 String 对象相等的字符串，正如 equals(Object)方法所确定的，那么池子里的字符串会被返回。否则，这个 String 对象被添加到池中，并返回这个 String 对象的引用。</p>
+<p>由此可见，对于任何两个字符串 s 和 t，当且仅当 s.equals(t)为真时，s.intern() &#x3D;&#x3D; t.intern()为真。</p>
+<p>所有字面字符串和以字符串为值的常量表达式都是 interned。</p>
+<p>返回一个与此字符串内容相同的字符串，但保证是来自一个唯一的字符串池。</p>
+<hr>
+<p>intern 是一个 native 方法，调用的是底层 C 的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> String <span class="hljs-title function_">intern</span><span class="hljs-params">()</span>;<br></code></pre></td></tr></table></figure>
+
+<p>如果不是用双引号声明的 String 对象，可以使用 String 提供的 intern 方法，它会从字符串常量池中查询当前字符串是否存在，若不存在就会将当前字符串放入常量池中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">String</span> <span class="hljs-variable">myInfo</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">string</span>(<span class="hljs-string">&quot;I love atguigu&quot;</span>).intern();<br></code></pre></td></tr></table></figure>
+
+<p>也就是说，如果在任意字符串上调用 String.intern 方法，那么其返回结果所指向的那个类实例，必须和直接以常量形式出现的字符串实例完全相同。因此，下列表达式的值必定是 true</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">(<span class="hljs-string">&quot;a&quot;</span>+<span class="hljs-string">&quot;b&quot;</span>+<span class="hljs-string">&quot;c&quot;</span>).intern() == <span class="hljs-string">&quot;abc&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>通俗点讲，Interned string 就是确保字符串在内存里只有一份拷贝，这样可以节约内存空间，加快字符串操作任务的执行速度。注意，这个值会被存放在字符串内部池（String Intern Pool）</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106672.png" srcset="/img/loading.gif" lazyload alt="image-20210511145542579"></p>
+<h3 id="10-5-1-intern-的使用：JDK6-vs-JDK7-8"><a href="#10-5-1-intern-的使用：JDK6-vs-JDK7-8" class="headerlink" title="10.5.1. intern 的使用：JDK6 vs JDK7&#x2F;8"></a>10.5.1. intern 的使用：JDK6 vs JDK7&#x2F;8</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/** * ① String s = new String(&quot;1&quot;) * 创建了两个对象 * 		堆空间中一个new对象 * 		字符串常量池中一个字符串常量&quot;1&quot;（注意：此时字符串常量池中已有&quot;1&quot;） * ② s.intern()由于字符串常量池中已存在&quot;1&quot; *  * s  指向的是堆空间中的对象地址 * s2 指向的是堆空间中常量池中&quot;1&quot;的地址 * 所以不相等 */</span><span class="hljs-type">String</span> <span class="hljs-variable">s</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(<span class="hljs-string">&quot;1&quot;</span>);s.intern();<span class="hljs-type">String</span> <span class="hljs-variable">s2</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;1&quot;</span>;System.out.println(s==s2); <span class="hljs-comment">// jdk1.6 false jdk7/8 false/* * ① String s3 = new String(&quot;1&quot;) + new String(&quot;1&quot;) * 等价于new String（&quot;11&quot;），但是，常量池中并不生成字符串&quot;11&quot;； * * ② s3.intern() * 由于此时常量池中并无&quot;11&quot;，所以把s3中记录的对象的地址存入常量池 * 所以s3 和 s4 指向的都是一个地址*/String s3 = new String(&quot;1&quot;) + new String(&quot;1&quot;);s3.intern();String s4 = &quot;11&quot;;System.out.println(s3==s4); //jdk1.6 false jdk7/8 true</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106673.png" srcset="/img/loading.gif" lazyload alt="image-20210511152240683"></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106674.png" srcset="/img/loading.gif" lazyload alt="image-20200711145925091"></p>
+<p>总结 String 的 intern()的使用：</p>
+<p>JDK1.6 中，将这个字符串对象尝试放入串池。</p>
+<ul>
+<li>如果串池中有，则并不会放入。返回已有的串池中的对象的地址</li>
+<li>如果没有，会把此<mark>对象复制一份</mark>，放入串池，并返回串池中的对象地址</li>
+</ul>
+<p>JDK1.7 起，将这个字符串对象尝试放入串池。</p>
+<ul>
+<li>如果串池中有，则并不会放入。返回已有的串池中的对象的地址</li>
+<li>如果没有，则会把<mark>对象的引用地址</mark>复制一份，放入串池，并返回串池中的引用地址</li>
+</ul>
+<p><strong>练习 1</strong></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106675.png" srcset="/img/loading.gif" lazyload alt="image-20200711150859709"></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106676.png" srcset="/img/loading.gif" lazyload alt="image-20200711151326909"></p>
+<p><strong>练习 2</strong></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271106677.png" srcset="/img/loading.gif" lazyload alt="image-20200711151433277"></p>
+<h3 id="10-5-2-intern-的效率测试：空间角度"><a href="#10-5-2-intern-的效率测试：空间角度" class="headerlink" title="10.5.2. intern 的效率测试：空间角度"></a>10.5.2. intern 的效率测试：空间角度</h3><p>我们通过测试一下，使用了 intern 和不使用的时候，其实相差还挺多的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StringIntern2</span> &#123;    <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">MAX_COUNT</span> <span class="hljs-operator">=</span> <span class="hljs-number">1000</span> * <span class="hljs-number">10000</span>;    <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String[] arr = <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>[MAX_COUNT];    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;        Integer [] data = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Integer</span>[]&#123;<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>,<span class="hljs-number">10</span>&#125;;        <span class="hljs-type">long</span> <span class="hljs-variable">start</span> <span class="hljs-operator">=</span> System.currentTimeMillis();        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; MAX_COUNT; i++) &#123;            <span class="hljs-comment">// arr[i] = new String(String.valueOf(data[i%data.length]));            arr[i] = new String(String.valueOf(data[i%data.length])).intern();        &#125;        long end = System.currentTimeMillis();        System.out.println(&quot;花费的时间为：&quot; + (end - start));        try &#123;            Thread.sleep(1000000);        &#125; catch (Exception e) &#123;            e.getStackTrace();        &#125;    &#125;&#125;// 运行结果不使用intern：7256ms使用intern：1395ms</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>结论</strong>：对于程序中大量使用存在的字符串时，尤其存在很多已经重复的字符串时，使用 intern()方法能够节省内存空间。</p>
+<p>大的网站平台，需要内存中存储大量的字符串。比如社交网站，很多人都存储：北京市、海淀区等信息。这时候如果字符串都调用 intern()方法，就会很明显降低内存的大小。</p>
+<h2 id="10-6-StringTable-的垃圾回收"><a href="#10-6-StringTable-的垃圾回收" class="headerlink" title="10.6. StringTable 的垃圾回收"></a>10.6. StringTable 的垃圾回收</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StringGCTest</span> &#123;    <span class="hljs-comment">/**     * -Xms15m -Xmx15m -XX:+PrintGCDetails     */</span>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;                <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100000</span>; i++) &#123;            String.valueOf(i).intern();        &#125;    &#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>运行结果</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">[GC (Allocation Failure) [PSYoungGen: 4096K-&gt;504K(4608K)] 4096K-&gt;1689K(15872K), <span class="hljs-number">0.0581583</span> secs] [Times: user=<span class="hljs-number">0.00</span> sys=<span class="hljs-number">0.00</span>, real=<span class="hljs-number">0.06</span> secs] [GC (Allocation Failure) [PSYoungGen: 4600K-&gt;504K(4608K)] 5785K-&gt;2310K(15872K), <span class="hljs-number">0.0015621</span> secs] [Times: user=<span class="hljs-number">0.00</span> sys=<span class="hljs-number">0.00</span>, real=<span class="hljs-number">0.00</span> secs] [GC (Allocation Failure) [PSYoungGen: 4600K-&gt;504K(4608K)] 6406K-&gt;2350K(15872K), <span class="hljs-number">0.0034849</span> secs] [Times: user=<span class="hljs-number">0.00</span> sys=<span class="hljs-number">0.00</span>, real=<span class="hljs-number">0.00</span> secs] Heap PSYoungGen      total 4608K, used 1919K [<span class="hljs-number">0x00000000ffb00000</span>, <span class="hljs-number">0x0000000100000000</span>, <span class="hljs-number">0x0000000100000000</span>)  eden space 4096K, <span class="hljs-number">34</span>% used [<span class="hljs-number">0x00000000ffb00000</span>,<span class="hljs-number">0x00000000ffc61d30</span>,<span class="hljs-number">0x00000000fff00000</span>)  from space 512K, <span class="hljs-number">98</span>% used [<span class="hljs-number">0x00000000fff00000</span>,<span class="hljs-number">0x00000000fff7e010</span>,<span class="hljs-number">0x00000000fff80000</span>)  to   space 512K, <span class="hljs-number">0</span>% used [<span class="hljs-number">0x00000000fff80000</span>,<span class="hljs-number">0x00000000fff80000</span>,<span class="hljs-number">0x0000000100000000</span>) ParOldGen       total 11264K, used 1846K [<span class="hljs-number">0x00000000ff000000</span>, <span class="hljs-number">0x00000000ffb00000</span>, <span class="hljs-number">0x00000000ffb00000</span>)  object space 11264K, <span class="hljs-number">16</span>% used [<span class="hljs-number">0x00000000ff000000</span>,<span class="hljs-number">0x00000000ff1cd9b0</span>,<span class="hljs-number">0x00000000ffb00000</span>) Metaspace       used 3378K, capacity 4496K, committed 4864K, reserved 1056768K  <span class="hljs-keyword">class</span> <span class="hljs-title class_">space</span>    used 361K, capacity 388K, committed 512K, reserved 1048576K<br></code></pre></td></tr></table></figure>
+
+<h2 id="10-7-G1-中的-String-去重操作"><a href="#10-7-G1-中的-String-去重操作" class="headerlink" title="10.7. G1 中的 String 去重操作"></a>10.7. G1 中的 String 去重操作</h2><p>官网地址：<a target="_blank" rel="noopener" href="http://openjdk.java.net/jeps/192">JEP 192: String Deduplication in G1 (java.net)</a></p>
+<blockquote>
+<h2 id="Motivation-1"><a href="#Motivation-1" class="headerlink" title="Motivation"></a>Motivation</h2><p>Many large-scale Java applications are currently bottlenecked on memory. Measurements have shown that roughly 25% of the Java heap live data set in these types of applications is consumed by <code>String</code> objects. Further, roughly half of those <code>String</code> objects are duplicates, where duplicates means <code>string1.equals(string2)</code> is true. Having duplicate <code>String</code> objects on the heap is, essentially, just a waste of memory. This project will implement automatic and continuous <code>String</code> deduplication in the G1 garbage collector to avoid wasting memory and reduce the memory footprint.</p>
+</blockquote>
+<p>目前，许多大规模的 Java 应用程序在内存上遇到了瓶颈。测量表明，在这些类型的应用程序中，大约 25%的 Java 堆实时数据集被<code>String&#39;对象所消耗。此外，这些 &quot;String &quot;对象中大约有一半是重复的，其中重复意味着 &quot;string1.equals(string2) &quot;是真的。在堆上有重复的</code>String’对象，从本质上讲，只是一种内存的浪费。这个项目将在 G1 垃圾收集器中实现自动和持续的&#96;String’重复数据删除，以避免浪费内存，减少内存占用。</p>
+<hr>
+<p>注意这里说的重复，指的是在堆中的数据，而不是常量池中的，因为常量池中的本身就不会重复</p>
+<p>背景：对许多 Java 应用（有大的也有小的）做的测试得出以下结果：</p>
+<ul>
+<li>堆存活数据集合里面 string 对象占了 25%</li>
+<li>堆存活数据集合里面重复的 string 对象有 13.5%</li>
+<li>string 对象的平均长度是 45</li>
+</ul>
+<p>许多大规模的 Java 应用的瓶颈在于内存，测试表明，在这些类型的应用里面，<mark>Java 堆中存活的数据集合差不多 25%是 String 对象</mark>。更进一步，这里面差不多一半 string 对象是重复的，重复的意思是说： <code>stringl.equals(string2)= true</code>。<mark>堆上存在重复的 String 对象必然是一种内存的浪费</mark>。这个项目将在 G1 垃圾收集器中实现自动持续对重复的 string 对象进行去重，这样就能避免浪费内存。</p>
+<p><strong>实现</strong></p>
+<ol>
+<li>当垃圾收集器工作的时候，会访问堆上存活的对象。<mark>对每一个访问的对象都会检查是否是候选的要去重的 String 对象</mark></li>
+<li>如果是，把这个对象的一个引用插入到队列中等待后续的处理。一个去重的线程在后台运行，处理这个队列。处理队列的一个元素意味着从队列删除这个元素，然后尝试去重它引用的 string 对象。</li>
+<li>使用一个 hashtable 来记录所有的被 String 对象使用的不重复的 char 数组。当去重的时候，会查这个 hashtable，来看堆上是否已经存在一个一模一样的 char 数组。</li>
+<li>如果存在，String 对象会被调整引用那个数组，释放对原来的数组的引用，最终会被垃圾收集器回收掉。</li>
+<li>如果查找失败，char 数组会被插入到 hashtable，这样以后的时候就可以共享这个数组了。</li>
+</ol>
+<p><strong>命令行选项</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">开启String去重，默认是不开启的，需要手动开启。 UseStringDeduplication(bool)  <span class="hljs-comment"># 打印详细的去重统计信息 PrintStringDeduplicationStatistics(bool)  # 达到这个年龄的String对象被认为是去重的候选对象StringpeDuplicationAgeThreshold(uintx)</span></span><br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JVM上10_StringTable</div>
+      <div>http://example.com/2025/02/27/JVM上10-StringTable/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kon4tsu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E4%B8%8A11-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%A6%82%E8%BF%B0%E5%8F%8A%E7%AE%97%E6%B3%95/" title="JVM上11_垃圾回收概述及算法">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JVM上11_垃圾回收概述及算法</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E4%B8%8A09-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/" title="JVM上09_执行引擎">
+                        <span class="hidden-mobile">JVM上09_执行引擎</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

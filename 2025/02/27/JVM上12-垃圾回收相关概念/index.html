@@ -1,0 +1,784 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kon4tsu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="[toc] 12. 垃圾回收相关概念12.1. System.gc()的理解在默认情况下，通过 system.gc()或者 Runtime.getRuntime().gc() 的调用，会显式触发 Full GC，同时对老年代和新生代进行回收，尝试释放被丢弃对象占用的内存。 然而 System.gc() 调用附带一个免责声明，无法保证对垃圾收集器的调用。(不能确保立即生效) JVM 实现者可以通过">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM上12_垃圾回收相关概念">
+<meta property="og:url" content="http://example.com/2025/02/27/JVM%E4%B8%8A12-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5/index.html">
+<meta property="og:site_name" content="Kon4tsu Blog">
+<meta property="og:description" content="[toc] 12. 垃圾回收相关概念12.1. System.gc()的理解在默认情况下，通过 system.gc()或者 Runtime.getRuntime().gc() 的调用，会显式触发 Full GC，同时对老年代和新生代进行回收，尝试释放被丢弃对象占用的内存。 然而 System.gc() 调用附带一个免责声明，无法保证对垃圾收集器的调用。(不能确保立即生效) JVM 实现者可以通过">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108759.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108760.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108761.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108762.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108763.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108764.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108765.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108766.png">
+<meta property="article:published_time" content="2025-02-27T03:08:05.000Z">
+<meta property="article:modified_time" content="2025-02-27T03:08:31.690Z">
+<meta property="article:author" content="Kon4tsu">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108759.png">
+  
+  
+  
+  <title>JVM上12_垃圾回收相关概念 - Kon4tsu Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/macpanel.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kon4tsu&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JVM上12_垃圾回收相关概念"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-27 11:08" pubdate>
+          2025年2月27日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          43 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">JVM上12_垃圾回收相关概念</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>[toc]</p>
+<h1 id="12-垃圾回收相关概念"><a href="#12-垃圾回收相关概念" class="headerlink" title="12. 垃圾回收相关概念"></a>12. 垃圾回收相关概念</h1><h2 id="12-1-System-gc-的理解"><a href="#12-1-System-gc-的理解" class="headerlink" title="12.1. System.gc()的理解"></a>12.1. System.gc()的理解</h2><p>在默认情况下，通过 system.gc()或者 Runtime.getRuntime().gc() 的调用，<mark>会显式触发 Full GC</mark>，同时对老年代和新生代进行回收，尝试释放被丢弃对象占用的内存。</p>
+<p>然而 System.gc() 调用附带一个免责声明，无法保证对垃圾收集器的调用。(不能确保立即生效)</p>
+<p>JVM 实现者可以通过 System.gc() 调用来决定 JVM 的 GC 行为。而一般情况下，垃圾回收应该是自动进行的，<mark>无须手动触发，否则就太过于麻烦了</mark>。在一些特殊情况下，如我们正在编写一个性能基准，我们可以在运行之间调用 System.gc()</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SystemGCTest</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">SystemGCTest</span>();<br>        System.gc();<span class="hljs-comment">// 提醒JVM的垃圾回收器执行gc，但是不确定是否马上执行gc</span><br>        <span class="hljs-comment">// 与Runtime.getRuntime().gc();的作用一样</span><br><br>        System.runFinalization();<span class="hljs-comment">//强制执行使用引用的对象的finalize()方法</span><br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">finalize</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Throwable &#123;<br>        <span class="hljs-built_in">super</span>.finalize();<br>        System.out.println(<span class="hljs-string">&quot;SystemGCTest 重写了finalize()&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="12-2-内存溢出与内存泄露"><a href="#12-2-内存溢出与内存泄露" class="headerlink" title="12.2. 内存溢出与内存泄露"></a>12.2. 内存溢出与内存泄露</h2><h3 id="内存溢出（OOM）"><a href="#内存溢出（OOM）" class="headerlink" title="内存溢出（OOM）"></a>内存溢出（OOM）</h3><p>内存溢出相对于内存泄漏来说，尽管更容易被理解，但是同样的，内存溢出也是引发程序崩溃的罪魁祸首之一。</p>
+<p>由于 GC 一直在发展，所有一般情况下，除非应用程序占用的内存增长速度非常快，造成垃圾回收已经跟不上内存消耗的速度，否则不太容易出现 ooM 的情况。</p>
+<p>大多数情况下，GC 会进行各种年龄段的垃圾回收，实在不行了就放大招，来一次独占式的 Full GC 操作，这时候会回收大量的内存，供应用程序继续使用。</p>
+<p>javadoc 中对 OutOfMemoryError 的解释是，<mark>没有空闲内存，并且垃圾收集器也无法提供更多内存</mark>。</p>
+<p>首先说没有空闲内存的情况：说明 Java 虚拟机的堆内存不够。原因有二：</p>
+<ol>
+<li><p><mark>Java 虚拟机的堆内存设置不够。</mark></p>
+<p>比如：可能存在内存泄漏问题；也很有可能就是堆的大小不合理，比如我们要处理比较可观的数据量，但是没有显式指定 JVM 堆大小或者指定数值偏小。我们可以通过参数<code>-Xms</code> 、<code>-Xmx</code>来调整。</p>
+</li>
+<li><p><mark>代码中创建了大量大对象，并且长时间不能被垃圾收集器收集（存在被引用）</mark></p>
+<p>对于老版本的 Oracle JDK，因为永久代的大小是有限的，并且 JVM 对永久代垃圾回收（如，常量池回收、卸载不再需要的类型）非常不积极，所以当我们不断添加新类型的时候，永久代出现 OutOfMemoryError 也非常多见，尤其是在运行时存在大量动态类型生成的场合；类似 intern 字符串缓存占用太多空间，也会导致 OOM 问题。对应的异常信息，会标记出来和永久代相关：“<code>java.lang.OutOfMemoryError: PermGen space</code>“。</p>
+<p>随着元数据区的引入，方法区内存已经不再那么窘迫，所以相应的 ooM 有所改观，出现 OOM，异常信息则变成了：“<code>java.lang.OutofMemoryError:Metaspace</code>“。直接内存不足，也会导致 OOM。</p>
+</li>
+</ol>
+<p>这里面隐含着一层意思是，在抛出 OutOfMemoryError 之前，通常垃圾收集器会被触发，尽其所能去清理出空间。</p>
+<ul>
+<li>例如：在引用机制分析中，涉及到 JVM 会去尝试回收软引用指向的对象等。</li>
+<li>在<code>java.nio.BIts.reserveMemory()</code>方法中，我们能清楚的看到，<code>System.gc()</code>会被调用，以清理空间。</li>
+</ul>
+<p>当然，也不是在任何情况下垃圾收集器都会被触发的</p>
+<ul>
+<li>比如，我们去分配一个超大对象，类似一个超大数组超过堆的最大值，JVM 可以判断出垃圾收集并不能解决这个问题，所以直接抛出 OutOfMemoryError。</li>
+</ul>
+<h3 id="内存泄漏（Memory-Leak）"><a href="#内存泄漏（Memory-Leak）" class="headerlink" title="内存泄漏（Memory Leak）"></a>内存泄漏（Memory Leak）</h3><p>也称作“存储渗漏”。严格来说，<mark>只有对象不会再被程序用到了，但是 GC 又不能回收他们的情况，才叫内存泄漏</mark>。</p>
+<p>但实际情况很多时候一些不太好的实践（或疏忽）会导致对象的生命周期变得很长甚至导致 00M，也可以叫做<mark>宽泛意义上的“内存泄漏”</mark>。</p>
+<p>尽管内存泄漏并不会立刻引起程序崩溃，但是一旦发生内存泄漏，程序中的可用内存就会被逐步蚕食，直至耗尽所有内存，最终出现 OutOfMemory 异常，导致程序崩溃。</p>
+<p>注意，这里的存储空间并不是指物理内存，而是指虚拟内存大小，这个虚拟内存大小取决于磁盘交换区设定的大小。</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108759.png" srcset="/img/loading.gif" lazyload alt="image-20200712195158470"></p>
+<p><strong>举例</strong></p>
+<ol>
+<li><p>单例模式</p>
+<p>单例的生命周期和应用程序是一样长的，所以单例程序中，如果持有对外部对象的引用的话，那么这个外部对象是不能被回收的，则会导致内存泄漏的产生。</p>
+</li>
+<li><p>一些提供 close 的资源未关闭导致内存泄漏</p>
+<p>数据库连接（dataSourse.getConnection() ），网络连接（socket）和 io 连接必须手动 close，否则是不能被回收的。</p>
+</li>
+</ol>
+<h2 id="12-3-Stop-The-World"><a href="#12-3-Stop-The-World" class="headerlink" title="12.3. Stop The World"></a>12.3. Stop The World</h2><p>Stop-the-World，简称 STW，指的是 GC 事件发生过程中，会产生应用程序的停顿。<mark>停顿产生时整个应用程序线程都会被暂停，没有任何响应</mark>，有点像卡死的感觉，这个停顿称为 STW。</p>
+<p>可达性分析算法中枚举根节点（GC Roots）会导致所有 Java 执行线程停顿。</p>
+<ul>
+<li>分析工作必须在一个能确保一致性的快照中进行</li>
+<li>一致性指整个分析期间整个执行系统看起来像被冻结在某个时间点上</li>
+<li><mark>如果出现分析过程中对象引用关系还在不断变化，则分析结果的准确性无法保证</mark></li>
+</ul>
+<p>被 STW 中断的应用程序线程会在完成 GC 之后恢复，频繁中断会让用户感觉像是网速不快造成电影卡带一样，所以我们需要减少 STW 的发生。</p>
+<p>STW 事件和采用哪款 GC 无关，所有的 GC 都有这个事件。</p>
+<p>哪怕是 G1 也不能完全避免 Stop-the-World 情况发生，只能说垃圾回收器越来越优秀，回收效率越来越高，尽可能地缩短了暂停时间。</p>
+<p>STW 是 JVM 在<mark>后台自动发起和自动完成</mark>的。在用户不可见的情况下，把用户正常的工作线程全部停掉。</p>
+<p>开发中不要用 System.gc() 会导致 Stop-the-World 的发生。</p>
+<h2 id="12-4-垃圾回收的并行与并发"><a href="#12-4-垃圾回收的并行与并发" class="headerlink" title="12.4. 垃圾回收的并行与并发"></a>12.4. 垃圾回收的并行与并发</h2><h3 id="并发（Concurrent）"><a href="#并发（Concurrent）" class="headerlink" title="并发（Concurrent）"></a>并发（Concurrent）</h3><p>在操作系统中，是指一个时间段中有几个程序都处于已启动运行到运行完毕之间，且这几个程序都是在同一个处理器上运行。</p>
+<p>并发不是真正意义上的“同时进行”，只是 CPU 把一个时间段划分成几个时间片段（时间区间），然后在这几个时间区间之间来回切换，由于 CPU 处理的速度非常快，只要时间间隔处理得当，即可让用户感觉是多个应用程序同时在进行。</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108760.png" srcset="/img/loading.gif" lazyload alt="image-20200712202522051"></p>
+<h3 id="并行（Parallel）"><a href="#并行（Parallel）" class="headerlink" title="并行（Parallel）"></a>并行（Parallel）</h3><p>当系统有一个以上 CPU 时，当一个 CPU 执行一个进程时，另一个 CPU 可以执行另一个进程，两个进程互不抢占 CPU 资源，可以同时进行，我们称之为并行（Parallel）。</p>
+<p>其实决定并行的因素不是 CPU 的数量，而是 CPU 的核心数量，比如一个 CPU 多个核也可以并行。</p>
+<p>适合科学计算，后台处理等弱交互场景</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108761.png" srcset="/img/loading.gif" lazyload alt="image-20200712202822129"></p>
+<h3 id="并发-vs-并行"><a href="#并发-vs-并行" class="headerlink" title="并发 vs 并行"></a>并发 vs 并行</h3><ul>
+<li><p>并发，指的是多个事情，在<mark>同一时间段内</mark>同时发生了。</p>
+</li>
+<li><p>并行，指的是多个事情，在<mark>同一时间点上</mark>同时发生了。</p>
+</li>
+<li><p>并发的多个任务之间是互相抢占资源的。</p>
+</li>
+<li><p>并行的多个任务之间是不互相抢占资源的。</p>
+</li>
+<li><p>只有在多 CPU 或者一个 CPU 多核的情况中，才会发生并行。</p>
+</li>
+<li><p>否则，看似同时发生的事情，其实都是并发执行的。</p>
+</li>
+</ul>
+<h3 id="垃圾回收的并发与并行"><a href="#垃圾回收的并发与并行" class="headerlink" title="垃圾回收的并发与并行"></a>垃圾回收的并发与并行</h3><p>并发和并行，在谈论垃圾收集器的上下文语境中，它们可以解释如下：</p>
+<h4 id="并行（Parallel）-1"><a href="#并行（Parallel）-1" class="headerlink" title="并行（Parallel）"></a>并行（Parallel）</h4><p>指多条垃圾收集线程并行工作，但此时用户线程仍处于等待状态。如 ParNew、Parallel Scavenge、Parallel Old；</p>
+<h4 id="串行（Serial）"><a href="#串行（Serial）" class="headerlink" title="串行（Serial）"></a>串行（Serial）</h4><p>相较于并行的概念，单线程执行。如果内存不够，则程序暂停，启动 JM 垃圾回收器进行垃圾回收。回收完，再启动程序的线程。</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108762.png" srcset="/img/loading.gif" lazyload alt="image-20210512112822896"></p>
+<h4 id="并发（Concurrent）-1"><a href="#并发（Concurrent）-1" class="headerlink" title="并发（Concurrent）"></a>并发（Concurrent）</h4><p>指用户线程与垃圾收集线程同时执行（但不一定是并行的，可能会交替执行），垃圾回收线程在执行时不会停顿用户程序的运行。用户程序在继续运行，而垃圾收集程序线程运行于另一个 CPU 上；如：CMS、G1</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108763.png" srcset="/img/loading.gif" lazyload alt="image-20200712203815517"></p>
+<h2 id="12-5-安全点与安全区域"><a href="#12-5-安全点与安全区域" class="headerlink" title="12.5. 安全点与安全区域"></a>12.5. 安全点与安全区域</h2><h3 id="安全点"><a href="#安全点" class="headerlink" title="安全点"></a>安全点</h3><p>程序执行时并非在所有地方都能停顿下来开始 GC，只有在特定的位置才能停顿下来开始 GC，这些位置称为“安全点（Safepoint）”。</p>
+<p>Safe Point 的选择很重要，<mark>如果太少可能导致 GC 等待的时间太长，如果太频繁可能导致运行时的性能问题</mark>。大部分指令的执行时间都非常短暂，通常会根据“<mark>是否具有让程序长时间执行的特征</mark>”为标准。比如：选择一些执行时间较长的指令作为 Safe Point，如<mark>方法调用、循环跳转和异常跳转等</mark>。</p>
+<p>如何在 GC 发生时，检查所有线程都跑到最近的安全点停顿下来呢？</p>
+<h4 id="抢先式中断：（目前没有虚拟机采用了）"><a href="#抢先式中断：（目前没有虚拟机采用了）" class="headerlink" title="抢先式中断：（目前没有虚拟机采用了）"></a>抢先式中断：（目前没有虚拟机采用了）</h4><ul>
+<li>首先中断所有线程。如果还有线程不在安全点，就恢复线程，让线程跑到安全点。\</li>
+</ul>
+<h4 id="主动式中断"><a href="#主动式中断" class="headerlink" title="主动式中断"></a>主动式中断</h4><p>设置一个中断标志，各个线程运行到 Safe Point 的时候主动轮询这个标志，如果中断标志为真，则将自己进行中断挂起。（有轮询的机制）</p>
+<h3 id="安全区域（Safe-Resion）"><a href="#安全区域（Safe-Resion）" class="headerlink" title="安全区域（Safe Resion）"></a>安全区域（Safe Resion）</h3><p>Safepoint 机制保证了程序执行时，在不太长的时间内就会遇到可进入 GC 的 Safepoint。但是，程序“不执行”的时候呢？例如线程处于 Sleep 状态或 Blocked 状态，这时候线程无法响应 JVM 的中断请求，“走”到安全点去中断挂起，JVM 也不太可能等待线程被唤醒。对于这种情况，就需要安全区域（Safe Region）来解决。</p>
+<p><mark>安全区域是指在一段代码片段中，对象的引用关系不会发生变化，在这个区域中的任何位置开始 Gc 都是安全的。</mark>我们也可以把 Safe Region 看做是被扩展了的 Safepoint。</p>
+<h3 id="实际执行时："><a href="#实际执行时：" class="headerlink" title="实际执行时："></a>实际执行时：</h3><ol>
+<li>当线程运行到 Safe Region 的代码时，首先标识已经进入了 Safe Relgion，如果这段时间内发生 GC，JVM 会忽略标识为 Safe Region 状态的线程</li>
+<li>当线程即将离开 Safe Region 时，会检查 JVM 是否已经完成 GC，如果完成了，则继续运行，否则线程必须等待直到收到可以安全离开 Safe Region 的信号为止；</li>
+</ol>
+<h2 id="12-6-再谈引用：强引用"><a href="#12-6-再谈引用：强引用" class="headerlink" title="12.6. 再谈引用：强引用"></a>12.6. 再谈引用：强引用</h2><p>我们希望能描述这样一类对象：当内存空间还足够时，则能保留在内存中；如果内存空间在进行垃圾收集后还是很紧张，则可以抛弃这些对象。</p>
+<p>【既<mark>偏门</mark>又非常<mark>高频</mark>的面试题】强引用、软引用、弱引用、虚引用有什么区别？具体使用场景是什么？</p>
+<p>在 JDK1.2 版之后，Java 对引用的概念进行了扩充，将引用分为：强引用（Strong Reference）、软引用（Soft Reference）、弱引用（Weak Reference）、虚引用（Phantom Reference）这 4 种引用强度依次逐渐减弱。</p>
+<p>除强引用外，其他 3 种引用均可以在 java.lang.ref 包中找到它们的身影。如下图，显示了这 3 种引用类型对应的类，开发人员可以在应用程序中直接使用它们。</p>
+<p>.<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108764.png" srcset="/img/loading.gif" lazyload alt="image-20200712205813321"></p>
+<p>Reference 子类中只有终结器引用是包内可见的，其他 3 种引用类型均为 public，可以在应用程序中直接使用</p>
+<ul>
+<li><mark>强引用（StrongReference）</mark>：最传统的“引用”的定义，是指在程序代码之中普遍存在的引用赋值，即类似“<code>Object obj = new Object()</code>”这种引用关系。无论任何情况下，只要强引用关系还存在，垃圾收集器就永远不会回收掉被引用的对象。</li>
+<li><mark>软引用（SoftReference）</mark>：在系统将要发生内存溢出之前，将会把这些对象列入回收范围之中进行第二次回收。如果这次回收后还没有足够的内存，才会抛出内存流出异常。</li>
+<li><mark>弱引用（WeakReference）</mark>：被弱引用关联的对象只能生存到下一次垃圾收集之前。当垃圾收集器工作时，无论内存空间是否足够，都会回收掉被弱引用关联的对象。</li>
+<li><mark>虚引用（PhantomReference）</mark>：一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来获得一个对象的实例。为一个对象设置虚引用关联的唯一目的就是能在这个对象被收集器回收时收到一个系统通知。</li>
+</ul>
+<h3 id="强引用（Strong-Reference）——不回收"><a href="#强引用（Strong-Reference）——不回收" class="headerlink" title="强引用（Strong Reference）——不回收"></a>强引用（Strong Reference）——不回收</h3><p>在 Java 程序中，最常见的引用类型是强引用（<mark>普通系统 99%以上都是强引用</mark>），也就是我们最常见的普通对象引用，<mark>也是默认的引用类型</mark>。</p>
+<p>当在 Java 语言中使用 new 操作符创建一个新的对象，并将其赋值给一个变量的时候，这个变量就成为指向该对象的一个强引用。</p>
+<p><mark>强引用的对象是可触及的，垃圾收集器就永远不会回收掉被引用的对象。</mark></p>
+<p>对于一个普通的对象，如果没有其他的引用关系，只要超过了引用的作用域或者显式地将相应（强）引用赋值为 nu11，就是可以当做垃圾被收集了，当然具体回收时机还是要看垃圾收集策略。</p>
+<p>相对的，软引用、弱引用和虚引用的对象是软可触及、弱可触及和虚可触及的，在一定条件下，都是可以被回收的。所以，<mark>强引用是造成 Java 内存泄漏的主要原因之一</mark>。</p>
+<p><strong>强引用例子</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">StringBuffer</span> <span class="hljs-variable">str</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuffer</span>(<span class="hljs-string">&quot;hello mogublog&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>局部变量 str 指向 StringBuffer 实例所在堆空间，通过 str 可以操作该实例，那么 str 就是 StringBuffer 实例的强引用</p>
+<p><strong>对应内存结构</strong></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108765.png" srcset="/img/loading.gif" lazyload alt="image-20200712211501377"></p>
+<p>此时，如果再运行一个赋值语句</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">StringBuffer</span> <span class="hljs-variable">str1</span> <span class="hljs-operator">=</span> str;<br></code></pre></td></tr></table></figure>
+
+<p><strong>对应的内存结构</strong></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271108766.png" srcset="/img/loading.gif" lazyload alt="image-20200712211732976"></p>
+<p>本例中的两个引用，都是强引用，强引用具备以下特点：</p>
+<ul>
+<li>强引用可以直接访问目标对象。</li>
+<li>强引用所指向的对象在任何时候都不会被系统回收，虚拟机宁愿抛出 OOM 异常，也不会回收强引用所指向对象。</li>
+<li>强引用可能导致内存泄漏。</li>
+</ul>
+<h2 id="12-8-再谈引用：-软引用"><a href="#12-8-再谈引用：-软引用" class="headerlink" title="12.8. 再谈引用： 软引用"></a>12.8. 再谈引用： 软引用</h2><h3 id="软引用（Soft-Reference）——内存不足即回收"><a href="#软引用（Soft-Reference）——内存不足即回收" class="headerlink" title="软引用（Soft Reference）——内存不足即回收"></a>软引用（Soft Reference）——内存不足即回收</h3><p>软引用是用来描述一些还有用，但非必需的对象。<mark>只被软引用关联着的对象，在系统将要发生内存溢出异常前，会把这些对象列进回收范围之中进行第二次回收</mark>，如果这次回收还没有足够的内存，才会抛出内存溢出异常。</p>
+<p>软引用通常用来实现内存敏感的缓存。比如：<mark>高速缓存</mark>就有用到软引用。如果还有空闲内存，就可以暂时保留缓存，当内存不足时清理掉，这样就保证了使用缓存的同时，不会耗尽内存。</p>
+<p>垃圾回收器在某个时刻决定回收软可达的对象的时候，会清理软引用，并可选地把引用存放到一个引用队列（Reference Queue）。</p>
+<p>类似弱引用，只不过 Java 虚拟机会尽量让软引用的存活时间长一些，迫不得已才清理。</p>
+<p>在 JDK1.2 版之后提供了 java.lang.ref.SoftReference 类来实现软引用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">Object</span> <span class="hljs-variable">obj</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>(); <span class="hljs-comment">// 声明强引用</span><br>SoftReference&lt;Object&gt; sf = <span class="hljs-keyword">new</span> <span class="hljs-title class_">SoftReference</span>&lt;&gt;(obj);<br>obj = <span class="hljs-literal">null</span>; <span class="hljs-comment">//销毁强引用</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="12-9-再谈引用：弱引用"><a href="#12-9-再谈引用：弱引用" class="headerlink" title="12.9. 再谈引用：弱引用"></a>12.9. 再谈引用：弱引用</h2><h3 id="弱引用（Weak-Reference）——发现即回收"><a href="#弱引用（Weak-Reference）——发现即回收" class="headerlink" title="弱引用（Weak Reference）——发现即回收"></a>弱引用（Weak Reference）——发现即回收</h3><p>弱引用也是用来描述那些非必需对象，<mark>只被弱引用关联的对象只能生存到下一次垃圾收集发生为止</mark>。在系统 GC 时，只要发现弱引用，不管系统堆空间使用是否充足，都会回收掉只被弱引用关联的对象。</p>
+<p>但是，由于垃圾回收器的线程通常优先级很低，因此，并不一定能很快地发现持有弱引用的对象。在这种情况下，<mark>弱引用对象可以存在较长的时间</mark>。</p>
+<p>弱引用和软引用一样，在构造弱引用时，也可以指定一个引用队列，当弱引用对象被回收时，就会加入指定的引用队列，通过这个队列可以跟踪对象的回收情况。</p>
+<p><mark>软引用、弱引用都非常适合来保存那些可有可无的缓存数据</mark>。如果这么做，当系统内存不足时，这些缓存数据会被回收，不会导致内存溢出。而当内存资源充足时，这些缓存数据又可以存在相当长的时间，从而起到加速系统的作用。</p>
+<p>在 JDK1.2 版之后提供了 WeakReference 类来实现弱引用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">Object</span> <span class="hljs-variable">obj</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>(); <span class="hljs-comment">// 声明强引用</span><br>WeakReference&lt;Object&gt; sf = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WeakReference</span>&lt;&gt;(obj);<br>obj = <span class="hljs-literal">null</span>; <span class="hljs-comment">//销毁强引用</span><br></code></pre></td></tr></table></figure>
+
+<p><mark>弱引用对象与软引用对象的最大不同</mark>就在于，当 GC 在进行回收时，需要通过算法检查是否回收软引用对象，而对于弱引用对象，GC 总是进行回收。<mark>弱引用对象更容易、更快被 GC 回收</mark>。</p>
+<p><strong>面试题：你开发中使用过 WeakHashMap 吗？</strong></p>
+<p>WeakHashMap 用来存储图片信息，可以在内存不足的时候，及时回收，避免了 OOM</p>
+<h2 id="12-X-再谈引用：虚引用"><a href="#12-X-再谈引用：虚引用" class="headerlink" title="12.X. 再谈引用：虚引用"></a>12.X. 再谈引用：虚引用</h2><h3 id="虚引用（Phantom-Reference）——对象回收跟踪"><a href="#虚引用（Phantom-Reference）——对象回收跟踪" class="headerlink" title="虚引用（Phantom Reference）——对象回收跟踪"></a>虚引用（Phantom Reference）——对象回收跟踪</h3><p>也称为“幽灵引用”或者“幻影引用”，是所有引用类型中最弱的一个。</p>
+<p>一个对象是否有虚引用的存在，完全不会决定对象的生命周期。如果一个对象仅持有虚引用，那么它和没有引用几乎是一样的，随时都可能被垃圾回收器回收。</p>
+<p>它不能单独使用，也无法通过虚引用来获取被引用的对象。当试图通过虚引用的 get()方法取得对象时，总是 null</p>
+<p><mark>为一个对象设置虚引用关联的唯一目的在于跟踪垃圾回收过程。比如：能在这个对象被收集器回收时收到一个系统通知。</mark></p>
+<p>虚引用必须和引用队列一起使用。虚引用在创建时必须提供一个引用队列作为参数。当垃圾回收器准备回收一个对象时，如果发现它还有虚引用，就会在回收对象后，将这个虚引用加入引用队列，以通知应用程序对象的回收情况。</p>
+<p><mark>由于虚引用可以跟踪对象的回收时间，因此，也可以将一些资源释放操作放置在虚引用中执行和记录。</mark></p>
+<p>在 JDK1.2 版之后提供了 PhantomReference 类来实现虚引用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">Object</span> <span class="hljs-variable">obj</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>(); <span class="hljs-comment">// 声明强引用</span><br><span class="hljs-type">ReferenceQueue</span> <span class="hljs-variable">phantomQueue</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReferenceQueue</span>();<br>PhantomReference&lt;Object&gt; sf = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PhantomReference</span>&lt;&gt;(obj, phantomQueue);<br>obj = <span class="hljs-literal">null</span>;<br></code></pre></td></tr></table></figure>
+
+<h2 id="12-11-终结器引用"><a href="#12-11-终结器引用" class="headerlink" title="12.11. 终结器引用"></a>12.11. 终结器引用</h2><p>它用于实现对象的 finalize() 方法，也可以称为终结器引用。无需手动编码，其内部配合引用队列使用。</p>
+<p>在 GC 时，终结器引用入队。由 Finalizer 线程通过终结器引用找到被引用对象调用它的 finalize()方法，第二次 GC 时才回收被引用的对象</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JVM上12_垃圾回收相关概念</div>
+      <div>http://example.com/2025/02/27/JVM上12-垃圾回收相关概念/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kon4tsu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E4%B8%8A13-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/" title="JVM上13_垃圾回收器">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JVM上13_垃圾回收器</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E4%B8%8A11-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%A6%82%E8%BF%B0%E5%8F%8A%E7%AE%97%E6%B3%95/" title="JVM上11_垃圾回收概述及算法">
+                        <span class="hidden-mobile">JVM上11_垃圾回收概述及算法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

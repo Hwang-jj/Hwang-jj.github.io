@@ -21,7 +21,7 @@
   
     <meta property="og:type" content="website">
 <meta property="og:title" content="Kon4tsu Blog">
-<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:url" content="http://example.com/page/2/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="Kon4tsu">
@@ -231,15 +231,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2025/02/27/JVM%E4%B8%8A13-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/" target="_self">
-          JVM上13_垃圾回收器
+        <a href="/2025/02/27/JVM%E4%B8%8A03-%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%8F%8A%E7%A8%8B%E5%BA%8F%E8%AE%A1%E6%95%B0%E5%99%A8/" target="_self">
+          JVM上03_运行时数据区及程序计数器
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A13-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A03-%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%8F%8A%E7%A8%8B%E5%BA%8F%E8%AE%A1%E6%95%B0%E5%99%A8/" target="_self">
         <div>
-          [toc] 13. 垃圾回收器13.1. GC 分类与性能指标13.1.1. 垃圾回收器概述垃圾收集器没有在规范中进行过多的规定，可以由不同的厂商、不同版本的 JVM 来实现。 由于 JDK 的版本处于高速迭代过程中，因此 Java 发展至今已经衍生了众多的 GC 版本。 从不同角度分析垃圾收集器，可以将 GC 分为不同的类型。 13.1.2. 垃圾收集器分类按线程数分，可以分为串行垃圾回收器和并
+          [toc] 3. 运行时数据区及程序计数器3.1. 运行时数据区3.1.1. 概述本节主要讲的是运行时数据区，也就是下图这部分，它是在类加载完成后的阶段  当我们通过前面的：类的加载-&gt; 验证 -&gt; 准备 -&gt; 解析 -&gt; 初始化 这几个阶段完成后，就会用到执行引擎对我们的类进行使用，同时执行引擎将会使用到我们运行时数据区  内存是非常重要的系统资源，是硬盘和 CPU 的中
         </div>
       </a>
 
@@ -247,7 +247,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-27 11:08" pubdate>
+            <time datetime="2025-02-27 10:54" pubdate>
               2025-02-27
             </time>
           </div>
@@ -264,15 +264,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2025/02/27/JVM%E4%B8%8A12-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5/" target="_self">
-          JVM上12_垃圾回收相关概念
+        <a href="/2025/02/27/JVM%E4%B8%8A02-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/" target="_self">
+          JVM上02_类加载子系统
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A12-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A02-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/" target="_self">
         <div>
-          [toc] 12. 垃圾回收相关概念12.1. System.gc()的理解在默认情况下，通过 system.gc()或者 Runtime.getRuntime().gc() 的调用，会显式触发 Full GC，同时对老年代和新生代进行回收，尝试释放被丢弃对象占用的内存。 然而 System.gc() 调用附带一个免责声明，无法保证对垃圾收集器的调用。(不能确保立即生效) JVM 实现者可以通过
+          [toc] 2. 类加载子系统2.1. 内存结构概述 Class 文件 类加载子系统 运行时数据区 方法区 堆 程序计数器 虚拟机栈 本地方法栈   执行引擎 本地方法接口 本地方法库    如果自己想手写一个 Java 虚拟机的话，主要考虑哪些结构呢？  类加载器 执行引擎  2.2. 类加载器与类的加载过程类加载器子系统作用   类加载器子系统负责从文件系统或者网络中加载 Class 文件，c
         </div>
       </a>
 
@@ -280,7 +280,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-27 11:08" pubdate>
+            <time datetime="2025-02-27 10:50" pubdate>
               2025-02-27
             </time>
           </div>
@@ -297,15 +297,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2025/02/27/JVM%E4%B8%8A11-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%A6%82%E8%BF%B0%E5%8F%8A%E7%AE%97%E6%B3%95/" target="_self">
-          JVM上11_垃圾回收概述及算法
+        <a href="/2025/02/27/JVM%E4%B8%8A01-JVM%E4%B8%8EJava%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" target="_self">
+          JVM上01_JVM与Java体系结构
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A11-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%A6%82%E8%BF%B0%E5%8F%8A%E7%AE%97%E6%B3%95/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A01-JVM%E4%B8%8EJava%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" target="_self">
         <div>
-          [toc] 11. 垃圾回收概述及算法11.1. 垃圾回收概述11.1.1. 什么是垃圾？ 垃圾收集，不是 Java 语言的伴生产物。早在 1960 年，第一门开始使用内存动态分配和垃圾收集技术的 Lisp 语言诞生。 关于垃圾收集有三个经典问题：  哪些内存需要回收？ 什么时候回收？ 如何回收？  垃圾收集机制是 Java 的招牌能力，极大地提高了开发效率。如今，垃圾收集几乎成为现代语言的标配，
+          [toc] 1.JVM 与 Java 体系结构1.1. 前言作为 Java 工程师的你曾被伤害过吗？你是否也遇到过这些问题？  运行着的线上系统突然卡死，系统无法访问，甚至直接 OOM 想解决线上 JVM GC 问题，但却无从下手 新项目上线，对各种 JVM 参数设置一脸茫然，直接默认吧然后就 JJ 了 每次面试之前都要重新背一遍 JVM 的一些原理概念性的东西，然而面试官却经常问你在实际项目中如
         </div>
       </a>
 
@@ -313,7 +313,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-27 11:06" pubdate>
+            <time datetime="2025-02-27 10:48" pubdate>
               2025-02-27
             </time>
           </div>
@@ -330,15 +330,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2025/02/27/JVM%E4%B8%8A10-StringTable/" target="_self">
-          JVM上10_StringTable
+        <a href="/2025/02/21/MYDB-record/" target="_self">
+          MYDB record
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A10-StringTable/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/21/MYDB-record/" target="_self">
         <div>
-          [toc] 10. StringTable10.1. String 的基本特性 String：字符串，使用一对””引起来表示 String 声明为 final 的，不可被继承 String 实现了 Serializable 接口：表示字符串是支持序列化的。 String 实现了 Comparable 接口：表示 string 可以比较大小 String 在 jdk8 及以前内部定义了 final
+          MYDB1. 项目结构整体架构  Transaction Manager（TM） Data Manager（DM） Version Manager（VM） Index Manager（IM） Table Manager（TBM）  每个模块的职责如下：  TM 通过维护 XID 文件来维护事务的状态，并提供接口供其他模块来查询某个事务的状态。 DM 直接管理数据库 DB 文件和日志文件。DM 的主
         </div>
       </a>
 
@@ -346,8 +346,75 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-27 11:05" pubdate>
-              2025-02-27
+            <time datetime="2025-02-21 10:30" pubdate>
+              2025-02-21
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java/" class="category-chain-item">Java</a>
+  
+  
+
+      </span>
+    
+  
+    
+  
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Java/">#Java</a>
+            
+              <a href="/tags/Database/">#Database</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/02/17/RPC/" target="_self">
+          RPC
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/17/RPC/" target="_self">
+        <div>
+          RPC（Remote Procedure Call） 本文参考： ​	JavaGuide星球RPC文档 ​	https://javaguide.cn/distributed-system/rpc/http_rpc.html#http-%E5%92%8C-rpc-%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB  1. 什么是RPC？RPC原理是什么？什么是
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-17 11:48" pubdate>
+              2025-02-17
             </time>
           </div>
         
@@ -363,15 +430,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2025/02/27/JVM%E4%B8%8A09-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/" target="_self">
-          JVM上09_执行引擎
+        <a href="/2025/02/15/%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE/" target="_self">
+          点评项目
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A09-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/15/%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE/" target="_self">
         <div>
-          [toc] 9. 执行引擎9.1. 执行引擎概述执行引擎属于 JVM 的下层，里面包括解释器、及时编译器、垃圾回收器  执行引擎是 Java 虚拟机核心的组成部分之一。 “虚拟机”是一个相对于“物理机”的概念，这两种机器都有代码执行能力，其区别是物理机的执行引擎是直接建立在处理器、缓存、指令集和操作系统层面上的，而虚拟机的执行引擎则是由软件自行实现的，因此可以不受物理条件制约地定制指令集与执行引擎
+          点评项目短信登录功能基于Session实现登录 Session原理 Session会为每一次会话分配一个Session对象 同一个浏览器发起的多次请求，同属于一次会话（Session） 首次使用到Session时，服务器会自动创建Session，并创建Cookie存储SessionId发送回客户端  Session在项目中的使用 保存验证码到session：session.setAttribute
         </div>
       </a>
 
@@ -379,12 +446,48 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-27 11:02" pubdate>
-              2025-02-27
+            <time datetime="2025-02-15 19:00" pubdate>
+              2025-02-15
             </time>
           </div>
         
         
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java/" class="category-chain-item">Java</a>
+  
+  
+
+      </span>
+    
+  
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Java/">#Java</a>
+            
+              <a href="/tags/Redis/">#Redis</a>
+            
+              <a href="/tags/%E7%BC%93%E5%AD%98/">#缓存</a>
+            
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">#分布式锁</a>
+            
+          </div>
         
       </div>
     </article>
@@ -396,15 +499,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2025/02/27/JVM%E4%B8%8A08-%E5%AF%B9%E8%B1%A1%E5%AE%9E%E4%BE%8B%E5%8C%96%E5%8F%8A%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98/" target="_self">
-          JVM上08_对象实例化及直接内存
+        <a href="/2025/02/15/hello-world/" target="_self">
+          Hello World
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A08-%E5%AF%B9%E8%B1%A1%E5%AE%9E%E4%BE%8B%E5%8C%96%E5%8F%8A%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/15/hello-world/" target="_self">
         <div>
-          [toc] 8. 对象实例化及直接内存8.1. 对象实例化面试题  美团： 对象在 JVM 中是怎么存储的？ 对象头信息里面有哪些东西？ 蚂蚁金服： Java 对象头有什么？   8.1.1. 创建对象的方式 new：最常见的方式、Xxx 的静态方法，XxxBuilder&#x2F;XxxFactory 的静态方法 Class 的 newInstance 方法：反射的方式，只能调用空参的构造器，权
+          Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick
         </div>
       </a>
 
@@ -412,140 +515,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-27 11:02" pubdate>
-              2025-02-27
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/02/27/JVM%E4%B8%8A07-%E6%96%B9%E6%B3%95%E5%8C%BA/" target="_self">
-          JVM上07_方法区
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A07-%E6%96%B9%E6%B3%95%E5%8C%BA/" target="_self">
-        <div>
-          [toc] 7. 方法区 从线程共享与否的角度来看  7.1. 栈、堆、方法区的交互关系 7.2. 方法区的理解官方文档：Chapter 2. The Structure of the Java Virtual Machine (oracle.com)  7.2.1. 方法区在哪里？《Java 虚拟机规范》中明确说明：“尽管所有的方法区在逻辑上是属于堆的一部分，但一些简单的实现可能不会选择去进行垃
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-27 11:01" pubdate>
-              2025-02-27
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/02/27/JVM%E4%B8%8A06-%E5%A0%86/" target="_self">
-          JVM上06_堆
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A06-%E5%A0%86/" target="_self">
-        <div>
-          [toc] 6. 堆6.1. 堆（Heap）的核心概述堆针对一个 JVM 进程来说是唯一的，也就是一个进程只有一个 JVM，但是进程包含多个线程，他们是共享同一堆空间的。  一个 JVM 实例只存在一个堆内存，堆也是 Java 内存管理的核心区域。 Java 堆区在 JVM 启动的时候即被创建，其空间大小也就确定了。是 JVM 管理的最大一块内存空间。  堆内存的大小是可以调节的。  《Java
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-27 10:59" pubdate>
-              2025-02-27
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/02/27/JVM%E4%B8%8A05-%E6%9C%AC%E5%9C%B0%E6%96%B9%E6%B3%95%E6%8E%A5%E5%8F%A3%E5%92%8C%E6%9C%AC%E5%9C%B0%E6%96%B9%E6%B3%95%E6%A0%88/" target="_self">
-          JVM上05_本地方法接口和本地方法栈
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A05-%E6%9C%AC%E5%9C%B0%E6%96%B9%E6%B3%95%E6%8E%A5%E5%8F%A3%E5%92%8C%E6%9C%AC%E5%9C%B0%E6%96%B9%E6%B3%95%E6%A0%88/" target="_self">
-        <div>
-          [toc] 5. 本地方法接口和本地方法栈5.1. 什么是本地方法？简单地讲，一个 Native Method 是一个 Java 调用非 Java 代码的接囗。一个 Native Method 是这样一个 Java 方法：该方法的实现由非 Java 语言实现，比如 C。这个特征并非 Java 所特有，很多其它的编程语言都有这一机制，比如在 C++中，你可以用 extern “c” 告知 c++编译
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-27 10:58" pubdate>
-              2025-02-27
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/02/27/JVM%E4%B8%8A04-%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A0%88/" target="_self">
-          JVM上04_虚拟机栈
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/27/JVM%E4%B8%8A04-%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A0%88/" target="_self">
-        <div>
-          [toc] 4. 虚拟机栈4.1. 虚拟机栈概述4.1.1. 虚拟机栈出现的背景由于跨平台性的设计，Java 的指令都是根据栈来设计的。不同平台 CPU 架构不同，所以不能设计为基于寄存器的。 优点是跨平台，指令集小，编译器容易实现，缺点是性能下降，实现同样的功能需要更多的指令。 4.1.2. 初步印象有不少 Java 开发人员一提到 Java 内存结构，就会非常粗粒度地将 JVM 中的内存区理解
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-27 10:56" pubdate>
-              2025-02-27
+            <time datetime="2025-02-15 14:43" pubdate>
+              2025-02-15
             </time>
           </div>
         
@@ -559,7 +530,7 @@
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
     </span>
   </nav>
 
