@@ -1,0 +1,1691 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kon4tsu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="[toc] 1. 概述 2. 加载与存储指令   2.1. 局部变量压栈指令 iload 从局部变量中装载int类型值 lload 从局部变量中装载long类型值 fload 从局部变量中装载float类型值 dload 从局部变量中装载double类型值 aload 从局部变量中装载引用类型值（refernce） iload_0 从局部变量0中装载int类型值 iload_1 从局部变量1中装载">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM中02-字节码指令集">
+<meta property="og:url" content="http://example.com/2025/02/27/JVM%E4%B8%AD02-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/index.html">
+<meta property="og:site_name" content="Kon4tsu Blog">
+<meta property="og:description" content="[toc] 1. 概述 2. 加载与存储指令   2.1. 局部变量压栈指令 iload 从局部变量中装载int类型值 lload 从局部变量中装载long类型值 fload 从局部变量中装载float类型值 dload 从局部变量中装载double类型值 aload 从局部变量中装载引用类型值（refernce） iload_0 从局部变量0中装载int类型值 iload_1 从局部变量1中装载">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115617.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115618.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115619.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115620.png">
+<meta property="og:image" content="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210424190846.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115621.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115622.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115623.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115624.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115625.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115626.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115627.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115628.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115629.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115630.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115631.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115632.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115633.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115634.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115635.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115636.gif">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115637.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115638.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115639.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115640.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115641.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115642.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115643.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115644.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115645.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115646.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115647.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115648.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115649.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115650.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115651.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115652.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115653.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115654.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115655.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115656.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115657.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115658.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115659.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115660.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115661.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115662.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115663.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115664.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115665.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115666.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115667.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115668.png">
+<meta property="article:published_time" content="2025-02-27T03:14:50.000Z">
+<meta property="article:modified_time" content="2025-02-27T03:17:15.294Z">
+<meta property="article:author" content="Kon4tsu">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115617.png">
+  
+  
+  
+  <title>JVM中02-字节码指令集 - Kon4tsu Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/macpanel.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kon4tsu&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JVM中02-字节码指令集"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-27 11:14" pubdate>
+          2025年2月27日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          40 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">JVM中02-字节码指令集</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>[toc]</p>
+<h1 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h1><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115617.png" srcset="/img/loading.gif" lazyload><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115618.png" srcset="/img/loading.gif" lazyload><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115619.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h1 id="2-加载与存储指令"><a href="#2-加载与存储指令" class="headerlink" title="2. 加载与存储指令"></a>2. 加载与存储指令</h1><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115620.png" srcset="/img/loading.gif" lazyload alt="0ca8044c-f78d-4787-aeac-c986a35f9cdf"><br><img src="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210424190846.png" srcset="/img/loading.gif" lazyload alt="16e3afaf-b7d8-4a23-8897-9fe02586aafd"><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115621.png" srcset="/img/loading.gif" lazyload alt="08e01fd0-a33e-47e4-8fd2-34c2935db71d"></p>
+<hr/>
+
+<h2 id="2-1-局部变量压栈指令"><a href="#2-1-局部变量压栈指令" class="headerlink" title="2.1. 局部变量压栈指令"></a>2.1. 局部变量压栈指令</h2><blockquote>
+<p>iload 从局部变量中装载int类型值</p>
+<p>lload 从局部变量中装载long类型值</p>
+<p>fload 从局部变量中装载float类型值</p>
+<p>dload 从局部变量中装载double类型值</p>
+<p>aload 从局部变量中装载引用类型值（refernce）</p>
+<p>iload_0 从局部变量0中装载int类型值</p>
+<p>iload_1 从局部变量1中装载int类型值</p>
+<p>iload_2 从局部变量2中装载int类型值</p>
+<p>iload_3 从局部变量3中装载int类型值</p>
+<p>lload_0 从局部变量0中装载long类型值</p>
+<p>lload_1 从局部变量1中装载long类型值</p>
+<p>lload_2 从局部变量2中装载long类型值</p>
+<p>lload_3 从局部变量3中装载long类型值</p>
+<p>fload_0 从局部变量0中装载float类型值</p>
+<p>fload_1 从局部变量1中装载float类型值</p>
+<p>fload_2 从局部变量2中装载float类型值</p>
+<p>fload_3 从局部变量3中装载float类型值</p>
+<p>dload_0 从局部变量0中装载double类型值</p>
+<p>dload_1 从局部变量1中装载double类型值</p>
+<p>dload_2 从局部变量2中装载double类型值</p>
+<p>dload_3 从局部变量3中装载double类型值</p>
+<p>aload_0 从局部变量0中装载引用类型值</p>
+<p>aload_1 从局部变量1中装载引用类型值</p>
+<p>aload_2 从局部变量2中装载引用类型值</p>
+<p>aload_3 从局部变量3中装载引用类型值</p>
+<p>iaload 从数组中装载int类型值</p>
+<p>laload 从数组中装载long类型值</p>
+<p>faload 从数组中装载float类型值</p>
+<p>daload 从数组中装载double类型值</p>
+<p>aaload 从数组中装载引用类型值</p>
+<p>baload 从数组中装载byte类型或boolean类型值</p>
+<p>caload 从数组中装载char类型值</p>
+<p>saload 从数组中装载short类型值</p>
+</blockquote>
+<h2 id="局部变量压栈常用指令集"><a href="#局部变量压栈常用指令集" class="headerlink" title="局部变量压栈常用指令集"></a>局部变量压栈常用指令集</h2><table>
+<thead>
+<tr>
+<th>xload_n</th>
+<th>xload_0</th>
+<th>xload_1</th>
+<th>xload_2</th>
+<th>xload_3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><b>iload_n</b></td>
+<td>iload_0</td>
+<td>iload_1</td>
+<td>iload_2</td>
+<td>iload_3</td>
+</tr>
+<tr>
+<td><b>lload_n</b></td>
+<td>lload_0</td>
+<td>lload_1</td>
+<td>lload_2</td>
+<td>lload_3</td>
+</tr>
+<tr>
+<td><b>fload_n</b></td>
+<td>fload_0</td>
+<td>fload_1</td>
+<td>fload_2</td>
+<td>fload_3</td>
+</tr>
+<tr>
+<td><b>dload_n</b></td>
+<td>dload_0</td>
+<td>dload_1</td>
+<td>dload_2</td>
+<td>dload_3</td>
+</tr>
+<tr>
+<td><b>aload_n</b></td>
+<td>aload_0</td>
+<td>aload_1</td>
+<td>aload_2</td>
+<td>aload_3</td>
+</tr>
+</tbody></table>
+<h2 id="局部变量压栈指令剖析"><a href="#局部变量压栈指令剖析" class="headerlink" title="局部变量压栈指令剖析"></a>局部变量压栈指令剖析</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115622.png" srcset="/img/loading.gif" lazyload alt="1"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">load</span><span class="hljs-params">(<span class="hljs-type">int</span> num, Object obj, <span class="hljs-type">long</span> count, <span class="hljs-type">boolean</span> flag, <span class="hljs-type">short</span>[] arr)</span> &#123;<br>	System.out.println(num);<br>    System.out.println(obj);<br>    System.out.println(count);<br>    System.out.println(flag);<br>    System.out.println(arr);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115623.png" srcset="/img/loading.gif" lazyload alt="3"></p>
+<hr/>
+
+<h2 id="2-2-常量入栈指令"><a href="#2-2-常量入栈指令" class="headerlink" title="2.2. 常量入栈指令"></a>2.2. 常量入栈指令</h2><blockquote>
+<p>aconst_null 将null对象引用压入栈</p>
+<p>iconst_m1 将int类型常量-1压入栈</p>
+<p>iconst_0 将int类型常量0压入栈</p>
+<p>iconst_1 将int类型常量1压入栈</p>
+<p>iconst_2 将int类型常量2压入栈</p>
+<p>iconst_3 将int类型常量3压入栈</p>
+<p>iconst_4 将int类型常量4压入栈</p>
+<p>iconst_5 将int类型常量5压入栈</p>
+<p>lconst_0 将long类型常量0压入栈</p>
+<p>lconst_1 将long类型常量1压入栈</p>
+<p>fconst_0 将float类型常量0压入栈</p>
+<p>fconst_1 将float类型常量1压入栈</p>
+<p>dconst_0 将double类型常量0压入栈</p>
+<p>dconst_1 将double类型常量1压入栈</p>
+<p>bipush 将一个8位带符号整数压入栈</p>
+<p>sipush 将16位带符号整数压入栈</p>
+<p>ldc 把常量池中的项压入栈</p>
+<p>ldc_w 把常量池中的项压入栈（使用宽索引）</p>
+<p>ldc2_w 把常量池中long类型或者double类型的项压入栈（使用宽索引）</p>
+</blockquote>
+<h2 id="常量入栈常用指令集"><a href="#常量入栈常用指令集" class="headerlink" title="常量入栈常用指令集"></a>常量入栈常用指令集</h2><table>
+<thead>
+<tr>
+<th align="center">xconst_n</th>
+<th>范围</th>
+<th>xconst_null</th>
+<th align="center">xconst_m1</th>
+<th align="center">xconst_0</th>
+<th align="center">xconst_1</th>
+<th align="center">xconst_2</th>
+<th align="center">xconst_3</th>
+<th align="center">xconst_4</th>
+<th align="center">xconst_5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>iconst_n</strong></td>
+<td>[-1, 5]</td>
+<td></td>
+<td align="center">iconst_m1</td>
+<td align="center">iconst_0</td>
+<td align="center">iconst_1</td>
+<td align="center">iconst_2</td>
+<td align="center">iconst_3</td>
+<td align="center">iconst_4</td>
+<td align="center">iconst_5</td>
+</tr>
+<tr>
+<td align="center"><strong>lconst_n</strong></td>
+<td>0, 1</td>
+<td></td>
+<td align="center"></td>
+<td align="center">lconst_0</td>
+<td align="center">lconst_1</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"><strong>fconst_n</strong></td>
+<td>0, 1, 2</td>
+<td></td>
+<td align="center"></td>
+<td align="center">fconst_0</td>
+<td align="center">fconst_1</td>
+<td align="center">fconst_2</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"><strong>dconst_n</strong></td>
+<td>0, 1</td>
+<td></td>
+<td align="center"></td>
+<td align="center">dconst_0</td>
+<td align="center">dconst_1</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"><strong>aconst_n</strong></td>
+<td>null, String literal, Class literal</td>
+<td>aconst_null</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"><strong>bipush</strong></td>
+<td>一个字节，2^8^，[-2^7^, 2^7^ - 1]，即[-128, 127]</td>
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"><strong>sipush</strong></td>
+<td>两个字节，2^16^，[-2^15^, 2^15^ - 1]，即[-32768, 32767]</td>
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"><strong>ldc</strong></td>
+<td>四个字节，2^32^，[-2^31^, 2^31^ - 1]</td>
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"><strong>ldc_w</strong></td>
+<td>宽索引</td>
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"><strong>ldc2_w</strong></td>
+<td>宽索引，long或double</td>
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<h2 id="常量入栈指令剖析"><a href="#常量入栈指令剖析" class="headerlink" title="常量入栈指令剖析"></a>常量入栈指令剖析</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115624.png" srcset="/img/loading.gif" lazyload alt="437a717e-98e2-4847-b52e-e6632d0745a4"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115625.png" srcset="/img/loading.gif" lazyload alt="ffd7246e-2e46-41e0-9fd6-1e65ace5dbd1"></p>
+<table>
+    <tbody>  
+        <tr>
+            <th>类型</th> 
+            <th>常数指令</th> 
+            <th>范围</th> 
+       </tr>
+       <tr>
+            <td rowspan="4">int(boolean,byte,char,short)</td>
+            <td>iconst</td>
+            <td>[-1, 5]</td>
+       </tr>	
+       <tr>
+            <td>bipush</td>
+            <td>[-128, 127]</td>
+       </tr>
+       <tr>
+            <td>sipush</td>
+            <td>[-32768, 32767]</td>
+       </tr> 
+       <tr>
+            <td>ldc</td>
+            <td>any int value</td>
+       </tr>
+       <tr>
+            <td rowspan="2">long</td>
+            <td>lconst</td>
+            <td>0, 1</td>
+       </tr>	
+       <tr>
+            <td>ldc</td>
+            <td>any long value</td>
+       </tr>
+       <tr>
+            <td rowspan="2">float</td>
+            <td>fconst</td>
+            <td>0, 1, 2</td>
+       </tr>	
+       <tr>
+            <td>ldc</td>
+            <td>any float value</td>
+       </tr>
+       <tr>
+            <td rowspan="2">double</td>
+            <td>dconst</td>
+            <td>0, 1</td>
+       </tr>	
+       <tr>
+            <td>ldc</td>
+            <td>any double value</td>
+       </tr> 
+       <tr>
+            <td rowspan="2">reference</td>
+            <td>aconst</td>
+            <td>null</td>
+       </tr>
+       <tr>
+            <td>ldc</td>
+            <td>String literal, Class literal</td>
+       </tr>
+   <tbody> 
+</table>
+
+
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115626.png" srcset="/img/loading.gif" lazyload alt="566b9397-5afe-4a3f-9e17-9ebf504dfc80"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115627.png" srcset="/img/loading.gif" lazyload alt="b59702d2-4c93-44df-87f1-01a5dfe53b61"></p>
+<hr/>
+
+<h2 id="2-3-出栈装入局部变量表指令"><a href="#2-3-出栈装入局部变量表指令" class="headerlink" title="2.3. 出栈装入局部变量表指令"></a>2.3. 出栈装入局部变量表指令</h2><blockquote>
+<p>istore 将int类型值存入局部变量</p>
+<p>lstore 将long类型值存入局部变量</p>
+<p>fstore 将float类型值存入局部变量</p>
+<p>dstore 将double类型值存入局部变量</p>
+<p>astore 将将引用类型或returnAddress类型值存入局部变量</p>
+<p>istore_0 将int类型值存入局部变量0</p>
+<p>istore_1 将int类型值存入局部变量1</p>
+<p>istore_2 将int类型值存入局部变量2</p>
+<p>istore_3 将int类型值存入局部变量3</p>
+<p>lstore_0 将long类型值存入局部变量0</p>
+<p>lstore_1 将long类型值存入局部变量1</p>
+<p>lstore_2 将long类型值存入局部变量2</p>
+<p>lstore_3 将long类型值存入局部变量3</p>
+<p>fstore_0 将float类型值存入局部变量0</p>
+<p>fstore_1 将float类型值存入局部变量1</p>
+<p>fstore_2 将float类型值存入局部变量2</p>
+<p>fstore_3 将float类型值存入局部变量3</p>
+<p>dstore_0 将double类型值存入局部变量0</p>
+<p>dstore_1 将double类型值存入局部变量1</p>
+<p>dstore_2 将double类型值存入局部变量2</p>
+<p>dstore_3 将double类型值存入局部变量3</p>
+<p>astore_0 将引用类型或returnAddress类型值存入局部变量0</p>
+<p>astore_1 将引用类型或returnAddress类型值存入局部变量1</p>
+<p>astore_2 将引用类型或returnAddress类型值存入局部变量2</p>
+<p>astore_3 将引用类型或returnAddress类型值存入局部变量3</p>
+<p>iastore 将int类型值存入数组中</p>
+<p>lastore 将long类型值存入数组中</p>
+<p>fastore 将float类型值存入数组中</p>
+<p>dastore 将double类型值存入数组中</p>
+<p>aastore 将引用类型值存入数组中</p>
+<p>bastore 将byte类型或者boolean类型值存入数组中</p>
+<p>castore 将char类型值存入数组中</p>
+<p>sastore 将short类型值存入数组中</p>
+<p>wide指令</p>
+<p>wide 使用附加字节扩展局部变量索引</p>
+</blockquote>
+<h2 id="出栈装入局部变量表常用指令集"><a href="#出栈装入局部变量表常用指令集" class="headerlink" title="出栈装入局部变量表常用指令集"></a>出栈装入局部变量表常用指令集</h2><table>
+<thead>
+<tr>
+<th align="center">xstore_n</th>
+<th align="center">xstore_0</th>
+<th align="center">xstore_1</th>
+<th align="center">xstore_2</th>
+<th align="center">xstore_3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>istore_n</strong></td>
+<td align="center">istore_0</td>
+<td align="center">istore_1</td>
+<td align="center">istore_2</td>
+<td align="center">istore_3</td>
+</tr>
+<tr>
+<td align="center"><strong>lstore_n</strong></td>
+<td align="center">lstore_0</td>
+<td align="center">lstore_1</td>
+<td align="center">lstore_2</td>
+<td align="center">lstore_3</td>
+</tr>
+<tr>
+<td align="center"><strong>fstore_n</strong></td>
+<td align="center">fstore_0</td>
+<td align="center">fstore_1</td>
+<td align="center">fstore_2</td>
+<td align="center">fstore_3</td>
+</tr>
+<tr>
+<td align="center"><strong>dstore_n</strong></td>
+<td align="center">dstore_0</td>
+<td align="center">dstore_1</td>
+<td align="center">dstore_2</td>
+<td align="center">dstore_3</td>
+</tr>
+<tr>
+<td align="center"><strong>astore_n</strong></td>
+<td align="center">astore_0</td>
+<td align="center">astore_1</td>
+<td align="center">astore_2</td>
+<td align="center">astore_3</td>
+</tr>
+</tbody></table>
+<h2 id="出栈装入局部变量表指令剖析"><a href="#出栈装入局部变量表指令剖析" class="headerlink" title="出栈装入局部变量表指令剖析"></a>出栈装入局部变量表指令剖析</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115628.png" srcset="/img/loading.gif" lazyload alt="1"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115629.png" srcset="/img/loading.gif" lazyload alt="2"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115630.png" srcset="/img/loading.gif" lazyload alt="3"></p>
+<hr/>
+
+<h1 id="3-算术指令"><a href="#3-算术指令" class="headerlink" title="3. 算术指令"></a>3. 算术指令</h1><blockquote>
+<h2 id="整数运算"><a href="#整数运算" class="headerlink" title="整数运算"></a>整数运算</h2><p>iadd 执行int类型的加法</p>
+<p>ladd 执行long类型的加法</p>
+<p>isub 执行int类型的减法</p>
+<p>lsub 执行long类型的减法</p>
+<p>imul 执行int类型的乘法</p>
+<p>lmul 执行long类型的乘法</p>
+<p>idiv 执行int类型的除法</p>
+<p>ldiv 执行long类型的除法</p>
+<p>irem 计算int类型除法的余数</p>
+<p>lrem 计算long类型除法的余数</p>
+<p>ineg 对一个int类型值进行取反操作</p>
+<p>lneg 对一个long类型值进行取反操作</p>
+<p>iinc 把一个常量值加到一个int类型的局部变量上</p>
+<h2 id="逻辑运算"><a href="#逻辑运算" class="headerlink" title="逻辑运算"></a>逻辑运算</h2><h3 id="移位操作"><a href="#移位操作" class="headerlink" title="移位操作"></a>移位操作</h3><p>ishl 执行int类型的向左移位操作</p>
+<p>lshl 执行long类型的向左移位操作</p>
+<p>ishr 执行int类型的向右移位操作</p>
+<p>lshr 执行long类型的向右移位操作</p>
+<p>iushr 执行int类型的向右逻辑移位操作</p>
+<p>lushr 执行long类型的向右逻辑移位操作</p>
+<h3 id="按位布尔运算"><a href="#按位布尔运算" class="headerlink" title="按位布尔运算"></a>按位布尔运算</h3><p>iand 对int类型值进行“逻辑与”操作</p>
+<p>land 对long类型值进行“逻辑与”操作</p>
+<p>ior 对int类型值进行“逻辑或”操作</p>
+<p>lor 对long类型值进行“逻辑或”操作</p>
+<p>ixor 对int类型值进行“逻辑异或”操作</p>
+<p>lxor 对long类型值进行“逻辑异或”操作</p>
+<h3 id="浮点运算"><a href="#浮点运算" class="headerlink" title="浮点运算"></a>浮点运算</h3><p>fadd 执行float类型的加法</p>
+<p>dadd 执行double类型的加法</p>
+<p>fsub 执行float类型的减法</p>
+<p>dsub 执行double类型的减法</p>
+<p>fmul 执行float类型的乘法</p>
+<p>dmul 执行double类型的乘法</p>
+<p>fdiv 执行float类型的除法</p>
+<p>ddiv 执行double类型的除法</p>
+<p>frem 计算float类型除法的余数</p>
+<p>drem 计算double类型除法的余数</p>
+<p>fneg 将一个float类型的数值取反</p>
+<p>dneg 将一个double类型的数值取反</p>
+</blockquote>
+<h2 id="算术指令集"><a href="#算术指令集" class="headerlink" title="算术指令集"></a>算术指令集</h2><table>
+    <tbody>  
+        <tr>
+            <th colspan="2">算数指令</th> 
+            <th>int(boolean,byte,char,short)</th> 
+            <th>long</th>
+            <th>float</th> 
+      		<th>double</th> 
+       </tr>
+       <tr>
+            <td colspan="2">加法指令</td>
+            <td>iadd</td>
+            <td>ladd</td>
+            <td>fadd</td>
+            <td>dadd</td>
+       </tr>	
+       <tr>
+            <td colspan="2">减法指令</td>
+            <td>isub</td>
+            <td>lsub</td>
+            <td>fsub</td>
+            <td>dsub</td>
+       </tr> 
+       <tr>
+            <td colspan="2">乘法指令</td>
+            <td>imul</td>
+            <td>lmul</td>
+            <td>fmul</td>
+            <td>dmul</td>
+       </tr> 
+       <tr>
+            <td colspan="2">除法指令</td>
+            <td>idiv</td>
+            <td>ldiv</td>
+            <td>fdiv</td>
+            <td>ddiv</td>
+       </tr>
+       <tr>
+            <td colspan="2">求余指令</td>
+            <td>irem</td>
+            <td>lrem</td>
+            <td>frem</td>
+            <td>drem</td>
+       </tr>
+       <tr>
+            <td colspan="2">取反指令</td>
+            <td>ineg</td>
+            <td>lneg</td>
+            <td>fneg</td>
+            <td>dneg</td>
+       </tr>
+       <tr>
+            <td colspan="2">自增指令</td>
+            <td>iinc</td>
+            <td></td>
+            <td></td>
+            <td></td>
+       </tr>
+       <tr>
+            <td rowspan="4">位运算指令</td>
+            <td>按位或指令</td>
+            <td>ior</td>
+            <td>lor</td>
+            <td></td>
+            <td></td>
+       </tr> 
+       <tr>
+            <td>按位或指令</td>
+            <td>ior</td>
+            <td>lor</td>
+            <td></td>
+            <td></td>
+       </tr> 
+       <tr>
+            <td>按位与指令</td>
+            <td>iand</td>
+            <td>land</td>
+            <td></td>
+            <td></td>
+       </tr>
+       <tr>
+            <td>按位异或指令</td>
+            <td>ixor</td>
+            <td>lxor</td>
+            <td></td>
+            <td></td>
+       </tr> 
+       <tr>
+            <td colspan="2">比较指令</td>
+            <td></td>
+            <td>lcmp</td>
+            <td>fcmpg / fcmpl</td>
+            <td>dcmpg / dcmpl</td>
+       </tr> 
+   <tbody> 
+</table>
+
+
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115631.png" srcset="/img/loading.gif" lazyload></p>
+<blockquote>
+<p>注意：NaN(Not a Number)表示不是一个数字</p>
+</blockquote>
+<h2 id="算术指令举例"><a href="#算术指令举例" class="headerlink" title="算术指令举例"></a>算术指令举例</h2><h3 id="举例1"><a href="#举例1" class="headerlink" title="举例1"></a>举例1</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">bar</span><span class="hljs-params">(<span class="hljs-type">int</span> i)</span> &#123;<br>	<span class="hljs-keyword">return</span> ((i + <span class="hljs-number">1</span>) - <span class="hljs-number">2</span>) * <span class="hljs-number">3</span> / <span class="hljs-number">4</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115632.png" srcset="/img/loading.gif" lazyload alt="a54c2ac8-dd36-49f4-a49d-9afd725e8365"></p>
+<h3 id="举例2"><a href="#举例2" class="headerlink" title="举例2"></a>举例2</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">add</span><span class="hljs-params">()</span> &#123;<br>	<span class="hljs-type">byte</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">15</span>;<br>	<span class="hljs-type">int</span> <span class="hljs-variable">j</span> <span class="hljs-operator">=</span> <span class="hljs-number">8</span>;<br>	<span class="hljs-type">int</span> <span class="hljs-variable">k</span> <span class="hljs-operator">=</span> i + j;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115633.png" srcset="/img/loading.gif" lazyload alt="image-20210424210710750"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115634.png" srcset="/img/loading.gif" lazyload alt="2"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115635.png" srcset="/img/loading.gif" lazyload alt="3"></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115636.gif" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h3 id="举例3"><a href="#举例3" class="headerlink" title="举例3"></a>举例3</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>	<span class="hljs-type">int</span> <span class="hljs-variable">x</span> <span class="hljs-operator">=</span> <span class="hljs-number">500</span>;<br>	<span class="hljs-type">int</span> <span class="hljs-variable">y</span> <span class="hljs-operator">=</span> <span class="hljs-number">100</span>;<br>	<span class="hljs-type">int</span> <span class="hljs-variable">a</span> <span class="hljs-operator">=</span> x / y;<br>	<span class="hljs-type">int</span> <span class="hljs-variable">b</span> <span class="hljs-operator">=</span> <span class="hljs-number">50</span>;<br>	System.out.println(a + b);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115637.png" srcset="/img/loading.gif" lazyload alt="c43c0407-020f-4ec4-bd27-e4c109640b39"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115638.png" srcset="/img/loading.gif" lazyload alt="04282df1-4e52-4c3d-a47b-84023159b624"></p>
+<hr/>
+
+<h1 id="4-类型转换指令"><a href="#4-类型转换指令" class="headerlink" title="4. 类型转换指令"></a>4. 类型转换指令</h1><blockquote>
+<h2 id="宽化类型转换"><a href="#宽化类型转换" class="headerlink" title="宽化类型转换"></a>宽化类型转换</h2><p>i2l 把int类型的数据转化为long类型</p>
+<p>i2f 把int类型的数据转化为float类型</p>
+<p>i2d 把int类型的数据转化为double类型</p>
+<p>l2f 把long类型的数据转化为float类型</p>
+<p>l2d 把long类型的数据转化为double类型</p>
+<p>f2d 把float类型的数据转化为double类型</p>
+<h2 id="窄化类型转换"><a href="#窄化类型转换" class="headerlink" title="窄化类型转换"></a>窄化类型转换</h2><p>i2b 把int类型的数据转化为byte类型</p>
+<p>i2c 把int类型的数据转化为char类型</p>
+<p>i2s 把int类型的数据转化为short类型</p>
+<p>l2i 把long类型的数据转化为int类型</p>
+<p>f2i 把float类型的数据转化为int类型</p>
+<p>f2l 把float类型的数据转化为long类型</p>
+<p>d2i 把double类型的数据转化为int类型</p>
+<p>d2l 把double类型的数据转化为long类型</p>
+<p>d2f 把double类型的数据转化为float类型</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center"><strong>byte</strong></th>
+<th align="center"><strong>char</strong></th>
+<th align="center"><strong>short</strong></th>
+<th align="center"><strong>int</strong></th>
+<th align="center"><strong>long</strong></th>
+<th align="center"><strong>float</strong></th>
+<th align="center"><strong>double</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>int</strong></td>
+<td align="center">i2b</td>
+<td align="center">i2c</td>
+<td align="center">i2s</td>
+<td align="center">○</td>
+<td align="center">i2l</td>
+<td align="center">i2f</td>
+<td align="center">i2d</td>
+</tr>
+<tr>
+<td align="center"><strong>long</strong></td>
+<td align="center">l2i i2b</td>
+<td align="center">l2i i2c</td>
+<td align="center">l2i i2s</td>
+<td align="center">l2i</td>
+<td align="center">○</td>
+<td align="center">l2f</td>
+<td align="center">l2d</td>
+</tr>
+<tr>
+<td align="center"><strong>float</strong></td>
+<td align="center">f2i i2b</td>
+<td align="center">f2i i2c</td>
+<td align="center">f2i i2s</td>
+<td align="center">f2i</td>
+<td align="center">f2l</td>
+<td align="center">○</td>
+<td align="center">f2d</td>
+</tr>
+<tr>
+<td align="center"><strong>double</strong></td>
+<td align="center">d2i i2b</td>
+<td align="center">d2i i2c</td>
+<td align="center">d2i i2s</td>
+<td align="center">d2i</td>
+<td align="center">d2l</td>
+<td align="center">d2f</td>
+<td align="center">○</td>
+</tr>
+</tbody></table>
+<p>类型转换指令可以将两种不同的数值类型进行相互转换。这些转换操作一般用于实现用户代码中的显式类型转換操作，或者用来处理字节码指令集中数据类型相关指令无法与数据类型一一对应的问题。</p>
+<h2 id="4-1-宽化类型转换剖析"><a href="#4-1-宽化类型转换剖析" class="headerlink" title="4.1. 宽化类型转换剖析"></a>4.1. 宽化类型转换剖析</h2><blockquote>
+<p>宽化类型转换( Widening Numeric Conversions)</p>
+<ol>
+<li>转换规则</li>
+</ol>
+<p>Java虚拟机直接支持以下数值的宽化类型转换（ widening numeric conversion,小范围类型向大范围类型的安全转换）。也就是说，并不需要指令执行，包括</p>
+<blockquote>
+<p>从int类型到long、float或者 double类型。对应的指令为：i21、i2f、i2d</p>
+<p>从long类型到float、 double类型。对应的指令为：i2f、i2d</p>
+<p>从float类型到double类型。对应的指令为：f2d</p>
+</blockquote>
+<p>简化为：int–&gt;long–&gt;float-&gt; double</p>
+<ol start="2">
+<li>精度损失问题</li>
+</ol>
+<blockquote>
+<p>2.1. 宽化类型转换是不会因为超过目标类型最大值而丢失信息的，例如，从int转换到long,或者从int转换到double,都不会丢失任何信息，转换前后的值是精确相等的。</p>
+<p>2.2. 从int、long类型数值转换到float,或者long类型数值转换到double时，将可能发生精度丢失一一可能丢失掉几个最低有效位上的值，转换后的浮点数值是根据IEEE754最接近含入模式所得到的正确整数值。</p>
+</blockquote>
+<p>尽管宽化类型转换实际上是可能发生精度丢失的，但是这种转换永远不会导致Java虚拟机抛出运行时异常</p>
+<ol start="3">
+<li>补充说明</li>
+</ol>
+<p>从byte、char和 short类型到int类型的宽化类型转换实际上是不存在的。对于byte类型转为int,拟机并没有做实质性的转化处理，只是简单地通过操作数栈交換了两个数据。而将byte转为long时，使用的是i2l,可以看到在内部，byte在这里已经等同于int类型处理，类似的还有 short类型，这种处理方式有两个特点：</p>
+<p>一方面可以减少实际的数据类型，如果为 short和byte都准备一套指令，那么指令的数量就会大増，而虚拟机目前的设计上，只愿意使用一个字节表示指令，因此指令总数不能超过256个，为了节省指令资源，将 short和byte当做int处理也在情理之中。</p>
+<p>另一方面，由于局部变量表中的槽位固定为32位，无论是byte或者 short存入局部变量表，都会占用32位空间。从这个角度说，也没有必要特意区分这几种数据类型。</p>
+</blockquote>
+<h2 id="4-2-窄化类型转换剖析"><a href="#4-2-窄化类型转换剖析" class="headerlink" title="4.2. 窄化类型转换剖析"></a>4.2. 窄化类型转换剖析</h2><blockquote>
+<p>窄化类型转换( Narrowing Numeric Conversion)</p>
+<ol>
+<li>转换规则</li>
+</ol>
+<p>Java虚拟机也直接支持以下窄化类型转换：</p>
+<blockquote>
+<p>从主int类型至byte、 short或者char类型。对应的指令有：i2b、i2c、i2s</p>
+<p>从long类型到int类型。对应的指令有：l2i</p>
+<p>从float类型到int或者long类型。对应的指令有：f2i、f2l</p>
+<p>从double类型到int、long或者float类型。对应的指令有：d2i、d2l、d2f</p>
+</blockquote>
+<ol start="2">
+<li>精度损失问题</li>
+</ol>
+<p>窄化类型转换可能会导致转换结果具备不同的正负号、不同的数量级，因此，转换过程很可能会导致数值丢失精度。</p>
+<p>尽管数据类型窄化转换可能会发生上限溢出、下限溢出和精度丢失等情况，但是Java虚拟机规范中明确规定数值类型的窄化转换指令永远不可能导致虚拟机抛出运行时异常</p>
+<ol start="3">
+<li>补充说明</li>
+</ol>
+<blockquote>
+<p>3.1. 当将一个浮点值窄化转换为整数类型T(T限于int或long类型之一)的时候，将遵循以下转换规则：</p>
+<blockquote>
+<p>如果浮点值是NaN,那转换结果就是int或long类型的0.</p>
+<p>如果浮点值不是无穷大的话，浮点值使用IEEE754的向零含入模式取整，获得整数值Vv如果v在目标类型T(int或long)的表示范围之内，那转换结果就是v。否则，将根据v的符号，转换为T所能表示的最大或者最小正数</p>
+</blockquote>
+<p>3.2. 当将一个double类型窄化转换为float类型时，将遵循以下转换规则</p>
+<blockquote>
+<p>通过向最接近数舍入模式舍入一个可以使用float类型表示的数字。最后结果根据下面这3条规则判断</p>
+<p>如果转换结果的绝对值太小而无法使用float来表示，将返回float类型的正负零</p>
+<p>如果转换结果的绝对值太大而无法使用float来表示，将返回float类型的正负无穷大。</p>
+<p>对于double类型的NaN值将按规定转換为float类型的NaN值。</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<hr/>
+
+<h1 id="5-对象的创建与访问指令"><a href="#5-对象的创建与访问指令" class="headerlink" title="5. 对象的创建与访问指令"></a>5. 对象的创建与访问指令</h1><blockquote>
+<h2 id="对象操作指令"><a href="#对象操作指令" class="headerlink" title="对象操作指令"></a>对象操作指令</h2><p>new 创建一个新对象</p>
+<p>getfield 从对象中获取字段</p>
+<p>putfield 设置对象中字段的值</p>
+<p>getstatic 从类中获取静态字段</p>
+<p>putstatic 设置类中静态字段的值</p>
+<p>checkcast 确定对象为所给定的类型。后跟目标类，判断栈顶元素是否为目标类 &#x2F; 接口的实例。如果不是便抛出异常</p>
+<p>instanceof 判断对象是否为给定的类型。后跟目标类，判断栈顶元素是否为目标类 &#x2F; 接口的实例。是则压入 1，否则压入 0</p>
+<h2 id="数组操作指令"><a href="#数组操作指令" class="headerlink" title="数组操作指令"></a>数组操作指令</h2><p>newarray 分配数据成员类型为基本上数据类型的新数组</p>
+<p>anewarray 分配数据成员类型为引用类型的新数组</p>
+<p>arraylength 获取数组长度</p>
+<p>multianewarray 分配新的多维数组</p>
+</blockquote>
+<p>Java是面向对象的程序设计语言，虚拟机平台从字节码层面就对面向对象做了深层次的支持。有一系列指令专门用于对象操作，可进一步细分为创建指令、字段访问指令、数组操作指令、类型检查指令。</p>
+<h2 id="5-1-创建指令"><a href="#5-1-创建指令" class="headerlink" title="5.1. 创建指令"></a>5.1. 创建指令</h2><table>
+<thead>
+<tr>
+<th align="left">创建指令</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">new</td>
+<td align="left">创建类实例</td>
+</tr>
+<tr>
+<td align="left">newarray</td>
+<td align="left">创建基本类型数组</td>
+</tr>
+<tr>
+<td align="left">anewarray</td>
+<td align="left">创建引用类型数组</td>
+</tr>
+<tr>
+<td align="left">multilanewarra</td>
+<td align="left">创建多维数组</td>
+</tr>
+</tbody></table>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115639.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="5-2-字段访问指令"><a href="#5-2-字段访问指令" class="headerlink" title="5.2. 字段访问指令"></a>5.2. 字段访问指令</h2><table>
+<thead>
+<tr>
+<th align="left">字段访问指令</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">getstatic、putstatic</td>
+<td align="left">访问类字段（static字段，或者称为类变量）的指令</td>
+</tr>
+<tr>
+<td align="left">getfield、 putfield</td>
+<td align="left">访问类实例字段（非static字段，或者称为实例变量）的指令</td>
+</tr>
+</tbody></table>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115640.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115641.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="5-3-数组操作指令"><a href="#5-3-数组操作指令" class="headerlink" title="5.3. 数组操作指令"></a>5.3. 数组操作指令</h2><table>
+<thead>
+<tr>
+<th>数组指令</th>
+<th>byte(boolean)</th>
+<th>char</th>
+<th>short</th>
+<th>long</th>
+<th>long</th>
+<th>float</th>
+<th>double</th>
+<th>reference</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>xaload</strong></td>
+<td>baload</td>
+<td>caload</td>
+<td>saload</td>
+<td>iaload</td>
+<td>laload</td>
+<td>faload</td>
+<td>daload</td>
+<td>aaload</td>
+</tr>
+<tr>
+<td><strong>xastore</strong></td>
+<td>bastore</td>
+<td>castore</td>
+<td>sastore</td>
+<td>iastore</td>
+<td>lastore</td>
+<td>fastore</td>
+<td>dastore</td>
+<td>aastore</td>
+</tr>
+</tbody></table>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115642.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115643.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="5-4-类型检查指令"><a href="#5-4-类型检查指令" class="headerlink" title="5.4. 类型检查指令"></a>5.4. 类型检查指令</h2><table>
+<thead>
+<tr>
+<th>类型检查指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>instanceof</td>
+<td>检查类型强制转换是否可以进行</td>
+</tr>
+<tr>
+<td>checkcast</td>
+<td>判断给定对象是否是某一个类的实例</td>
+</tr>
+</tbody></table>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115644.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<hr/>
+
+<h1 id="6-方法调用与返回指令"><a href="#6-方法调用与返回指令" class="headerlink" title="6. 方法调用与返回指令"></a>6. 方法调用与返回指令</h1><blockquote>
+<h2 id="方法调用指令"><a href="#方法调用指令" class="headerlink" title="方法调用指令"></a>方法调用指令</h2><p>invokcvirtual 运行时按照对象的类来调用实例方法</p>
+<p>invokespecial 根据编译时类型来调用实例方法</p>
+<p>invokestatic 调用类（静态）方法</p>
+<p>invokcinterface 调用接口方法</p>
+<h2 id="方法返回指令"><a href="#方法返回指令" class="headerlink" title="方法返回指令"></a>方法返回指令</h2><p>ireturn 从方法中返回int类型的数据</p>
+<p>lreturn 从方法中返回long类型的数据</p>
+<p>freturn 从方法中返回float类型的数据</p>
+<p>dreturn 从方法中返回double类型的数据</p>
+<p>areturn 从方法中返回引用类型的数据</p>
+<p>return 从方法中返回，返回值为void</p>
+</blockquote>
+<h2 id="6-1-方法调用指令"><a href="#6-1-方法调用指令" class="headerlink" title="6.1. 方法调用指令"></a>6.1. 方法调用指令</h2><table>
+<thead>
+<tr>
+<th>方法调用指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>invokevirtual</td>
+<td>调用对象的实例方法</td>
+</tr>
+<tr>
+<td>invokeinterface</td>
+<td>调用接口方法</td>
+</tr>
+<tr>
+<td>invokespecial</td>
+<td>调用一些需要特殊处理的实例方法，包括实例初始化方法（构造器）、私有方法和父类方法</td>
+</tr>
+<tr>
+<td>invokestatic</td>
+<td>调用命名类中的类方法（static方法）</td>
+</tr>
+<tr>
+<td>invokedynamic</td>
+<td>调用动态绑定的方法</td>
+</tr>
+</tbody></table>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115645.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="6-2-方法返回指令"><a href="#6-2-方法返回指令" class="headerlink" title="6.2. 方法返回指令"></a>6.2. 方法返回指令</h2><table>
+<thead>
+<tr>
+<th>方法返回指令</th>
+<th>void</th>
+<th>int</th>
+<th>long</th>
+<th>float</th>
+<th>double</th>
+<th>reference</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>xreturn</strong></td>
+<td>return</td>
+<td>ireturn</td>
+<td>lreturn</td>
+<td>freutrn</td>
+<td>dreturn</td>
+<td>areturn</td>
+</tr>
+</tbody></table>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115646.png" srcset="/img/loading.gif" lazyload alt="image-20210425222017858"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115647.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">methodReturn</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">500</span>;<br>    <span class="hljs-type">int</span> <span class="hljs-variable">j</span> <span class="hljs-operator">=</span> <span class="hljs-number">200</span>;<br>    <span class="hljs-type">int</span> <span class="hljs-variable">k</span> <span class="hljs-operator">=</span> <span class="hljs-number">50</span>;<br>    <br>    <span class="hljs-keyword">return</span> (i + j) / k;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115648.png" srcset="/img/loading.gif" lazyload alt="image-20210425222245665"></p>
+<hr/>
+
+<h1 id="7-操作数栈管理指令"><a href="#7-操作数栈管理指令" class="headerlink" title="7. 操作数栈管理指令"></a>7. 操作数栈管理指令</h1><blockquote>
+<h2 id="通用-无类型）栈操作"><a href="#通用-无类型）栈操作" class="headerlink" title="通用(无类型）栈操作"></a>通用(无类型）栈操作</h2><p>nop 不做任何操作</p>
+<p>pop 弹出栈顶端一个字长的内容</p>
+<p>pop2 弹出栈顶端两个字长的内容</p>
+<p>dup 复制栈顶部一个字长内容</p>
+<p>dup_x1 复制栈顶部一个字长的内容，然后将复制内容及原来弹出的两个字长的内容压入栈</p>
+<p>dup_x2 复制栈顶部一个字长的内容，然后将复制内容及原来弹出的三个字长的内容压入栈</p>
+<p>dup2 复制栈顶部两个字长内容</p>
+<p>dup2_x1 复制栈顶部两个字长的内容，然后将复制内容及原来弹出的三个字长的内容压入栈</p>
+<p>dup2_x2 复制栈顶部两个字长的内容，然后将复制内容及原来弹出的四个字长的内容压入栈</p>
+<p>swap 交换栈顶部两个字长内容</p>
+</blockquote>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115649.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115650.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<hr/>
+
+<h1 id="8-控制转移指令"><a href="#8-控制转移指令" class="headerlink" title="8. 控制转移指令"></a>8. 控制转移指令</h1><blockquote>
+<h2 id="比较指令"><a href="#比较指令" class="headerlink" title="比较指令"></a>比较指令</h2><p>lcmp 比较long类型值</p>
+<p>fcmpl 比较float类型值（当遇到NaN时，返回-1）</p>
+<p>fcmpg 比较float类型值（当遇到NaN时，返回1）</p>
+<p>dcmpl 比较double类型值（当遇到NaN时，返回-1）</p>
+<p>dcmpg 比较double类型值（当遇到NaN时，返回1）</p>
+<h2 id="条件分支指令"><a href="#条件分支指令" class="headerlink" title="条件分支指令"></a>条件分支指令</h2><p>ifeq 如果等于0，则跳转</p>
+<p>ifne 如果不等于0，则跳转</p>
+<p>iflt 如果小于0，则跳转</p>
+<p>ifge 如果大于等于0，则跳转</p>
+<p>ifgt 如果大于0，则跳转</p>
+<p>ifle 如果小于等于0，则跳转</p>
+<h2 id="比较条件分支指令"><a href="#比较条件分支指令" class="headerlink" title="比较条件分支指令"></a>比较条件分支指令</h2><p>if_icmpeq 如果两个int值相等，则跳转</p>
+<p>if_icmpne 如果两个int类型值不相等，则跳转</p>
+<p>if_icmplt 如果一个int类型值小于另外一个int类型值，则跳转</p>
+<p>if_icmpge 如果一个int类型值大于或者等于另外一个int类型值，则跳转</p>
+<p>if_icmpgt 如果一个int类型值大于另外一个int类型值，则跳转</p>
+<p>if_icmple 如果一个int类型值小于或者等于另外一个int类型值，则跳转</p>
+<p>ifnull 如果等于null，则跳转</p>
+<p>ifnonnull 如果不等于null，则跳转</p>
+<p>if_acmpeq 如果两个对象引用相等，则跳转</p>
+<p>if_acmpne 如果两个对象引用不相等，则跳转</p>
+<h2 id="多条件分支跳转指令"><a href="#多条件分支跳转指令" class="headerlink" title="多条件分支跳转指令"></a>多条件分支跳转指令</h2><p>tableswitch 通过索引访问跳转表，并跳转</p>
+<p>lookupswitch 通过键值匹配访问跳转表，并执行跳转操作</p>
+<h2 id="无条件跳转指令"><a href="#无条件跳转指令" class="headerlink" title="无条件跳转指令"></a>无条件跳转指令</h2><p>goto 无条件跳转</p>
+<p>goto_w 无条件跳转（宽索引）</p>
+</blockquote>
+<h2 id="8-1-比较指令"><a href="#8-1-比较指令" class="headerlink" title="8.1. 比较指令"></a>8.1. 比较指令</h2><blockquote>
+<p>比较指令的作用是比较占栈顶两个元素的大小，并将比较结果入栽。</p>
+<p>比较指令有： dcmpg,dcmpl、 fcmpg、fcmpl、lcmp</p>
+<p>与前面讲解的指令类似，首字符d表示double类型，f表示float,l表示long.</p>
+<p>对于double和float类型的数字，由于NaN的存在，各有两个版本的比较指令。以float为例，有fcmpg和fcmpl两个指令，它们的区别在于在数字比较时，若遇到NaN值，处理结果不同。</p>
+<p>指令dcmpl和 dcmpg也是类似的，根据其命名可以推测其含义，在此不再赘述。</p>
+<p>举例</p>
+<p>指令 fcmp和fcmpl都从中弹出两个操作数，并将它们做比较，设栈顶的元素为v2,顶顺位第2位的元素为v1,若v1&#x3D;v2,则压入0:若v1&gt;v2则压入1:若v1&lt;v2则压入-1.</p>
+<p>两个指令的不同之处在于，如果遇到NaN值， fcmpg会压入1,而fcmpl会压入-1</p>
+</blockquote>
+<h2 id="8-2-条件跳转指令"><a href="#8-2-条件跳转指令" class="headerlink" title="8.2. 条件跳转指令"></a>8.2. 条件跳转指令</h2><table>
+<thead>
+<tr>
+<th>&lt;</th>
+<th>&lt;&#x3D;</th>
+<th>&#x3D;&#x3D;</th>
+<th>!&#x3D;</th>
+<th>&gt;&#x3D;</th>
+<th>&gt;</th>
+<th>null</th>
+<th>not null</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>iflt</td>
+<td>ifle</td>
+<td>ifeq</td>
+<td>ifng</td>
+<td>ifge</td>
+<td>ifgt</td>
+<td>ifnull</td>
+<td>ifnonnull</td>
+</tr>
+</tbody></table>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115651.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115652.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="8-3-比较条件跳转指令"><a href="#8-3-比较条件跳转指令" class="headerlink" title="8.3. 比较条件跳转指令"></a>8.3. 比较条件跳转指令</h2><table>
+<thead>
+<tr>
+<th>&lt;</th>
+<th>&lt;&#x3D;</th>
+<th>&#x3D;&#x3D;</th>
+<th>!&#x3D;</th>
+<th>&gt;&#x3D;</th>
+<th>&gt;</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>if_icmplt</td>
+<td>if_icmple</td>
+<td>if_icmpeq、if_acmpeq</td>
+<td>if_icmpne、if_acmpne</td>
+<td>if_icmpge</td>
+<td>if_icmpgt</td>
+</tr>
+</tbody></table>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115653.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="8-4-多条件分支跳转"><a href="#8-4-多条件分支跳转" class="headerlink" title="8.4. 多条件分支跳转"></a>8.4. 多条件分支跳转</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115654.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115655.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115656.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="8-5-无条件跳转"><a href="#8-5-无条件跳转" class="headerlink" title="8.5. 无条件跳转"></a>8.5. 无条件跳转</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115657.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<hr/>
+
+<h1 id="9-异常处理指令"><a href="#9-异常处理指令" class="headerlink" title="9. 异常处理指令"></a>9. 异常处理指令</h1><blockquote>
+<h2 id="异常处理指令"><a href="#异常处理指令" class="headerlink" title="异常处理指令"></a>异常处理指令</h2><p>athrow 抛出异常或错误。将栈顶异常抛出</p>
+<p>jsr 跳转到子例程</p>
+<p>jsr_w 跳转到子例程（宽索引）</p>
+<p>rct 从子例程返回</p>
+</blockquote>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115658.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115659.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115660.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115661.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<hr/>
+
+<h1 id="10-同步控制指令"><a href="#10-同步控制指令" class="headerlink" title="10. 同步控制指令"></a>10. 同步控制指令</h1><blockquote>
+<h3 id="线程同步"><a href="#线程同步" class="headerlink" title="线程同步"></a>线程同步</h3><p>montiorenter 进入并获取对象监视器。即：为栈顶对象加锁</p>
+<p>monitorexit 释放并退出对象监视器。即：为栈顶对象解锁</p>
+</blockquote>
+<p>Java虚拟机支持两种同步结构：方法级的同步和方法内部一段指令序列的同步，这两种同步都是使用monitor来支持的</p>
+<h2 id="10-1-方法级的同步"><a href="#10-1-方法级的同步" class="headerlink" title="10.1. 方法级的同步"></a>10.1. 方法级的同步</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115662.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">add</span><span class="hljs-params">()</span> &#123;<br>	i++;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115663.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115664.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="10-2-方法内指令指令序列的同步"><a href="#10-2-方法内指令指令序列的同步" class="headerlink" title="10.2. 方法内指令指令序列的同步"></a>10.2. 方法内指令指令序列的同步</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115665.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115666.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115667.png" srcset="/img/loading.gif" lazyload alt="img"><br><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271115668.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<hr/>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JVM/" class="category-chain-item">JVM</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JVM中02-字节码指令集</div>
+      <div>http://example.com/2025/02/27/JVM中02-字节码指令集/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kon4tsu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E4%B8%AD03-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/" title="JVM中03-类的加载过程">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JVM中03-类的加载过程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E4%B8%AD01-class%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/" title="JVM中01-class文件结构">
+                        <span class="hidden-mobile">JVM中01-class文件结构</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

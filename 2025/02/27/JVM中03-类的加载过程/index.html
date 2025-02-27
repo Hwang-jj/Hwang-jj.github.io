@@ -1,0 +1,922 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kon4tsu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="[toc] 1. 概述在 Java 中数据类型分为基本数据类型和引用数据类型。基本数据类型由虚拟机预先定义，引用数据类型则需要进行类的加载。 按照 Java 虚拟机规范，从 class 文件到加载到内存中的类，到类卸载出内存为止，它的整个生命周期包括如下 7 个阶段：  其中，验证、准备、解析 3 个部分统称为链接（Linking） 从程序中类的使用过程看  大厂面试题 蚂蚁金服： 描述一下 JV">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM中03-类的加载过程">
+<meta property="og:url" content="http://example.com/2025/02/27/JVM%E4%B8%AD03-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Kon4tsu Blog">
+<meta property="og:description" content="[toc] 1. 概述在 Java 中数据类型分为基本数据类型和引用数据类型。基本数据类型由虚拟机预先定义，引用数据类型则需要进行类的加载。 按照 Java 虚拟机规范，从 class 文件到加载到内存中的类，到类卸载出内存为止，它的整个生命周期包括如下 7 个阶段：  其中，验证、准备、解析 3 个部分统称为链接（Linking） 从程序中类的使用过程看  大厂面试题 蚂蚁金服： 描述一下 JV">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116436.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116437.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116438.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116439.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116440.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116441.png">
+<meta property="article:published_time" content="2025-02-27T03:15:45.000Z">
+<meta property="article:modified_time" content="2025-02-27T03:17:11.235Z">
+<meta property="article:author" content="Kon4tsu">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116436.png">
+  
+  
+  
+  <title>JVM中03-类的加载过程 - Kon4tsu Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/macpanel.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kon4tsu&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JVM中03-类的加载过程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-27 11:15" pubdate>
+          2025年2月27日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          51 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">JVM中03-类的加载过程</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>[toc]</p>
+<h1 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h1><p>在 Java 中数据类型分为基本数据类型和引用数据类型。<mark>基本数据类型由虚拟机预先定义，引用数据类型则需要进行类的加载。</mark></p>
+<p>按照 Java 虚拟机规范，从 class 文件到加载到内存中的类，到类卸载出内存为止，它的整个生命周期包括如下 7 个阶段：</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116436.png" srcset="/img/loading.gif" lazyload alt="image-20210430215050746"></p>
+<p>其中，验证、准备、解析 3 个部分统称为链接（Linking）</p>
+<p>从程序中类的使用过程看</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116437.png" srcset="/img/loading.gif" lazyload alt="image-20210430215236716"></p>
+<h2 id="大厂面试题"><a href="#大厂面试题" class="headerlink" title="大厂面试题"></a>大厂面试题</h2><blockquote>
+<p><mark>蚂蚁金服：</mark></p>
+<p>描述一下 JVM 加载 Class 文件的原理机制？</p>
+<p>一面：类加载过程</p>
+<p><mark>百度：</mark></p>
+<p>类加载的时机</p>
+<p>java 类加载过程？</p>
+<p>简述 java 类加载机制？</p>
+<p><mark>腾讯：</mark></p>
+<p>JVM 中类加载机制，类加载过程？</p>
+<p><mark>滴滴：</mark></p>
+<p>JVM 类加载机制</p>
+<p><mark>美团：</mark></p>
+<p>Java 类加载过程</p>
+<p>描述一下 jvm 加载 class 文件的原理机制</p>
+<p><mark>京东：</mark></p>
+<p>什么是类的加载？</p>
+<p>哪些情况会触发类的加载？</p>
+<p>讲一下 JVM 加载一个类的过程 JVM 的类加载机制是什么？</p>
+</blockquote>
+<hr/>
+
+<h1 id="2-过程一：Loading（加载）阶段"><a href="#2-过程一：Loading（加载）阶段" class="headerlink" title="2. 过程一：Loading（加载）阶段"></a>2. 过程一：Loading（加载）阶段</h1><h2 id="2-1-加载完成的操作"><a href="#2-1-加载完成的操作" class="headerlink" title="2.1. 加载完成的操作"></a>2.1. 加载完成的操作</h2><p><strong>加载的理解</strong></p>
+<p>$\color{red}{所谓加载，简而言之就是将Java类的字节码文件加载到机器内存中，并在内存中构建出Java类的原型——类模板对象。}$所谓类模板对象，其实就是 Java 类在]VM 内存中的一个快照，JVM 将从字节码文件中解析出的常量池、类字段、类方法等信息存储到类模板中，这样]VM 在运行期便能通过类模板而获取 Java 类中的任意信息，能够对 Java 类的成员变量进行遍历，也能进行 Java 方法的调用。</p>
+<p>反射的机制即基于这一基础。如果 JVM 没有将 Java 类的声明信息存储起来，则 JVM 在运行期也无法反射。</p>
+<p><strong>加载完成的操作</strong></p>
+<p>$\color{red}{加载阶段，简言之，查找并加载类的二进制数据，生成Class的实例。}$</p>
+<p>在加载类时，Java 虚拟机必须完成以下 3 件事情：</p>
+<ul>
+<li><p>通过类的全名，获取类的二进制数据流。</p>
+</li>
+<li><p>解析类的二进制数据流为方法区内的数据结构（Java 类模型）</p>
+</li>
+<li><p>创建 java.lang.Class 类的实例，表示该类型。作为方法区这个类的各种数据的访问入口</p>
+</li>
+</ul>
+<h2 id="2-2-二进制流的获取方式"><a href="#2-2-二进制流的获取方式" class="headerlink" title="2.2. 二进制流的获取方式"></a>2.2. 二进制流的获取方式</h2><p>对于类的二进制数据流，虚拟机可以通过多种途径产生或获得。<mark>（只要所读取的字节码符合 JVM 规范即可）</mark></p>
+<ul>
+<li>虚拟机可能通过文件系统读入一个 class 后缀的文件$\color{red}{（最常见）}$</li>
+<li>读入 jar、zip 等归档数据包，提取类文件。</li>
+<li>事先存放在数据库中的类的二进制数据</li>
+<li>使用类似于 HTTP 之类的协议通过网络进行加载</li>
+<li>在运行时生成一段 class 的二进制信息等</li>
+<li>在获取到类的二进制信息后，Java 虚拟机就会处理这些数据，并最终转为一个 java.lang.Class 的实例。</li>
+</ul>
+<p>如果输入数据不是 ClassFile 的结构，则会抛出 ClassFormatError。</p>
+<h2 id="2-3-类模型与-Class-实例的位置"><a href="#2-3-类模型与-Class-实例的位置" class="headerlink" title="2.3. 类模型与 Class 实例的位置"></a>2.3. 类模型与 Class 实例的位置</h2><p><strong>类模型的位置</strong></p>
+<p>加载的类在 JVM 中创建相应的类结构，类结构会存储在方法区（JDKl.8 之前：永久代；J0Kl.8 及之后：元空间）。</p>
+<p><strong>Class 实例的位置</strong></p>
+<p>类将.class 文件加载至元空间后，会在堆中创建一个 Java.lang.Class 对象，用来封装类位于方法区内的数据结构，该 Class 对象是在加载类的过程中创建的，每个类都对应有一个 Class 类型的对象。</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116438.png" srcset="/img/loading.gif" lazyload alt="image-20210430221037898"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">Class</span> <span class="hljs-variable">clazz</span> <span class="hljs-operator">=</span> Class.forName(<span class="hljs-string">&quot;java.lang.String&quot;</span>);<br><span class="hljs-comment">//获取当前运行时类声明的所有方法</span><br>Method[] ms = clazz.getDecla#FF0000Methods();<br><span class="hljs-keyword">for</span> (Method m : ms) &#123;<br>    <span class="hljs-comment">//获取方法的修饰符</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">mod</span> <span class="hljs-operator">=</span> Modifier.toString(m.getModifiers());<br>    System.out.print(mod + <span class="hljs-string">&quot;&quot;</span>);<br>    <span class="hljs-comment">//获取方法的返回值类型</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">returnType</span> <span class="hljs-operator">=</span> (m.getReturnType()).getSimpleName();<br>    System.out.print(returnType + <span class="hljs-string">&quot;&quot;</span>);<br>    <span class="hljs-comment">//获取方法名</span><br>    System.out.print(m.getName() + <span class="hljs-string">&quot;(&quot;</span>);<br>    <span class="hljs-comment">//获取方法的参数列表</span><br>    Class&lt;?&gt;[] ps = m.getParameterTypes();<br>    <span class="hljs-keyword">if</span> (ps.length == <span class="hljs-number">0</span>) &#123;<br>        System.out.print(<span class="hljs-string">&#x27;)&#x27;</span>);<br>    &#125;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; ps.length; i++) &#123;<br>        <span class="hljs-type">char</span> <span class="hljs-variable">end</span> <span class="hljs-operator">=</span> (i == ps.length - <span class="hljs-number">1</span>) ? <span class="hljs-string">&#x27;)&#x27;</span> : <span class="hljs-string">&#x27;,&#x27;</span>;<br>        <span class="hljs-comment">//获取参教的类型</span><br>        System.out.print(ps[i].getSimpleName() + end);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="2-4-数组类的加载"><a href="#2-4-数组类的加载" class="headerlink" title="2.4. 数组类的加载"></a>2.4. 数组类的加载</h2><p>创建数组类的情况稍微有些特殊，因为<mark>数组类本身并不是由类加载器负责创建</mark>，而是由 JVM 在运行时根据需要而直接创建的，但数组的元素类型仍然需要依靠类加载器去创建。创建数组类（下述简称 A）的过程：</p>
+<ul>
+<li>如果数组的元素类型是引用类型，那么就遵循定义的加载过程递归加载和创建数组 A 的元素类型；</li>
+<li>JVM 使用指定的元素类型和数组维度来创建新的数组类。</li>
+</ul>
+<p>如果数组的元素类型是引用类型，数组类的可访问性就由元素类型的可访问性决定。否则数组类的可访问性将被缺省定义为 public。</p>
+<hr/>
+
+<h1 id="3-过程二：Linking（链接）阶段"><a href="#3-过程二：Linking（链接）阶段" class="headerlink" title="3. 过程二：Linking（链接）阶段"></a>3. 过程二：Linking（链接）阶段</h1><h2 id="3-1-环节-1：链接阶段之-Verification（验证）"><a href="#3-1-环节-1：链接阶段之-Verification（验证）" class="headerlink" title="3.1. 环节 1：链接阶段之 Verification（验证）"></a>3.1. 环节 1：链接阶段之 Verification（验证）</h2><p>当类加载到系统后，就开始链接操作，验证是链接操作的第一步。</p>
+<p>$\color{red}{它的目的是保证加载的字节码是合法、合理并符合规范的。}$</p>
+<p>验证的步骤比较复杂，实际要验证的项目也很繁多，大体上 Java 虚拟机需要做以下检查，如图所示。</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116439.png" srcset="/img/loading.gif" lazyload alt="image-20210430221736546"></p>
+<p><strong>整体说明：</strong></p>
+<p>验证的内容则涵盖了类数据信息的格式验证、语义检查、字节码验证，以及符号引用验证等。</p>
+<ul>
+<li>$\color{red}{其中格式验证会和加载阶段一起执行}$。验证通过之后，类加载器才会成功将类的二进制数据信息加载到方法区中。</li>
+<li>$\color{red}{格式验证之外的验证操作将会在方法区中进行}$。</li>
+</ul>
+<p>链接阶段的验证虽然拖慢了加载速度，但是它避免了在字节码运行时还需要进行各种检查。（磨刀不误砍柴工）</p>
+<p><strong>具体说明：</strong></p>
+<ol>
+<li><p><mark>格式验证</mark>：是否以魔数 0XCAFEBABE 开头，主版本和副版本号是否在当前 Java 虚拟机的支持范围内，数据中每一个项是否都拥有正确的长度等。</p>
+</li>
+<li><p><mark>语义检查</mark>：Java 虚拟机会进行字节码的语义检查，但凡在语义上不符合规范的，虚拟机也不会给予验证通过。比如：</p>
+<ul>
+<li>是否所有的类都有父类的存在（在 Java 里，除了 object 外，其他类都应该有父类）</li>
+<li>是否一些被定义为 final 的方法或者类被重写或继承了</li>
+<li>非抽象类是否实现了所有抽象方法或者接口方法</li>
+</ul>
+</li>
+<li><p><mark>字节码验证</mark>：Java 虚拟机还会进行字节码验证，$\color{red}{字节码验证也是验证过程中最为复杂的一个过程}$。它试图通过对字节码流的分析，判断字节码是否可以被正确地执行。比如：</p>
+<ul>
+<li>在字节码的执行过程中，是否会跳转到一条不存在的指令</li>
+<li>函数的调用是否传递了正确类型的参数</li>
+<li>变量的赋值是不是给了正确的数据类型等</li>
+</ul>
+<p>栈映射帧（StackMapTable）就是在这个阶段，用于检测在特定的字节码处，其局部变量表和操作数栈是否有着正确的数据类型。但遗憾的是，100%准确地判断一段字节码是否可以被安全执行是无法实现的，因此，该过程只是尽可能地检查出可以预知的明显的问题。如果在这个阶段无法通过检查，虚拟机也不会正确装载这个类。但是，如果通过了这个阶段的检查，也不能说明这个类是完全没有问题的。</p>
+<p>$\color{red}{在前面3次检查中，已经排除了文件格式错误、语义错误以及字节码的不正确性。但是依然不能确保类是没有问题的。}$</p>
+</li>
+<li><p><mark>符号引用的验证</mark>：校验器还将进符号引用的验证。Class 文件在其常量池会通过字符串记录自己将要使用的其他类或者方法。因此，在验证阶段，$\color{red}{虚拟机就会检查这些类或者方法确实是存在的}$，并且当前类有权限访问这些数据，如果一个需要使用类无法在系统中找到，则会抛出 NoClassDefFoundError，如果一个方法无法被找到，则会抛出 NoSuchMethodError。此阶段在解析环节才会执行。</p>
+</li>
+</ol>
+<h2 id="3-2-环节-2：链接阶段之-Preparation（准备）"><a href="#3-2-环节-2：链接阶段之-Preparation（准备）" class="headerlink" title="3.2. 环节 2：链接阶段之 Preparation（准备）"></a>3.2. 环节 2：链接阶段之 Preparation（准备）</h2><p>$\color{red}{准备阶段（Preparation），简言之，为类的静态变分配内存，并将其初始化为默认值。}$</p>
+<p>当一个类验证通过时，虚拟机就会进入准备阶段。在这个阶段，虚拟机就会为这个类分配相应的内存空间，并设置默认初始值。Java 虚拟机为各类型变量默认的初始值如表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">默认初始值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">byte</td>
+<td align="left">(byte)0</td>
+</tr>
+<tr>
+<td align="left">short</td>
+<td align="left">(short)0</td>
+</tr>
+<tr>
+<td align="left">int</td>
+<td align="left">0</td>
+</tr>
+<tr>
+<td align="left">long</td>
+<td align="left">0L</td>
+</tr>
+<tr>
+<td align="left">float</td>
+<td align="left">0.0f</td>
+</tr>
+<tr>
+<td align="left">double</td>
+<td align="left">0.0</td>
+</tr>
+<tr>
+<td align="left">char</td>
+<td align="left">\u0000</td>
+</tr>
+<tr>
+<td align="left">boolean</td>
+<td align="left">false</td>
+</tr>
+<tr>
+<td align="left">reference</td>
+<td align="left">null</td>
+</tr>
+</tbody></table>
+<p>Java 并不支持 boolean 类型，对于 boolean 类型，内部实现是 int，由于 int 的默认值是 0，故对应的，boolean 的默认值就是 false。</p>
+<p><strong>注意</strong></p>
+<ul>
+<li><p>$\color{red}{这里不包含基本数据类型的字段用static final修饰的情况，因为final在编译的时候就会分配了，准备阶段会显式赋值。}$</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 一般情况：static final修饰的基本数据类型、字符串类型字面量会在准备阶段赋值</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">str</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Hello world&quot;</span>;<br><span class="hljs-comment">// 特殊情况：static final修饰的引用类型不会在准备阶段赋值，而是在初始化阶段赋值</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">str</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(<span class="hljs-string">&quot;Hello world&quot;</span>);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>注意这里不会为实例变量分配初始化，类变量会分配在方法区中，而实例变量是会随着对象一起分配到 Java 堆中。</p>
+</li>
+<li><p>在这个阶段并不会像初始化阶段中那样会有初始化或者代码被执行。</p>
+</li>
+</ul>
+<h2 id="3-3-环节-3：链接阶段之-Resolution（解析）"><a href="#3-3-环节-3：链接阶段之-Resolution（解析）" class="headerlink" title="3.3. 环节 3：链接阶段之 Resolution（解析）"></a>3.3. 环节 3：链接阶段之 Resolution（解析）</h2><p>在准备阶段完成后，就进入了解析阶段。解析阶段（Resolution），简言之，将类、接口、字段和方法的符号引用转为直接引用。</p>
+<p><strong>具体描述</strong>：</p>
+<p>符号引用就是一些字面量的引用，和虚拟机的内部数据结构和和内存布局无关。比较容易理解的就是在 Class 类文件中，通过常量池进行了大量的符号引用。但是在程序实际运行时，只有符号引用是不够的，比如当如下 println()方法被调用时，系统需要明确知道该方法的位置。</p>
+<p><strong>举例</strong>：</p>
+<p>输出操作 System.out.println()对应的字节码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">invokevirtual #<span class="hljs-number">24</span> &lt;java/io/PrintStream.println&gt;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116440.png" srcset="/img/loading.gif" lazyload alt="image-20210430225015932"></p>
+<p>以方法为例，Java 虚拟机为每个类都准备了一张方法表，将其所有的方法都列在表中，当需要调用一个类的方法的时候，只要知道这个方法在方法表中的偏移量就可以直接调用该方法。$\color{red}{通过解析操作，符号引用就可以转变为目标方法在类中方法表中的位置，从而使得方法被成功调用。}$</p>
+<hr/>
+
+<h1 id="4-过程三：Initialization（初始化）阶段"><a href="#4-过程三：Initialization（初始化）阶段" class="headerlink" title="4. 过程三：Initialization（初始化）阶段"></a>4. 过程三：Initialization（初始化）阶段</h1><h2 id="4-1-static-与-final-的搭配问题"><a href="#4-1-static-与-final-的搭配问题" class="headerlink" title="4.1. static 与 final 的搭配问题"></a>4.1. static 与 final 的搭配问题</h2><p><strong>说明</strong>：使用 static+ final 修饰的字段的显式赋值的操作，到底是在哪个阶段进行的赋值？</p>
+<ul>
+<li><p>情况 1：在链接阶段的准备环节赋值</p>
+</li>
+<li><p>情况 2：在初始化阶段&lt;clinit&gt;()中赋值</p>
+</li>
+</ul>
+<p><strong>结论</strong>： 在链接阶段的准备环节赋值的情况：</p>
+<ul>
+<li><p>对于基本数据类型的字段来说，如果使用 static final 修饰，则显式赋值(直接赋值常量，而非调用方法通常是在链接阶段的准备环节进行</p>
+</li>
+<li><p>对于 String 来说，如果使用字面量的方式赋值，使用 static final 修饰的话，则显式赋值通常是在链接阶段的准备环节进行</p>
+</li>
+<li><p>在初始化阶段&lt;clinit&gt;()中赋值的情况： 排除上述的在准备环节赋值的情况之外的情况。</p>
+</li>
+</ul>
+<p><strong>最终结论</strong>：使用 static+final 修饰，且显示赋值中不涉及到方法或构造器调用的基本数据类到或 String 类型的显式财值，是在链接阶段的准备环节进行。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">INT_CONSTANT</span> <span class="hljs-operator">=</span> <span class="hljs-number">10</span>;                                <span class="hljs-comment">// 在链接阶段的准备环节赋值</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">NUM1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Random</span>().nextInt(<span class="hljs-number">10</span>);                  <span class="hljs-comment">// 在初始化阶段clinit&gt;()中赋值</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-variable">a</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;                                                  <span class="hljs-comment">// 在初始化阶段&lt;clinit&gt;()中赋值</span><br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Integer</span> <span class="hljs-variable">INTEGER_CONSTANT1</span> <span class="hljs-operator">=</span> Integer.valueOf(<span class="hljs-number">100</span>);     <span class="hljs-comment">// 在初始化阶段&lt;clinit&gt;()中赋值</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">Integer</span> <span class="hljs-variable">INTEGER_CONSTANT2</span> <span class="hljs-operator">=</span> Integer.valueOf(<span class="hljs-number">100</span>);           <span class="hljs-comment">// 在初始化阶段&lt;clinit&gt;()中概值</span><br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">s0</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;helloworld0&quot;</span>;                            <span class="hljs-comment">// 在链接阶段的准备环节赋值</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">s1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(<span class="hljs-string">&quot;helloworld1&quot;</span>);                <span class="hljs-comment">// 在初始化阶段&lt;clinit&gt;()中赋值</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">String</span> <span class="hljs-variable">s2</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;hellowrold2&quot;</span>;                                  <span class="hljs-comment">// 在初始化阶段&lt;clinit&gt;()中赋值</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="4-2-的线程安全性"><a href="#4-2-的线程安全性" class="headerlink" title="4.2. &lt;clinit&gt;()的线程安全性"></a>4.2. &lt;clinit&gt;()的线程安全性</h2><p>对于&lt;clinit&gt;()方法的调用，也就是类的初始化，虚拟机会在内部确保其多线程环境中的安全性。</p>
+<p>虚拟机会保证一个类的()方法在多线程环境中被正确地加锁、同步，如果多个线程同时去初始化一个类，那么只会有一个线程去执行这个类的&lt;clinit&gt;()方法，其他线程都需要阻塞等待，直到活动线程执行&lt;clinit&gt;()方法完毕。</p>
+<p>正是因为$\color{red}{函数<clinit>()带锁线程安全的}$，因此，如果在一个类的&lt;clinit&gt;()方法中有耗时很长的操作，就可能造成多个线程阻塞，引发死锁。并且这种死锁是很难发现的，因为看起来它们并没有可用的锁信息。</p>
+<p>如果之前的线程成功加载了类，则等在队列中的线程就没有机会再执行&lt;clinit&gt;()方法了。那么，当需要使用这个类时，虚拟机会直接返回给它已经准备好的信息。</p>
+<h2 id="4-3-类的初始化情况：主动使用-vs-被动使用"><a href="#4-3-类的初始化情况：主动使用-vs-被动使用" class="headerlink" title="4.3. 类的初始化情况：主动使用 vs 被动使用"></a>4.3. 类的初始化情况：主动使用 vs 被动使用</h2><p>Java 程序对类的使用分为两种：主动使用和被动使用。</p>
+<p><strong>主动使用</strong></p>
+<p>Class 只有在必须要首次使用的时候才会被装载，Java 虚拟机不会无条件地装载 Class 类型。Java 虚拟机规定，一个类或接口在初次使用前，必须要进行初始化。这里指的“使用”，是指主动使用，主动使用只有下列几种情况：（即：如果出现如下的情况，则会对类进行初始化操作。而初始化操作之前的加载、验证、准备已经完成。</p>
+<ol>
+<li><p><mark>实例化</mark>：当创建一个类的实例时，比如使用 new 关键字，或者通过反射、克隆、反序列化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 反序列化</span><br><span class="hljs-comment"> */</span><br>Class Order <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Serializable</span> &#123;<br>    <span class="hljs-keyword">static</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;Order类的初始化&quot;</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">oos</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>    <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">ois</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 序列化</span><br>        oos = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileOutputStream</span>(<span class="hljs-string">&quot;order.dat&quot;</span>));<br>        oos.writeObject(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Order</span>());<br>        <span class="hljs-comment">// 反序列化</span><br>        ois = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileOutputStream</span>(<span class="hljs-string">&quot;order.dat&quot;</span>));<br>        <span class="hljs-type">Order</span> <span class="hljs-variable">order</span> <span class="hljs-operator">=</span> ois.readObject();<br>    &#125;<br>    <span class="hljs-keyword">catch</span> (IOException e)&#123;<br>        e.printStackTrace();<br>    &#125;<br>    <span class="hljs-keyword">catch</span> (ClassNotFoundException e)&#123;<br>        e.printStackTrace();<br>    &#125;<br>    <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-keyword">if</span> (oos != <span class="hljs-literal">null</span>) &#123;<br>                oos.close();<br>            &#125;<br>            <span class="hljs-keyword">if</span> (ois != <span class="hljs-literal">null</span>) &#123;<br>                ois.close();<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">catch</span> (IOException e)&#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><mark>静态方法</mark>：当调用类的静态方法时，即当使用了字节码 invokestatic 指令。</p>
+</li>
+<li><p><mark>静态字段</mark>：当使用类、接口的静态字段时（final 修饰特殊考虑），比如，使用 getstatic 或者 putstatic 指令。（对应访问变量、赋值变量操作）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ActiveUse</span> &#123;<br>	<span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test</span><span class="hljs-params">()</span> &#123;<br>        System.out.println(User.num);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> &#123;<br>    <span class="hljs-keyword">static</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;User类的初始化&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">num</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><mark>反射</mark>：当使用 java.lang.reflect 包中的方法反射类的方法时。比如：Class.forName(“com.atguigu.java.Test”)</p>
+</li>
+<li><p><mark>继承</mark>：当初始化子类时，如果发现其父类还没有进行过初始化，则需要先触发其父类的初始化。</p>
+<blockquote>
+<p>当 Java 虚拟机初始化一个类时，要求它的所有父类都已经被初始化，但是这条规则并不适用于接口。</p>
+<ul>
+<li>在初始化一个类时，并不会先初始化它所实现的接口</li>
+<li>在初始化一个接口时，并不会先初始化它的父接口</li>
+<li>因此，一个父接口并不会因为它的子接口或者实现类的初始化而初始化。只有当程序首次使用特定接口的静态字段时，才会导致该接口的初始化。</li>
+</ul>
+</blockquote>
+</li>
+<li><p><mark>default 方法</mark>：如果一个接口定义了 default 方法，那么直接实现或者间接实现该接口的类的初始化，该接口要在其之前被初始化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">Compare</span> &#123;<br>	<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Thread</span> <span class="hljs-variable">t</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>() &#123;<br>        &#123;<br>            System.out.println(<span class="hljs-string">&quot;Compare接口的初始化&quot;</span>);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><mark>main 方法</mark>：当虚拟机启动时，用户需要指定一个要执行的主类（包含 main()方法的那个类），虚拟机会先初始化这个主类。</p>
+<blockquote>
+<p>VM 启动的时候通过引导类加载器加载一个初始类。这个类在调用 public static void main(String[])方法之前被链接和初始化。这个方法的执行将依次导致所需的类的加载，链接和初始化。</p>
+</blockquote>
+</li>
+<li><p><mark>MethodHandle<mark>：当初次调用 MethodHandle 实例时，初始化该 MethodHandle 指向的方法所在的类。（涉及解析 REF getStatic、REF_putStatic、REF invokeStatic 方法句柄对应的类）</p>
+</li>
+</ol>
+<p><strong>被动使用</strong></p>
+<p>除了以上的情况属于主动使用，其他的情况均属于被动使用。$\color{red}{被动使用不会引起类的初始化。}$</p>
+<p>也就是说：$\color{red}{并不是在代码中出现的类，就一定会被加载或者初始化。}$如果不符合主动使用的条件，类就不会初始化。</p>
+<ol>
+<li><p><mark>静态字段</mark>：当通过子类引用父类的静态变量，不会导致子类初始化，只有真正声明这个字段的类才会被初始化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PassiveUse</span> &#123;<br> 	<span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">test</span><span class="hljs-params">()</span> &#123;<br>        System.out.println(Child.num);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Child</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Parent</span> &#123;<br>    <span class="hljs-keyword">static</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;Child类的初始化&quot;</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Parent</span> &#123;<br>    <span class="hljs-keyword">static</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;Parent类的初始化&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-variable">num</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><mark>数组定义</mark>：通过数组定义类引用，不会触发此类的初始化</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">Parent[] parents= <span class="hljs-keyword">new</span> <span class="hljs-title class_">Parent</span>[<span class="hljs-number">10</span>];<br>System.out.println(parents.getClass());<br><span class="hljs-comment">// new的话才会初始化</span><br>parents[<span class="hljs-number">0</span>] = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Parent</span>();<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><mark>引用常量</mark>：引用常量不会触发此类或接口的初始化。因为常量在链接阶段就已经被显式赋值了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PassiveUse</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        System.out.println(Serival.num);<br>        <span class="hljs-comment">// 但引用其他类的话还是会初始化</span><br>        System.out.println(Serival.num2);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">interface</span> <span class="hljs-title class_">Serival</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Thread</span> <span class="hljs-variable">t</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>() &#123;<br>        &#123;<br>            System.out.println(<span class="hljs-string">&quot;Serival初始化&quot;</span>);<br>        &#125;<br>    &#125;;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-variable">num</span> <span class="hljs-operator">=</span> <span class="hljs-number">10</span>;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">num2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Random</span>().nextInt(<span class="hljs-number">10</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><mark>loadClass 方法</mark>：调用 ClassLoader 类的 loadClass()方法加载一个类，并不是对类的主动使用，不会导致类的初始化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">Class</span> <span class="hljs-variable">clazz</span> <span class="hljs-operator">=</span> ClassLoader.getSystemClassLoader().loadClass(<span class="hljs-string">&quot;com.test.java.Person&quot;</span>);<br></code></pre></td></tr></table></figure></li>
+</ol>
+<p><strong>扩展</strong></p>
+<blockquote>
+<p>-XX:+TraceClassLoading：追踪打印类的加载信息</p>
+</blockquote>
+<hr/>
+
+<h1 id="5-过程四：类的-Using（使用）"><a href="#5-过程四：类的-Using（使用）" class="headerlink" title="5. 过程四：类的 Using（使用）"></a>5. 过程四：类的 Using（使用）</h1><p>任何一个类型在使用之前都必须经历过完整的加载、链接和初始化 3 个类加载步骤。一旦一个类型成功经历过这 3 个步骤之后，便“厉事俱备只欠东风”，就等着开发者使用了。</p>
+<p>开发人员可以在程序中访问和调用它的静态类成员信息（比如：静态字段、静态方法），或者使用 new 关键字为其创建对象实例。</p>
+<hr/>
+
+<h1 id="6-过程五：类的-Unloading（卸载）"><a href="#6-过程五：类的-Unloading（卸载）" class="headerlink" title="6. 过程五：类的 Unloading（卸载）"></a>6. 过程五：类的 Unloading（卸载）</h1><h2 id="6-1-类、类的加载器、类的实例之间的引用关系"><a href="#6-1-类、类的加载器、类的实例之间的引用关系" class="headerlink" title="6.1. 类、类的加载器、类的实例之间的引用关系"></a>6.1. 类、类的加载器、类的实例之间的引用关系</h2><p>在类加载器的内部实现中，用一个 Java 集合来存放所加载类的引用。另一方面，一个 Class 对象总是会引用它的类加载器，调用 Class 对象的 getClassLoader()方法，就能获得它的类加载器。由此可见，代表某个类的 Class 实例与其类的加载器之间为双向关联关系。</p>
+<p>一个类的实例总是引用代表这个类的 Class 对象。在 Object 类中定义了 getClass()方法，这个方法返回代表对象所属类的 Class 对象的引用。此外，所有的 java 类都有一个静态属性 class，它引用代表这个类的 Class 对象。</p>
+<h2 id="6-2-类的生命周期"><a href="#6-2-类的生命周期" class="headerlink" title="6.2.类的生命周期"></a>6.2.类的生命周期</h2><p>当 Sample 类被加载、链接和初始化后，它的生命周期就开始了。当代表 Sample 类的 Class 对象不再被引用，即不可触及时，Class 对象就会结束生命周期，Sample 类在方法区内的数据也会被卸载，从而结束 Sample 类的生命周期。</p>
+<p>$\color{red}{一个类何时结束生命周期，取决于代表它的Class对象何时结束生命周期。}$</p>
+<h2 id="6-3-具体例子"><a href="#6-3-具体例子" class="headerlink" title="6.3. 具体例子"></a>6.3. 具体例子</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202502271116441.png" srcset="/img/loading.gif" lazyload alt="image-20210430235455086"></p>
+<p>loader1 变量和 obj 变量间接应用代表 Sample 类的 Class 对象，而 objClass 变量则直接引用它。</p>
+<p>如果程序运行过程中，将上图左侧三个引用变量都置为 null，此时 Sample 对象结束生命周期，MyClassLoader 对象结束生命周期，代表 Sample 类的 Class 对象也结束生命周期，Sample 类在方法区内的二进制数据被卸载。</p>
+<p>当再次有需要时，会检查 Sample 类的 Class 对象是否存在，如果存在会直接使用，不再重新加载；如果不存在 Sample 类会被重新加载，在 Java 虚拟机的堆区会生成一个新的代表 Sample 类的 Class 实例（可以通过哈希码查看是否是同一个实例）</p>
+<h2 id="6-4-类的卸载"><a href="#6-4-类的卸载" class="headerlink" title="6.4. 类的卸载"></a>6.4. 类的卸载</h2><p>（1）启动类加载器加载的类型在整个运行期间是不可能被卸载的（jvm 和 jls 规范）</p>
+<p>（2）被系统类加载器和扩展类加载器加载的类型在运行期间不太可能被卸载，因为系统类加载器实例或者扩展类的实例基本上在整个运行期间总能直接或者间接的访问的到，其达到 unreachable 的可能性极小。</p>
+<p>（3）被开发者自定义的类加载器实例加载的类型只有在很简单的上下文环境中才能被卸载，而且一般还要借助于强制调用虚拟机的垃圾收集功能才可以做到。可以预想，稍微复杂点的应用场景中（比如：很多时候用户在开发自定义类加载器实例的时候采用缓存的策略以提高系统性能），被加载的类型在运行期间也是几乎不太可能被卸载的（至少卸载的时间是不确定的）。</p>
+<p>综合以上三点，一个已经加载的类型被卸载的几率很小至少被卸载的时间是不确定的。同时我们可以看的出来，开发者在开发代码时候，不应该对虚拟机的类型卸载做任何假设的前提下，来实现系统中的特定功能。</p>
+<h2 id="回顾：方法区的垃圾回收"><a href="#回顾：方法区的垃圾回收" class="headerlink" title="回顾：方法区的垃圾回收"></a>回顾：方法区的垃圾回收</h2><p>方法区的垃圾收集主要回收两部分内容：常量池中废弃的常量和不再使用的类型。</p>
+<p>HotSpot 虚拟机对常量池的回收策略是很明确的，只要常量池中的常量没有被任何地方引用，就可以被回收。</p>
+<p>判定一个常量是否“废弃”还是相对简单，而要判定一个类型是否属于“不再使用的类”的条件就比较苛刻了。需要同时满足下面三个条件：</p>
+<ul>
+<li>$\color{blue}{该类所有的实例都已经被回收。也就是Java堆中不存在该类及其任何派生子类的实例。}$</li>
+<li>$\color{blue}{加载该类的类加载器已经被回收。这个条件除非是经过精心设计的可替换类加载器的场景，如OSGi、JSP的重加载等，否则通常是很难达成的。}$</li>
+<li>$\color{blue}{该类对应的java.lang.Class对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。}$</li>
+</ul>
+<p>Java 虚拟机被允许对满足上述三个条件的无用类进行回收，这里说的仅仅是“被允许”，而并不是和对象一样，没有引用了就必然会回收。</p>
+<hr/>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JVM/" class="category-chain-item">JVM</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JVM中03-类的加载过程</div>
+      <div>http://example.com/2025/02/27/JVM中03-类的加载过程/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kon4tsu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E4%B8%AD04-%E5%86%8D%E8%B0%88%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E5%99%A8/" title="JVM中04-再谈类的加载器">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JVM中04-再谈类的加载器</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/27/JVM%E4%B8%AD02-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" title="JVM中02-字节码指令集">
+                        <span class="hidden-mobile">JVM中02-字节码指令集</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
