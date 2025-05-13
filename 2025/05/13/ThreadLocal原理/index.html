@@ -1,0 +1,678 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kon4tsu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="参考：https:&#x2F;&#x2F;luming.blog.csdn.net&#x2F;article&#x2F;details&#x2F;141071290?fromshare&#x3D;blogdetail&amp;sharetype&#x3D;blogdetail&amp;sharerId&#x3D;141071290&amp;sharerefer&#x3D;PC&amp;sharesource&#x3D;m0_51140831&amp;sharefrom&#x3D;from_link  一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ThreadLocal原理">
+<meta property="og:url" content="http://example.com/2025/05/13/ThreadLocal%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="Kon4tsu Blog">
+<meta property="og:description" content="参考：https:&#x2F;&#x2F;luming.blog.csdn.net&#x2F;article&#x2F;details&#x2F;141071290?fromshare&#x3D;blogdetail&amp;sharetype&#x3D;blogdetail&amp;sharerId&#x3D;141071290&amp;sharerefer&#x3D;PC&amp;sharesource&#x3D;m0_51140831&amp;sharefrom&#x3D;from_link  一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/0e8cd2d1329d4e39a67beae5e2fe02b3.png">
+<meta property="og:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/7576248ab3d04fcb93ba0304fb80de2d.png">
+<meta property="og:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/5bfb6d7b0c7344ae93b363d2ba2fd824.png">
+<meta property="og:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/9491d7d3e0b14d90b23cbde36e8cde29.png">
+<meta property="og:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/5f5159528b5440599645bfa73965b382.png">
+<meta property="article:published_time" content="2025-05-13T01:51:55.000Z">
+<meta property="article:modified_time" content="2025-05-13T02:10:08.707Z">
+<meta property="article:author" content="Kon4tsu">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/0e8cd2d1329d4e39a67beae5e2fe02b3.png">
+  
+  
+  
+  <title>ThreadLocal原理 - Kon4tsu Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/macpanel.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kon4tsu&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="ThreadLocal原理"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-05-13 09:51" pubdate>
+          2025年5月13日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">ThreadLocal原理</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>参考：<a target="_blank" rel="noopener" href="https://luming.blog.csdn.net/article/details/141071290?fromshare=blogdetail&sharetype=blogdetail&sharerId=141071290&sharerefer=PC&sharesource=m0_51140831&sharefrom=from_link">https://luming.blog.csdn.net/article/details/141071290?fromshare=blogdetail&amp;sharetype=blogdetail&amp;sharerId=141071290&amp;sharerefer=PC&amp;sharesource=m0_51140831&amp;sharefrom=from_link</a></p>
+</blockquote>
+<h2 id="一、什么是ThreadLocal"><a href="#一、什么是ThreadLocal" class="headerlink" title="一、什么是ThreadLocal"></a>一、什么是ThreadLocal</h2><p>在Java中，ThreadLocal 类提供了一种方式，使得每个线程可以独立地持有自己的变量副本，而不是共享变量。这可以避免线程间的同步问题，因为<strong>每个线程只能访问自己的ThreadLocal变量</strong>。通过ThreadLocal为线程添加的值只能由这个线程访问到，其他的线程无法访问，因此就避免了多线程之间的同步问题</p>
+<p>使用ThreadLocal时，通常需要实现以下步骤：</p>
+<ul>
+<li>初始化：创建ThreadLocal变量。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> ThreadLocal&lt;T&gt; threadLocal = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThreadLocal</span>&lt;&gt;();<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>设置值：使用set(T value)方法为当前线程设置值。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">threadLocal.set(value);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>获取值：使用get()方法获取当前线程的值。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">T</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> threadLocal.get();<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>移除值：使用remove()方法在线程结束时清除ThreadLocal变量，以避免内存泄漏。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">threadLocal.remove();<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>示例：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ThreadLocalExample</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> ThreadLocal&lt;Integer&gt; threadLocal = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThreadLocal</span>&lt;&gt;();<br> <br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-comment">// 设置线程局部变量的值</span><br>        threadLocal.set(<span class="hljs-number">10</span>);<br> <br>        <span class="hljs-comment">// 这个值在其他线程中是取不到获取的</span><br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-type">Integer</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> threadLocal.get();<span class="hljs-comment">//null</span><br>            System.out.println(<span class="hljs-string">&quot;Thread value: &quot;</span> + value);<br>        &#125;).start();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/0e8cd2d1329d4e39a67beae5e2fe02b3.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="二、ThreadLocal的数据结构"><a href="#二、ThreadLocal的数据结构" class="headerlink" title="二、ThreadLocal的数据结构"></a>二、ThreadLocal的数据结构</h2><p>在JDK8之后每一个线程都会维护一个ThreadLocalMap，这个Map是一个哈希散列结构，如下图所示，每一个元素（Entry）都是一个键值对，key为ThreadLocal，Value为存储的数据，也就是set()方法存储的内容。</p>
+<p><img src="/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/7576248ab3d04fcb93ba0304fb80de2d.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="三、ThreadLocal的内存泄露问题"><a href="#三、ThreadLocal的内存泄露问题" class="headerlink" title="三、ThreadLocal的内存泄露问题"></a>三、ThreadLocal的内存泄露问题</h2><p>首先是内存泄漏的概念：</p>
+<ul>
+<li>内存溢出：没有足够的内存供申请者使用</li>
+<li>内存泄漏：程序中已经动态分配的内存由于某种原因未释放或无法释放，造成系统内存的浪费，导致程序运行速度减慢甚至崩溃。此外内存泄漏的堆积最终也会导致内存溢出。</li>
+</ul>
+<p>下图是ThreadLocal相关的内存结构图，在栈区中有threadLocal对象和当前线程对象，分别指向堆区真正存储的类对象，<strong>这俩个指向都是强引用</strong>。在堆区中当前线程肯定是只有自己的Map的信息的，而Map中又存储着一个个的Entry节点；在Entry节点中每一个Key都是ThreadLocal的实例，同时Value又指向了真正的存储的数据位置，以上便是下图的引用关系。<br><img src="/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/5bfb6d7b0c7344ae93b363d2ba2fd824.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>那么所谓的内存泄漏，其实就是指的<strong>Entry这块内存不能正确释放</strong></p>
+<blockquote>
+<p>强弱引用的概念：</p>
+<ul>
+<li>强引用(StrongReference)：就是我们最常见的普通对象引用，只要还有强引用指向一个对象，就能表明对象还“活着”，垃圾回收器就不会回收这种对象。</li>
+<li>弱引用(WeakReference)：垃圾回收器一旦发现了只具有弱引用的对象，不管当前内存空间足够与否，都会回收它的内存。</li>
+</ul>
+</blockquote>
+<h3 id="如果Key是强引用"><a href="#如果Key是强引用" class="headerlink" title="如果Key是强引用"></a>如果Key是强引用</h3><p>当我们在业务代码中使用完ThreadLocal，在栈区指向堆区的这个指向关系就会被回收掉了，但是由于Key是强引用指向ThreadLocal，故而堆区中的ThreadLocal无法被回收，此时的Key指向ThreadLocal，另外由于当前线程还没有结束，则下面那条强引用指向关系任然存在。故为下图的关系状态<br><img src="/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/9491d7d3e0b14d90b23cbde36e8cde29.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>在这样的情况下，由于栈上的指向已经消失了，我们无法访问到堆上的ThreadLocal，故而无法访问到Entry，但是Entry又有Map指向它，故而无法进行回收。那么此时的Entry即无法访问也无法回收，这就造成了<mark>Entry的内存溢出</mark>。</p>
+<h3 id="如果Key是弱引用"><a href="#如果Key是弱引用" class="headerlink" title="如果Key是弱引用"></a>如果Key是弱引用</h3><p>其次是弱引用的情况，当我们在业务代码中使用完ThreadLocal就通过垃圾回收（GC）进行了回收，那么由于Key是弱引用，Key此时就指向null，但是由于当前线程还没有结束，则下面那条强引用指向关系仍然存在</p>
+<p><img src="/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/ThreadLocal%E5%8E%9F%E7%90%86/5f5159528b5440599645bfa73965b382.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>在这样的情况下，Entry由于仍然有Map指向它所以不会被GC回收掉，但是此时的Key又为null，所以我们无法访问到这个Value。这就导致了这个Value我们即不能访问到也不能进行回收，此时就造成了<mark>Value的内存泄漏</mark>。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>通过以上分析，我们得知了不管Entry中的Key是否为弱引用，都会造成内存泄漏的情况，只不过强引用下是Entry的内存泄漏，弱引用下是Value的内存泄漏。造成这样内存泄漏的情况都有这样的共同特性：</p>
+<ul>
+<li>都没有手动删除Entry</li>
+<li>当前线程都在运行</li>
+</ul>
+<p>也就是说，只要我们在使用完ThreadLocal后，调用其remove()方法删除对应的Entry就可以避免内存泄漏的问题。</p>
+<p>并且由于ThreadLoaclMap是Thread的一个属性，故而它的生命周期和线程一样，那么当线程的生命周期结束，自然也就没有Map指向Entry，这也就在根源上解决了问题。</p>
+<p>综上所述，造成ThreadLocal内存泄漏的根本原因是：<mark>由于ThreadLocalMap的生命周期和Thread一样长，如果没有手动删除对应的Key就会导致内存泄漏</mark>。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>ThreadLocal原理</div>
+      <div>http://example.com/2025/05/13/ThreadLocal原理/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Kon4tsu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年5月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/03/12/RabbitMQ/" title="RabbitMQ">
+                        <span class="hidden-mobile">RabbitMQ</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
