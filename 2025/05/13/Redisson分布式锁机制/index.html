@@ -29,7 +29,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505131141327.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505131141329.png">
 <meta property="article:published_time" content="2025-05-13T03:16:34.000Z">
-<meta property="article:modified_time" content="2025-05-13T03:41:11.146Z">
+<meta property="article:modified_time" content="2025-05-13T03:43:14.169Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505131141327.png">
@@ -292,8 +292,8 @@
 <h2 id="二、Redisson的可重入锁原理"><a href="#二、Redisson的可重入锁原理" class="headerlink" title="二、Redisson的可重入锁原理"></a>二、Redisson的可重入锁原理</h2><p><strong>核心</strong>：基于 Redis 中的<strong>Hash结构</strong>实现的分布式锁，利用 key 来锁定资源（锁名称），对于 field 来标识唯一成功获取锁的对象（持有该锁的对象），而对于 value 来累计同一个线程成功获取相同的锁的次数（锁被获取的次数）。</p>
 <p>具体实现思路：</p>
 <ul>
-<li>**尝试获取锁：**先判断缓存中是否存在 key 字段，如果存在，则说明锁已经被成功获取，这时候需要继续判断成功获取锁的对象是否为当前线程，如果根据 key field 来判断是当前线程，则 value +&#x3D; 1 且还需要重置锁的超时时间；如果根据 key field 判断不是当前线程，则直接返回 null。如果缓存中不存在 key 字段，则说明锁还没有被其他线程获取，则获取锁成功。</li>
-<li>**释放锁：**当业务完成之后，在释放锁之前，先判断获取锁的对象是不是当前线程，如果不是当前线程，则说明可能由于超时，锁已经被自动释放了，这时候直接返回 null；如果是当前线程，则进行 value -&#x3D; 1 ，最后再来判断 value 是否大于 0 ，当大于 0 时，则不能直接释放锁，需要重置锁的超时时间；当 value &#x3D; 0 时，则可以真正的释放锁。</li>
+<li><strong>尝试获取锁</strong>：先判断缓存中是否存在 key 字段，如果存在，则说明锁已经被成功获取，这时候需要继续判断成功获取锁的对象是否为当前线程，如果根据 key field 来判断是当前线程，则 value +&#x3D; 1 且还需要重置锁的超时时间；如果根据 key field 判断不是当前线程，则直接返回 null。如果缓存中不存在 key 字段，则说明锁还没有被其他线程获取，则获取锁成功。</li>
+<li><strong>释放锁</strong>：当业务完成之后，在释放锁之前，先判断获取锁的对象是不是当前线程，如果不是当前线程，则说明可能由于超时，锁已经被自动释放了，这时候直接返回 null；如果是当前线程，则进行 value -&#x3D; 1 ，最后再来判断 value 是否大于 0 ，当大于 0 时，则不能直接释放锁，需要重置锁的超时时间；当 value &#x3D; 0 时，则可以真正的释放锁。</li>
 </ul>
 <p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505131141327.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
 <p><strong>又因为使用 Java 实现不能保证原子性，所以需要借助 Lua 脚本实现多条 Redis 命令来保证原则性。</strong></p>
