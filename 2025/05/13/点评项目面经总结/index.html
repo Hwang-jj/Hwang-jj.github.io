@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505131430201.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505131430284.png">
 <meta property="article:published_time" content="2025-05-13T05:21:26.000Z">
-<meta property="article:modified_time" content="2025-05-13T06:30:44.095Z">
+<meta property="article:modified_time" content="2025-05-14T02:38:23.203Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505131430982.webp">
@@ -234,7 +234,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.7k 字
+          4.3k 字
         
       </span>
     
@@ -245,7 +245,7 @@
         
         
         
-          31 分钟
+          36 分钟
         
       </span>
     
@@ -403,6 +403,7 @@
 <h3 id="CAS解决超卖问题时出现的问题"><a href="#CAS解决超卖问题时出现的问题" class="headerlink" title="CAS解决超卖问题时出现的问题"></a>CAS解决超卖问题时出现的问题</h3><p>我们选择使用上方的CAS方法解决超卖问题，在jMeter压力测试中，选择使用200个线程同时对100张秒杀优惠券进行抢购，这一次优惠券的库存没有变为负数，但是优惠券只卖出了20张，秒杀成功率大大减少了。</p>
 <p>这是因为当有<strong>多个线程同时查到了同样的库存</strong>时，<strong>只有一个线程能够抢到优惠券</strong>，其他线程会因为当前剩余库存与前面查询到的库存不一致导致秒杀失败。</p>
 <p>解决方案：将sql语句中的：stock &#x3D; 前面查询到的stock 更改为 <strong>stock &gt; 0</strong> 即可。</p>
+<h3 id="为什么超卖问题需要加锁？"><a href="#为什么超卖问题需要加锁？" class="headerlink" title="为什么超卖问题需要加锁？"></a>为什么超卖问题需要加锁？</h3><p>超卖问题是因为多个用户对不足的库存同时进行库存查询及获取导致库存减为负数的情况，为每个用户加一个乐观锁，能够保证一个商品只被一个用户购买。</p>
 <h2 id="5-基于Redisson分布式锁解决集群下一人一单的并发安全问题"><a href="#5-基于Redisson分布式锁解决集群下一人一单的并发安全问题" class="headerlink" title="5. 基于Redisson分布式锁解决集群下一人一单的并发安全问题"></a>5. 基于Redisson分布式锁解决集群下一人一单的并发安全问题</h2><blockquote>
 <p><strong>集群下一人一单的并发安全问题</strong></p>
 <p>在单体系统下，我们解决一人一单问题的实现方式是在对应代码上加锁，在单体部署的情况下是没有问题的，因为此时只有一台Tomcat1，即只有一台JVM1，线程获取的锁都是这台JVM1中的同一把锁（锁的UUID保存在常量池中），故<strong>多个线程竞争这一把锁</strong>，保证了线程安全。</p>
@@ -421,6 +422,7 @@
 </ol>
 <h3 id="解决方案二：Redisson分布式锁"><a href="#解决方案二：Redisson分布式锁" class="headerlink" title="解决方案二：Redisson分布式锁"></a>解决方案二：Redisson分布式锁</h3><p>具体原理可见：<a target="_blank" rel="noopener" href="https://hwang-jj.github.io/2025/05/13/Redisson%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E6%9C%BA%E5%88%B6/">Redisson分布式锁原理</a></p>
 <p>总之，使用Redisson分布式锁可以解决Redis分布式锁的：不可重入问题（Redisson可重入锁）、不可重试问题（Redisson锁重试机制）、超时释放带来的问题（WatchDog机制）、主从一致性问题（MultiLock）</p>
+<h3 id="为什么要加这个分布式锁"><a href="#为什么要加这个分布式锁" class="headerlink" title="为什么要加这个分布式锁"></a>为什么要加这个分布式锁</h3><p>一人一单出现线程安全问题是因为一个用户可能在多个线程同时下单导致一人多单的情况。是针对一个用户的多个线程加的锁。</p>
 <h2 id="6-利用Kafka-Lua脚本实现异步秒杀功能，提高系统秒杀功能"><a href="#6-利用Kafka-Lua脚本实现异步秒杀功能，提高系统秒杀功能" class="headerlink" title="6. 利用Kafka+Lua脚本实现异步秒杀功能，提高系统秒杀功能"></a>6. 利用Kafka+Lua脚本实现异步秒杀功能，提高系统秒杀功能</h2><blockquote>
 <p>秒杀下单流程：查询优惠券、判断秒杀库存是否足够、查询订单、校验是否一人一单、扣减库存、创建订单（串行执行，需要异步优化）</p>
 </blockquote>
@@ -441,6 +443,36 @@
 <li>因此，需要在关注时，同步将关注信息传入redis中；同理取关时也要将被关注者从当前用户的set集合中删除</li>
 <li>使用set数据结构的intersect功能来实现取交集</li>
 <li>取得共同关注id集合（String集合）后，要将id集合解析（String转化为Long），然后查询各id对应的用户信息user并<strong>封装到userDTO</strong>中确保安全，然后返回。</li>
+</ul>
+<h2 id="8-其他问题"><a href="#8-其他问题" class="headerlink" title="8. 其他问题"></a>8. 其他问题</h2><h3 id="Redis的大Key问题？"><a href="#Redis的大Key问题？" class="headerlink" title="Redis的大Key问题？"></a>Redis的大Key问题？</h3><blockquote>
+<p>**通俗易懂的讲，Big Key就是某个key对应的value很大，占用的redis空间很大，本质上是大value问题。**key往往是程序可以自行设置的，value往往不受程序控制，因此可能导致value很大。</p>
+<ul>
+<li>一个String类型的Key，它的值为5MB（数据过大）；</li>
+<li>一个List类型的Key，它的列表数量为20000个（列表数量过多）；</li>
+<li>一个ZSet类型的Key，它的成员数量为10000个（成员数量过多）；</li>
+<li>一个Hash格式的Key，它的成员数量虽然只有1000个但这些成员的value总大小为100MB（成员体积过大）；</li>
+</ul>
+<p>假设我们使用List数据结构保存某个明星&#x2F;网红的粉丝，或者保存热点新闻的评论列表，因为粉丝数量巨大，热点新闻因为点击率、评论数会很多，这样List集合中存放的元素就会很多，可能导致value过大，进而产生Big Key问题。</p>
+</blockquote>
+<ul>
+<li><p>大key的危害</p>
+<ul>
+<li>阻塞请求：Big Key对应的value较大，我们对其进行读写的时候，需要耗费较长的时间，这样就可能阻塞后续的请求处理。Redis的核心线程是单线程，单线程中请求任务的处理是串行的，前面的任务完不成，后面的任务就处理不了。</li>
+<li>内存增大：引发OOM</li>
+<li>阻塞网络：读取单value较大时会占用服务器网卡较多带宽，自身变慢的同时可能会影响该服务器上的其他Redis实例或者应用。</li>
+</ul>
+</li>
+<li><p>如何识别大key</p>
+<p>Redis官方客户端redis-cli加上–bigkeys参数，可以找到某个实例5种数据类型(String、hash、list、set、zset)的最大key</p>
+</li>
+<li><p>如何解决大key</p>
+<ul>
+<li>对大key进行拆分</li>
+<li>对大Key进行清理</li>
+<li>压缩value</li>
+<li>定期清理失效数据</li>
+</ul>
+</li>
 </ul>
 
                 

@@ -19,21 +19,23 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="为什么Integer用&#x3D;&#x3D;比较时127相等而128不相等？ 引用：https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;368421654  一、问题引出1234567public static void main(String[] args) &#123;    for (int i &#x3D; 0; i &lt; 150; i++) &#123;        Integer">
+    <meta name="description" content="Kafka工作原理 1. Kafka核心概念 Message（消息）：Kafka中的数据单元称为消息。可以将消息看成是数据库中的一条“数据行”或一条“记录”。消息是Kafka中最基本的单位，每一条消息都是一个独立的记录，包含消息的键、值、时间戳等信息。  Batch（批次）：为了提高效率，Kafka将消息进行批量处理。消息被分批写入Kafka，这种方式提高了吞吐量，但也会增加响应时间。批次处理使得">
 <meta property="og:type" content="article">
-<meta property="og:title" content="为什么Integer用双等号比较时127相等而128不相等">
-<meta property="og:url" content="http://example.com/2025/05/14/%E4%B8%BA%E4%BB%80%E4%B9%88Integer%E7%94%A8%E5%8F%8C%E7%AD%89%E5%8F%B7%E6%AF%94%E8%BE%83%E6%97%B6127%E7%9B%B8%E7%AD%89%E8%80%8C128%E4%B8%8D%E7%9B%B8%E7%AD%89/index.html">
+<meta property="og:title" content="Kafka工作原理">
+<meta property="og:url" content="http://example.com/2025/05/14/Kafka%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="为什么Integer用&#x3D;&#x3D;比较时127相等而128不相等？ 引用：https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;368421654  一、问题引出1234567public static void main(String[] args) &#123;    for (int i &#x3D; 0; i &lt; 150; i++) &#123;        Integer">
+<meta property="og:description" content="Kafka工作原理 1. Kafka核心概念 Message（消息）：Kafka中的数据单元称为消息。可以将消息看成是数据库中的一条“数据行”或一条“记录”。消息是Kafka中最基本的单位，每一条消息都是一个独立的记录，包含消息的键、值、时间戳等信息。  Batch（批次）：为了提高效率，Kafka将消息进行批量处理。消息被分批写入Kafka，这种方式提高了吞吐量，但也会增加响应时间。批次处理使得">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-05-14T02:13:32.000Z">
-<meta property="article:modified_time" content="2025-05-14T02:13:43.635Z">
+<meta property="og:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Kafka%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/3905bf49ce2b18f2e209a99d5d1a60f4.png">
+<meta property="article:published_time" content="2025-05-14T10:54:23.000Z">
+<meta property="article:modified_time" content="2025-05-14T11:47:22.896Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Kafka%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/3905bf49ce2b18f2e209a99d5d1a60f4.png">
   
   
   
-  <title>为什么Integer用双等号比较时127相等而128不相等 - Kon4tsu Blog</title>
+  <title>Kafka工作原理 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -203,7 +205,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="为什么Integer用双等号比较时127相等而128不相等"></span>
+            <span id="subtitle" data-typed-text="Kafka工作原理"></span>
           
         </div>
 
@@ -214,8 +216,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-05-14 10:13" pubdate>
-          2025年5月14日 上午
+        <time datetime="2025-05-14 18:54" pubdate>
+          2025年5月14日 晚上
         </time>
       </span>
     
@@ -226,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          877 字
+          865 字
         
       </span>
     
@@ -274,49 +276,43 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">为什么Integer用双等号比较时127相等而128不相等</h1>
+            <h1 id="seo-header">Kafka工作原理</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="为什么Integer用-比较时127相等而128不相等？"><a href="#为什么Integer用-比较时127相等而128不相等？" class="headerlink" title="为什么Integer用&#x3D;&#x3D;比较时127相等而128不相等？"></a>为什么Integer用&#x3D;&#x3D;比较时127相等而128不相等？</h1><blockquote>
-<p>引用：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/368421654">https://zhuanlan.zhihu.com/p/368421654</a></p>
+                <h1 id="Kafka工作原理"><a href="#Kafka工作原理" class="headerlink" title="Kafka工作原理"></a>Kafka工作原理</h1><p><img src="/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Kafka%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/3905bf49ce2b18f2e209a99d5d1a60f4.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="1-Kafka核心概念"><a href="#1-Kafka核心概念" class="headerlink" title="1. Kafka核心概念"></a>1. Kafka核心概念</h2><ul>
+<li><p>Message（消息）：Kafka中的数据单元称为消息。可以将消息看成是数据库中的一条“数据行”或一条“记录”。消息是Kafka中最基本的单位，每一条消息都是一个独立的记录，包含消息的键、值、时间戳等信息。</p>
+</li>
+<li><p>Batch（批次）：为了提高效率，Kafka将消息进行批量处理。消息被分批写入Kafka，这种方式提高了吞吐量，但也会增加响应时间。批次处理使得Kafka能够以更高效的方式进行I&#x2F;O操作，从而提升整体性能。</p>
+</li>
+<li><p>Producer（生产者）：Producer即生产者，消息的产生者，是消息的入口。</p>
+</li>
+<li><p>Broker：Broker是kafka实例，每个服务器上有一个或多个kafka的实例，我们姑且认为每个broker对应一台服务器。每个kafka集群内的broker都有一个不重复的编号，如图中的broker-0、broker-1等……</p>
+</li>
+<li><p>主题（Topic）：主题是Kafka中用于<strong>消息分类</strong>的概念，类似于数据库中的表。每个主题都可以包含多个消息，生产者将消息发送到主题，消费者从主题中读取消息。通过主题，我们可以将不同类型的消息分开管理。在每个Broker都可以创建多个Topic。</p>
+</li>
+<li><p>分区（Partition）：为了方便扩展和管理，Kafka中的每个主题可以分为多个分区。分区使得Kafka能够横向扩展，将消息分布在多个节点上。单个分区内的消息是有序的，但在多个分区间无法保证全局有序。如果希望消息全局有序，可以将分区数设置为一。</p>
+<blockquote>
+<p>每个topic可以有多个partition，partition的作用是做负载，提高kafka的吞吐量。同一个topic在不同的分区的数据是不重复的，partition的表现形式就是一个一个的文件夹！</p>
 </blockquote>
-<h2 id="一、问题引出"><a href="#一、问题引出" class="headerlink" title="一、问题引出"></a>一、问题引出</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">150</span>; i++) &#123;<br>        <span class="hljs-type">Integer</span> <span class="hljs-variable">a</span> <span class="hljs-operator">=</span> i;<br>        <span class="hljs-type">Integer</span> <span class="hljs-variable">b</span> <span class="hljs-operator">=</span> i;<br>        System.out.println(i + <span class="hljs-string">&quot; &quot;</span> + (a == b));<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>i取值从0到150，每次循环a与b的数值均相等，输出a &#x3D;&#x3D; b。运行结果：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-number">0</span> <span class="hljs-literal">true</span><br><span class="hljs-number">1</span> <span class="hljs-literal">true</span><br><span class="hljs-number">2</span> <span class="hljs-literal">true</span><br><span class="hljs-number">3</span> <span class="hljs-literal">true</span><br>...<br><span class="hljs-number">126</span> <span class="hljs-literal">true</span><br><span class="hljs-number">127</span> <span class="hljs-literal">true</span><br><span class="hljs-number">128</span> <span class="hljs-literal">false</span><br><span class="hljs-number">129</span> <span class="hljs-literal">false</span><br><span class="hljs-number">130</span> <span class="hljs-literal">false</span><br>...<br></code></pre></td></tr></table></figure>
-
-<p>从128开始a和b就不再相等了</p>
-<h2 id="二、自动装箱"><a href="#二、自动装箱" class="headerlink" title="二、自动装箱"></a>二、自动装箱</h2><p>首先回顾一下自动装箱。对于下面这行代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">Integer</span> <span class="hljs-variable">a</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;<br></code></pre></td></tr></table></figure>
-
-<p>变量a为Integer类型，而1为int类型，且Integer和int之间并无继承关系，按照Java的一般处理方法，这行代码应该报错。</p>
-<p>但因为自动装箱机制的存在，在为Integer类型的变量赋int类型值时，Java会自动将int类型转换为Integer类型，即</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">Integer</span> <span class="hljs-variable">a</span> <span class="hljs-operator">=</span> Integer.valueOf(<span class="hljs-number">1</span>);<br></code></pre></td></tr></table></figure>
-
-<p>valueOf()方法返回一个Integer类型值，并将其赋值给变量a。这就是int的自动装箱。</p>
-<h2 id="三、原理分析"><a href="#三、原理分析" class="headerlink" title="三、原理分析"></a>三、原理分析</h2><p>每次循环时，Integer a &#x3D; i和Integer b &#x3D; i都会触发自动装箱，而自动装箱会将int转换Integer类型值并返回；我们知道Java中两个new出来的对象因为是不同的实例，无论如何&#x3D;&#x3D;都会返回fasle。比如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">new</span> <span class="hljs-title class_">Integer</span>(<span class="hljs-number">1</span>) == <span class="hljs-keyword">new</span> <span class="hljs-title class_">Integer</span>(<span class="hljs-number">1</span>);<br></code></pre></td></tr></table></figure>
-
-<p>就会返回false。</p>
-<p>那么例子中Integer a &#x3D; i和Integer b &#x3D; i自动装箱产生的变量a和b就不应该时同一个对象了，那么&#x3D;&#x3D;的结果应该时false。</p>
-<p>128以上为false容易理解，但为何0到127时返回true了呢？&#x3D;&#x3D;返回true的唯一情况是比较的两个对象为同一个对象，那不妨把例子中a和b的内存地址都打印出来看看：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">150</span>;i++)&#123;<br>    Integer a=i;<br>    Integer b=i;<br>    System.out.println(a+<span class="hljs-string">&quot; &quot;</span>+b+<span class="hljs-string">&quot; &quot;</span>+System.identityHashCode(a)+<span class="hljs-string">&quot; &quot;</span>+System.identityHashCode(b));<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>identityHashCode()方法可以理解为输出对应变量的内存地址，输出为：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text">0 0 762119098 762119098<br>1 1 1278349992 1278349992<br>2 2 1801910956 1801910956<br>3 3 1468253089 1468253089<br>...<br>126 126 1605164995 1605164995<br>127 127 1318497351 1318497351<br>128 128 101224864 479240824<br>129 129 1373088356 636728630<br>130 130 587071409 1369296745<br>...<br></code></pre></td></tr></table></figure>
-
-<p>竟然从0到127不同时候自动装箱得到的是同一个对象！从128开始才是正常情况。</p>
-<h2 id="四、源码分析"><a href="#四、源码分析" class="headerlink" title="四、源码分析"></a>四、源码分析</h2><p>“从0到127不同时候自动装箱得到的是同一个对象”就只能有一种解释：自动装箱并不一定new出新的对象。</p>
-<p>既然自动装箱涉及到的方法是Integer.valueOf()，不妨看看其源码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Integer <span class="hljs-title function_">valueOf</span><span class="hljs-params">(<span class="hljs-type">int</span> i)</span> &#123;<br>    <span class="hljs-keyword">if</span> (i &gt;= IntegerCache.low &amp;&amp; i &lt;= IntegerCache.high)<br>        <span class="hljs-keyword">return</span> IntegerCache.cache[i + (-IntegerCache.low)];<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Integer</span>(i);<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>如果int型参数i在IntegerCache.low和IntegerCache.high范围内，则直接由IntegerCache返回；否则new一个新的对象返回。<mark>IntegerCache.low就是-128，IntegerCache.high就是127</mark>。</p>
-<p>在IntegerCache的static块中就一次性生成了-128到127直接的Integer类型变量存储在cache[]中，对于-128到127之间的int类型，返回的都是同一个Integer类型对象。</p>
-<p>这下真相大白了，整个工作过程就是：Integer.class在装载（Java虚拟机启动）时，其内部类型IntegerCache的static块即开始执行，实例化并暂存数值在-128到127之间的Integer类型对象。当自动装箱int型值在-128到127之间时，即直接返回IntegerCache中暂存的Integer类型对象。</p>
-<p>为什么Java这么设计？我想是出于效率考虑，因为自动装箱经常遇到，尤其是小数值的自动装箱；而如果每次自动装箱都触发new，在堆中分配内存，就显得太慢了；所以不如预先将那些常用的值提前生成好，自动装箱时直接拿出来返回。哪些值是常用的？就是-128到127了。</p>
-
+</li>
+<li><p>副本（Replication）：每一个分区都有多个副本，副本的作用是做备胎。当主分区（Leader）故障的时候会选择一个备胎（Follower）上位，成为Leader。在kafka中默认副本的最大数量是10个，且副本的数量不能大于Broker的数量，<mark>follower和leader绝对是在不同的机器</mark>，同一机器对同一个分区也只可能存放一个副本（包括自己）。<mark>副本机制是Kafka高可靠性的基础</mark>。</p>
+</li>
+<li><p>消费者（Consumer）：消费者，即消息的消费方，是消息的出口。</p>
+</li>
+<li><p>消费者组（Consumer Group）：我们可以将多个消费者组成一个消费者组，在kafka的设计中同一个分区的数据只能被消费者组中的某一个消费者消费。同一个消费者组的消费者可以消费同一个topic的不同分区的数据，这也是为了提高kafka的吞吐量！</p>
+</li>
+</ul>
+<h2 id="2-Kafka的优点"><a href="#2-Kafka的优点" class="headerlink" title="2. Kafka的优点"></a>2. Kafka的优点</h2><ul>
+<li>高性能、高吞吐量、低延迟：Kafka 生产和消费消息的速度都达到每秒10万级</li>
+<li>高可用：所有消息持久化存储到磁盘，并支持数据备份防止数据丢失</li>
+<li>高并发：支持数千个客户端同时读写</li>
+<li>容错性：允许集群中节点失败（若副本数量为n，则允许 n-1 个节点失败）</li>
+<li>高扩展性：Kafka 集群支持热伸缩，无须停机</li>
+</ul>
+<h2 id="3-为什么Kafka的吞吐量高？"><a href="#3-为什么Kafka的吞吐量高？" class="headerlink" title="3. 为什么Kafka的吞吐量高？"></a>3. 为什么Kafka的吞吐量高？</h2><h2 id="4-Kafka如何避免消息丢失？"><a href="#4-Kafka如何避免消息丢失？" class="headerlink" title="4. Kafka如何避免消息丢失？"></a>4. Kafka如何避免消息丢失？</h2>
                 
               </div>
             
@@ -333,8 +329,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>为什么Integer用双等号比较时127相等而128不相等</div>
-      <div>http://example.com/2025/05/14/为什么Integer用双等号比较时127相等而128不相等/</div>
+      <div>Kafka工作原理</div>
+      <div>http://example.com/2025/05/14/Kafka工作原理/</div>
     </div>
     <div class="license-meta">
       
@@ -378,18 +374,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/05/14/Kafka%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" title="Kafka工作原理">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Kafka工作原理</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/05/13/%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE%E9%9D%A2%E7%BB%8F%E6%80%BB%E7%BB%93/" title="点评项目面经总结">
-                        <span class="hidden-mobile">点评项目面经总结</span>
+                      <a href="/2025/05/14/%E4%B8%BA%E4%BB%80%E4%B9%88Integer%E7%94%A8%E5%8F%8C%E7%AD%89%E5%8F%B7%E6%AF%94%E8%BE%83%E6%97%B6127%E7%9B%B8%E7%AD%89%E8%80%8C128%E4%B8%8D%E7%9B%B8%E7%AD%89/" title="为什么Integer用双等号比较时127相等而128不相等">
+                        <span class="hidden-mobile">为什么Integer用双等号比较时127相等而128不相等</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
