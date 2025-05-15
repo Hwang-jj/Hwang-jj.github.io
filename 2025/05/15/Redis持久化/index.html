@@ -19,15 +19,15 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Redis持久化1. AOF日志1.1 AOF日志在Redis执行完一条命令后，将该命令记录到AOF日志中 1.2 写入操作如果直接将命令写回到磁盘中的AOF文件中，会出现如下问题：  还没写会磁盘就宕机，数据丢失 阻塞下一条Redis命令执行（Redis单线程）  因此，Redis会将命令先写到一个叫**“AOF缓冲区”**的地方，write()系统调用将AOF缓冲区数据写到内核缓冲区PageC">
+    <meta name="description" content="Redis持久化1. AOF日志1.1 AOF日志在Redis执行完一条命令后，将该命令记录到AOF日志中 为什么是在执行完命令之后记录日志呢？  避免额外的检查开销，AOF 记录日志不会对命令进行语法检查； 在命令执行完之后再记录，不会阻塞当前的命令执行。  这样也带来了风险：  如果刚执行完命令 Redis 就宕机会导致对应的修改丢失； 可能会阻塞后续其他命令的执行（AOF 记录日志是在 Re">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis持久化">
 <meta property="og:url" content="http://example.com/2025/05/15/Redis%E6%8C%81%E4%B9%85%E5%8C%96/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="Redis持久化1. AOF日志1.1 AOF日志在Redis执行完一条命令后，将该命令记录到AOF日志中 1.2 写入操作如果直接将命令写回到磁盘中的AOF文件中，会出现如下问题：  还没写会磁盘就宕机，数据丢失 阻塞下一条Redis命令执行（Redis单线程）  因此，Redis会将命令先写到一个叫**“AOF缓冲区”**的地方，write()系统调用将AOF缓冲区数据写到内核缓冲区PageC">
+<meta property="og:description" content="Redis持久化1. AOF日志1.1 AOF日志在Redis执行完一条命令后，将该命令记录到AOF日志中 为什么是在执行完命令之后记录日志呢？  避免额外的检查开销，AOF 记录日志不会对命令进行语法检查； 在命令执行完之后再记录，不会阻塞当前的命令执行。  这样也带来了风险：  如果刚执行完命令 Redis 就宕机会导致对应的修改丢失； 可能会阻塞后续其他命令的执行（AOF 记录日志是在 Re">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-05-15T09:15:24.000Z">
-<meta property="article:modified_time" content="2025-05-15T12:01:15.007Z">
+<meta property="article:modified_time" content="2025-05-15T13:02:53.652Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          814 字
+          937 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          7 分钟
+          8 分钟
         
       </span>
     
@@ -280,6 +280,16 @@
               <div class="markdown-body">
                 
                 <h1 id="Redis持久化"><a href="#Redis持久化" class="headerlink" title="Redis持久化"></a>Redis持久化</h1><h2 id="1-AOF日志"><a href="#1-AOF日志" class="headerlink" title="1. AOF日志"></a>1. AOF日志</h2><h3 id="1-1-AOF日志"><a href="#1-1-AOF日志" class="headerlink" title="1.1 AOF日志"></a>1.1 AOF日志</h3><p>在Redis执行完一条命令后，将该命令记录到AOF日志中</p>
+<p><strong>为什么是在执行完命令之后记录日志呢？</strong></p>
+<ul>
+<li>避免额外的检查开销，AOF 记录日志不会对命令进行语法检查；</li>
+<li>在命令执行完之后再记录，不会阻塞当前的命令执行。</li>
+</ul>
+<p>这样也带来了风险：</p>
+<ul>
+<li>如果刚执行完命令 Redis 就宕机会导致对应的修改丢失；</li>
+<li><strong>可能会阻塞后续其他命令的执行（AOF 记录日志是在 Redis 主线程中进行的）</strong>。</li>
+</ul>
 <h3 id="1-2-写入操作"><a href="#1-2-写入操作" class="headerlink" title="1.2 写入操作"></a>1.2 写入操作</h3><p>如果直接将命令写回到磁盘中的AOF文件中，会出现如下问题：</p>
 <ul>
 <li>还没写会磁盘就宕机，数据丢失</li>
