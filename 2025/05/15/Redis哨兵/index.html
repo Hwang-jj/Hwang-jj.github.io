@@ -19,26 +19,21 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Redis数据结构 引用：小林coding、JavaGuide  1. Redis是如何实现键值对数据库的？Redis是使用了一个哈希表保存所有键值对，哈希表其实就是一个数组，数组中的元素叫哈希桶。哈希桶存放的是指向键值对的指针（dictEntry*），键值对则保存了key和value的指针。  特别说明下，void * key 和 void * value指针指向的是Redis对象，Redis中">
+    <meta name="description" content="Redis哨兵1. 投票1：判断主服务器是否下线哨兵集群中的一个哨兵判定主节点下线后**（主观下线），会发起投票，若多数哨兵都认为主节点下线，则为客观下线**，需要切换主节点。 2. 投票2：选举leader哨兵切换主从节点需要一个哨兵来做，这个哨兵称为leader哨兵，需要经过推选得到。 3. leader哨兵进行主从切换 选出新主节点：先排除已离线的从节点，再排除网络状况不好的从节点，剩下的从">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Redis数据结构">
-<meta property="og:url" content="http://example.com/2025/05/15/Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:title" content="Redis哨兵">
+<meta property="og:url" content="http://example.com/2025/05/15/Redis%E5%93%A8%E5%85%B5/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="Redis数据结构 引用：小林coding、JavaGuide  1. Redis是如何实现键值对数据库的？Redis是使用了一个哈希表保存所有键值对，哈希表其实就是一个数组，数组中的元素叫哈希桶。哈希桶存放的是指向键值对的指针（dictEntry*），键值对则保存了key和value的指针。  特别说明下，void * key 和 void * value指针指向的是Redis对象，Redis中">
+<meta property="og:description" content="Redis哨兵1. 投票1：判断主服务器是否下线哨兵集群中的一个哨兵判定主节点下线后**（主观下线），会发起投票，若多数哨兵都认为主节点下线，则为客观下线**，需要切换主节点。 2. 投票2：选举leader哨兵切换主从节点需要一个哨兵来做，这个哨兵称为leader哨兵，需要经过推选得到。 3. leader哨兵进行主从切换 选出新主节点：先排除已离线的从节点，再排除网络状况不好的从节点，剩下的从">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642009.png">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642011.png">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642012.png">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642013.png">
-<meta property="article:published_time" content="2025-05-15T03:48:12.000Z">
-<meta property="article:modified_time" content="2025-05-15T08:42:40.011Z">
+<meta property="article:published_time" content="2025-05-15T12:38:17.000Z">
+<meta property="article:modified_time" content="2025-05-15T12:44:31.020Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642009.png">
   
   
   
-  <title>Redis数据结构 - Kon4tsu Blog</title>
+  <title>Redis哨兵 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -208,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Redis数据结构"></span>
+            <span id="subtitle" data-typed-text="Redis哨兵"></span>
           
         </div>
 
@@ -219,8 +214,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-05-15 11:48" pubdate>
-          2025年5月15日 中午
+        <time datetime="2025-05-15 20:38" pubdate>
+          2025年5月15日 晚上
         </time>
       </span>
     
@@ -231,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          960 字
+          238 字
         
       </span>
     
@@ -242,7 +237,7 @@
         
         
         
-          9 分钟
+          2 分钟
         
       </span>
     
@@ -279,69 +274,19 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Redis数据结构</h1>
+            <h1 id="seo-header">Redis哨兵</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="Redis数据结构"><a href="#Redis数据结构" class="headerlink" title="Redis数据结构"></a>Redis数据结构</h1><blockquote>
-<p>引用：小林coding、JavaGuide</p>
-</blockquote>
-<h2 id="1-Redis是如何实现键值对数据库的？"><a href="#1-Redis是如何实现键值对数据库的？" class="headerlink" title="1. Redis是如何实现键值对数据库的？"></a>1. Redis是如何实现键值对数据库的？</h2><p>Redis是使用了一个哈希表保存所有键值对，哈希表其实就是一个数组，数组中的元素叫哈希桶。哈希桶存放的是指向键值对的指针（dictEntry*），键值对则保存了key和value的指针。</p>
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642009.png" srcset="/img/loading.gif" lazyload alt="img"></p>
-<p>特别说明下，void * key 和 void * value指针指向的是Redis对象，Redis中的每个对象都由redisObject结构表示：</p>
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642011.png" srcset="/img/loading.gif" lazyload alt="img"></p>
-<h2 id="2-Redis的基本数据类型"><a href="#2-Redis的基本数据类型" class="headerlink" title="2. Redis的基本数据类型"></a>2. Redis的基本数据类型</h2><p>Redis 共有 5 种基本数据类型：String（字符串）、List（列表）、Set（集合）、Hash（散列）、Zset（有序集合）。</p>
-<p>这 5 种数据类型底层实现主要依赖这 8 种数据结构：简单动态字符串（SDS）、LinkedList（双向链表）、Dict（哈希表&#x2F;字典）、SkipList（跳跃表）、Intset（整数集合）、ZipList（压缩列表）、QuickList（快速列表）。Redis 5 种基本数据类型对应的底层数据结构实现如下表所示：</p>
-<table>
-<thead>
-<tr>
-<th align="left">String</th>
-<th align="left">List</th>
-<th align="left">Hash</th>
-<th align="left">Set</th>
-<th align="left">Zset</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">SDS</td>
-<td align="left">LinkedList&#x2F;ZipList&#x2F;QuickList</td>
-<td align="left">Dict、ZipList</td>
-<td align="left">Dict、Intset</td>
-<td align="left">ZipList、SkipList</td>
-</tr>
-</tbody></table>
-<blockquote>
-<p>Redis 3.2 之前，List 底层实现是 LinkedList 或者 ZipList。 Redis 3.2 之后，引入了 <strong>LinkedList 和 ZipList 的结合 QuickList</strong>，List 的底层实现变为 QuickList。从 Redis 7.0 开始， <strong>ZipList 被 ListPack 取代</strong>。</p>
-</blockquote>
-<h2 id="3-简单动态字符串SDS"><a href="#3-简单动态字符串SDS" class="headerlink" title="3. 简单动态字符串SDS"></a>3. 简单动态字符串SDS</h2><p>String数据类型是由SDS实现的，SDS包括字节数组buf[]，还包括了字符串长度len，以及给这个SDS分配的空间长度alloc，这样就能以O(1)的时间复杂度获取字符串的长度，同时还能方便计算剩余可用空间。</p>
-<h2 id="4-压缩列表ZipList"><a href="#4-压缩列表ZipList" class="headerlink" title="4. 压缩列表ZipList"></a>4. 压缩列表ZipList</h2><p>ZipList是Redis为了节约内存而开发的，它是由<strong>连续内存块组成的顺序型数据结构</strong>：</p>
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642012.png" srcset="/img/loading.gif" lazyload alt="img"></p>
-<ul>
-<li>zlbytes：记录整个ZipList占用的内存字节数</li>
-<li>zltail：记录ZipList尾部节点距离起始地址有多少字节，也就是列表尾部的偏移量</li>
-<li>zllen：记录ZipList包含的节点数</li>
-<li>zlend：标记ZipList的结束点，固定值0xFF</li>
-</ul>
-<h2 id="5-跳表SkipList"><a href="#5-跳表SkipList" class="headerlink" title="5. 跳表SkipList"></a>5. 跳表SkipList</h2><p>Redis的有序集合zset是用ZipList或SkipList实现的，因为设计者考虑到 Redis 数据存放于内存，为了节约宝贵的内存空间，在<strong>有序集合元素小于 64 字节且个数小于 128</strong> 的时候，会使用 ziplist；一旦有序集合中的某个元素超出这两个其中的一个阈值它就会转为 skiplist。</p>
-<p>也就是说，ZSet 有两种不同的实现，分别是 ziplist 和 skiplist，具体使用哪种结构进行存储的规则如下：</p>
-<ul>
-<li>当有序集合对象同时满足以下两个条件时，使用 ziplist： <ol>
-<li>ZSet 保存的键值对数量少于 128 个；</li>
-<li>每个元素的长度小于 64 字节。</li>
+                <h1 id="Redis哨兵"><a href="#Redis哨兵" class="headerlink" title="Redis哨兵"></a>Redis哨兵</h1><h2 id="1-投票1：判断主服务器是否下线"><a href="#1-投票1：判断主服务器是否下线" class="headerlink" title="1. 投票1：判断主服务器是否下线"></a>1. 投票1：判断主服务器是否下线</h2><p>哨兵集群中的一个哨兵判定主节点下线后**（主观下线）<strong>，会发起投票，若多数哨兵都认为主节点下线，则为</strong>客观下线**，需要切换主节点。</p>
+<h2 id="2-投票2：选举leader哨兵"><a href="#2-投票2：选举leader哨兵" class="headerlink" title="2. 投票2：选举leader哨兵"></a>2. 投票2：选举leader哨兵</h2><p>切换主从节点需要一个哨兵来做，这个哨兵称为leader哨兵，需要经过推选得到。</p>
+<h2 id="3-leader哨兵进行主从切换"><a href="#3-leader哨兵进行主从切换" class="headerlink" title="3. leader哨兵进行主从切换"></a>3. leader哨兵进行主从切换</h2><ol>
+<li>选出新主节点：先排除<strong>已离线</strong>的从节点，再排除<strong>网络状况不好</strong>的从节点，剩下的从节点依据<strong>优先级</strong>（从节点配置）、<strong>复制进度</strong>（谁更像主节点）、<strong>从节点id大小</strong>来选举新主节点</li>
+<li>其他从节点更换新主节点</li>
+<li>新主节点的信息通过Pub&#x2F;Sub机制通知客户端</li>
+<li>监视旧主节点，当它上线，将它设为新主节点的从节点</li>
 </ol>
-</li>
-<li>如果不满足上述两个条件，那么使用 skiplist 。</li>
-</ul>
-<h3 id="5-1-跳表是什么"><a href="#5-1-跳表是什么" class="headerlink" title="5.1 跳表是什么"></a>5.1 跳表是什么</h3><p>我们都知道有序链表在添加、查询、删除的平均时间复杂都都是 <strong>O(n)</strong> 即线性增长，所以一旦节点数量达到一定体量后其性能表现就会非常差劲。而跳表我们完全可以理解为在原始链表基础上，建立<strong>多级索引</strong>，通过多级索引检索定位将增删改查的时间复杂度变为 <strong>O(log n)</strong> 。</p>
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642013.png" srcset="/img/loading.gif" lazyload alt="img"></p>
-<p>假如我们需要查询元素 6，其工作流程如下：</p>
-<ol>
-<li>从 2 级索引开始，先来到节点 4。</li>
-<li>查看 4 的后继节点，是 8 的 2 级索引，这个值大于 6，说明 2 级索引后续的索引都是大于 6 的，没有再往后搜寻的必要，我们索引向下查找。</li>
-<li>来到 4 的 1 级索引，比对其后继节点为 6，查找结束。</li>
-</ol>
-<p>相较于原始有序链表需要 6 次，我们的跳表通过建立多级索引（每级索引的数量一般是下一层的数量的一半），我们只需两次就直接定位到了目标元素，其查询的复杂度被直接优化为<strong>O(log n)</strong>。</p>
 
                 
               </div>
@@ -380,8 +325,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Redis数据结构</div>
-      <div>http://example.com/2025/05/15/Redis数据结构/</div>
+      <div>Redis哨兵</div>
+      <div>http://example.com/2025/05/15/Redis哨兵/</div>
     </div>
     <div class="license-meta">
       
@@ -425,18 +370,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/05/15/Redis%E6%8C%81%E4%B9%85%E5%8C%96/" title="Redis持久化">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Redis持久化</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/05/14/%E4%B8%BA%E4%BB%80%E4%B9%88Integer%E7%94%A8%E5%8F%8C%E7%AD%89%E5%8F%B7%E6%AF%94%E8%BE%83%E6%97%B6127%E7%9B%B8%E7%AD%89%E8%80%8C128%E4%B8%8D%E7%9B%B8%E7%AD%89/" title="为什么Integer用双等号比较时127相等而128不相等">
-                        <span class="hidden-mobile">为什么Integer用双等号比较时127相等而128不相等</span>
+                      <a href="/2025/05/15/Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/" title="Redis主从复制">
+                        <span class="hidden-mobile">Redis主从复制</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
