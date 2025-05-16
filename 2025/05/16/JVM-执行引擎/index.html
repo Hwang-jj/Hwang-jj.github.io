@@ -19,21 +19,23 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Redis哨兵1. 投票1：判断主服务器是否下线哨兵集群中的一个哨兵判定主节点下线后**（主观下线），会发起投票，若多数哨兵都认为主节点下线，则为客观下线**，需要切换主节点。 2. 投票2：选举leader哨兵切换主从节点需要一个哨兵来做，这个哨兵称为leader哨兵，需要经过推选得到。 3. leader哨兵进行主从切换 选出新主节点：先排除已离线的从节点，再排除网络状况不好的从节点，剩下的从">
+    <meta name="description" content="JVM——执行引擎为什么说JAVA是“半编译半解释型”语言？ JVM的编译器 Client Compiler（C1）：注重启动速度、局部优化 Server Compiler（C2）：注重全局优化  JVM的分层编译 层级0：解释器 层级1：C1编译器+轻量级优化 层级2：C1编译器+完整优化 层级3：C1编译器+分析数据收集 层级4：C2编译器">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Redis哨兵">
-<meta property="og:url" content="http://example.com/2025/05/15/Redis%E5%93%A8%E5%85%B5/index.html">
+<meta property="og:title" content="JVM-执行引擎">
+<meta property="og:url" content="http://example.com/2025/05/16/JVM-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="Redis哨兵1. 投票1：判断主服务器是否下线哨兵集群中的一个哨兵判定主节点下线后**（主观下线），会发起投票，若多数哨兵都认为主节点下线，则为客观下线**，需要切换主节点。 2. 投票2：选举leader哨兵切换主从节点需要一个哨兵来做，这个哨兵称为leader哨兵，需要经过推选得到。 3. leader哨兵进行主从切换 选出新主节点：先排除已离线的从节点，再排除网络状况不好的从节点，剩下的从">
+<meta property="og:description" content="JVM——执行引擎为什么说JAVA是“半编译半解释型”语言？ JVM的编译器 Client Compiler（C1）：注重启动速度、局部优化 Server Compiler（C2）：注重全局优化  JVM的分层编译 层级0：解释器 层级1：C1编译器+轻量级优化 层级2：C1编译器+完整优化 层级3：C1编译器+分析数据收集 层级4：C2编译器">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-05-15T12:38:17.000Z">
-<meta property="article:modified_time" content="2025-05-15T12:44:31.020Z">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161056353.jpg">
+<meta property="article:published_time" content="2025-05-16T01:53:48.000Z">
+<meta property="article:modified_time" content="2025-05-16T02:56:46.244Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161056353.jpg">
   
   
   
-  <title>Redis哨兵 - Kon4tsu Blog</title>
+  <title>JVM-执行引擎 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -203,7 +205,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Redis哨兵"></span>
+            <span id="subtitle" data-typed-text="JVM-执行引擎"></span>
           
         </div>
 
@@ -214,8 +216,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-05-15 20:38" pubdate>
-          2025年5月15日 晚上
+        <time datetime="2025-05-16 09:53" pubdate>
+          2025年5月16日 上午
         </time>
       </span>
     
@@ -226,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          238 字
+          98 字
         
       </span>
     
@@ -237,7 +239,7 @@
         
         
         
-          2 分钟
+          1 分钟
         
       </span>
     
@@ -274,19 +276,23 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Redis哨兵</h1>
+            <h1 id="seo-header">JVM-执行引擎</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="Redis哨兵"><a href="#Redis哨兵" class="headerlink" title="Redis哨兵"></a>Redis哨兵</h1><h2 id="1-投票1：判断主服务器是否下线"><a href="#1-投票1：判断主服务器是否下线" class="headerlink" title="1. 投票1：判断主服务器是否下线"></a>1. 投票1：判断主服务器是否下线</h2><p>哨兵集群中的一个哨兵判定主节点下线后**（主观下线）<strong>，会发起投票，若多数哨兵都认为主节点下线，则为</strong>客观下线**，需要切换主节点。</p>
-<h2 id="2-投票2：选举leader哨兵"><a href="#2-投票2：选举leader哨兵" class="headerlink" title="2. 投票2：选举leader哨兵"></a>2. 投票2：选举leader哨兵</h2><p>切换主从节点需要一个哨兵来做，这个哨兵称为leader哨兵，需要经过推选得到。</p>
-<h2 id="3-leader哨兵进行主从切换"><a href="#3-leader哨兵进行主从切换" class="headerlink" title="3. leader哨兵进行主从切换"></a>3. leader哨兵进行主从切换</h2><ol>
-<li>选出新主节点：先排除<strong>已离线</strong>的从节点，再排除<strong>网络状况不好</strong>的从节点，剩下的从节点依据<strong>优先级</strong>（从节点配置）、<strong>复制进度</strong>（谁更像主节点）、<strong>从节点id大小</strong>来选举新主节点</li>
-<li>其他从节点更换新主节点</li>
-<li>新主节点的信息通过Pub&#x2F;Sub机制通知客户端</li>
-<li>监视旧主节点，当它上线，将它设为新主节点的从节点</li>
-</ol>
+                <h1 id="JVM——执行引擎"><a href="#JVM——执行引擎" class="headerlink" title="JVM——执行引擎"></a>JVM——执行引擎</h1><h2 id="为什么说JAVA是“半编译半解释型”语言？"><a href="#为什么说JAVA是“半编译半解释型”语言？" class="headerlink" title="为什么说JAVA是“半编译半解释型”语言？"></a>为什么说JAVA是“半编译半解释型”语言？</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161056353.jpg" srcset="/img/loading.gif" lazyload alt="IMG_4078"></p>
+<h2 id="JVM的编译器"><a href="#JVM的编译器" class="headerlink" title="JVM的编译器"></a>JVM的编译器</h2><ul>
+<li>Client Compiler（C1）：注重启动速度、局部优化</li>
+<li>Server Compiler（C2）：注重全局优化</li>
+</ul>
+<h2 id="JVM的分层编译"><a href="#JVM的分层编译" class="headerlink" title="JVM的分层编译"></a>JVM的分层编译</h2><ul>
+<li>层级0：解释器</li>
+<li>层级1：C1编译器+轻量级优化</li>
+<li>层级2：C1编译器+完整优化</li>
+<li>层级3：C1编译器+分析数据收集</li>
+<li>层级4：C2编译器</li>
+</ul>
 
                 
               </div>
@@ -305,7 +311,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  <a href="/categories/JVM/" class="category-chain-item">JVM</a>
   
   
 
@@ -325,8 +331,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Redis哨兵</div>
-      <div>http://example.com/2025/05/15/Redis哨兵/</div>
+      <div>JVM-执行引擎</div>
+      <div>http://example.com/2025/05/16/JVM-执行引擎/</div>
     </div>
     <div class="license-meta">
       
@@ -338,7 +344,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年5月15日</div>
+          <div>2025年5月16日</div>
         </div>
       
       
@@ -370,9 +376,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/05/16/JVM-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%AD%90%E7%B3%BB%E7%BB%9F/" title="JVM-类加载器子系统">
+                      <a href="/2025/05/16/JVM-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%B8%B8%E9%87%8F%E6%B1%A0/" title="JVM-字符串常量池">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">JVM-类加载器子系统</span>
+                        <span class="hidden-mobile">JVM-字符串常量池</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -380,8 +386,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/05/15/Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/" title="Redis主从复制">
-                        <span class="hidden-mobile">Redis主从复制</span>
+                      <a href="/2025/05/16/JVM-%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/" title="JVM-运行时数据区">
+                        <span class="hidden-mobile">JVM-运行时数据区</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
