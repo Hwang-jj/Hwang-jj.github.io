@@ -19,15 +19,15 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="JVM——垃圾回收算法1.">
+    <meta name="description" content="JVM——垃圾回收算法 垃圾：运行程序中没有任何指针指向的对象  1. 标记阶段 引用计数法：每个对象保存一个引用计数器，记录对象被引用的情况  优点：实现简单  缺点：计数器增加了存储空间开销；计数器更新增加了时间开销；无法处理循环引用    可达性分析：以GCRoots集合为起始点，所有存活对象都会被GCRoots集合直接或间接连接  GCRoots：一组必须活跃的引用（虚拟机栈中的引用对象、">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JVM-垃圾回收算法">
 <meta property="og:url" content="http://example.com/2025/05/16/JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="JVM——垃圾回收算法1.">
+<meta property="og:description" content="JVM——垃圾回收算法 垃圾：运行程序中没有任何指针指向的对象  1. 标记阶段 引用计数法：每个对象保存一个引用计数器，记录对象被引用的情况  优点：实现简单  缺点：计数器增加了存储空间开销；计数器更新增加了时间开销；无法处理循环引用    可达性分析：以GCRoots集合为起始点，所有存活对象都会被GCRoots集合直接或间接连接  GCRoots：一组必须活跃的引用（虚拟机栈中的引用对象、">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-05-16T01:54:25.000Z">
-<meta property="article:modified_time" content="2025-05-16T03:18:20.187Z">
+<meta property="article:modified_time" content="2025-05-16T05:13:45.769Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          8 字
+          742 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          1 分钟
+          7 分钟
         
       </span>
     
@@ -279,7 +279,45 @@
             
               <div class="markdown-body">
                 
-                <h1 id="JVM——垃圾回收算法"><a href="#JVM——垃圾回收算法" class="headerlink" title="JVM——垃圾回收算法"></a>JVM——垃圾回收算法</h1><h2 id="1"><a href="#1" class="headerlink" title="1."></a>1.</h2>
+                <h1 id="JVM——垃圾回收算法"><a href="#JVM——垃圾回收算法" class="headerlink" title="JVM——垃圾回收算法"></a>JVM——垃圾回收算法</h1><blockquote>
+<p>垃圾：运行程序中没有任何指针指向的对象</p>
+</blockquote>
+<h2 id="1-标记阶段"><a href="#1-标记阶段" class="headerlink" title="1. 标记阶段"></a>1. 标记阶段</h2><ol>
+<li><p>引用计数法：每个对象保存一个引用计数器，记录对象被引用的情况</p>
+<ul>
+<li><p>优点：实现简单</p>
+</li>
+<li><p>缺点：计数器增加了存储空间开销；计数器更新增加了时间开销；<strong>无法处理循环引用</strong></p>
+</li>
+</ul>
+</li>
+<li><p>可达性分析：以<strong>GCRoots</strong>集合为起始点，所有存活对象都会被GCRoots集合直接或间接连接</p>
+<blockquote>
+<p>GCRoots：一组必须活跃的引用（虚拟机栈中的引用对象、本地方法栈中的引用对象、方法区中的静态变量和常量、被synchronized所持有的对象……）</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="2-finalize-方法"><a href="#2-finalize-方法" class="headerlink" title="2. finalize()方法"></a>2. finalize()方法</h2><p>若一个对象obj到GCRoots没有引用链，则开始判断：</p>
+<ul>
+<li>若obj没有<strong>重写finalize()方法 或 finalize()方法已被调用过</strong>，则obj被判为不可触及，准备清除；</li>
+<li>若obj<strong>重写了finalize()方法 且 未执行过</strong>，则将obj插入 F-Queue中执行它的finalize()方法，这是它的最后一次逃脱死亡的机会，若执行finalize()方法过程中被引用则逃离死亡，这之后若再出现没有引用的情况就会直接被判为不可触及</li>
+</ul>
+<h2 id="3-清除阶段"><a href="#3-清除阶段" class="headerlink" title="3. 清除阶段"></a>3. 清除阶段</h2><h3 id="3-1-标记-清除算法"><a href="#3-1-标记-清除算法" class="headerlink" title="3.1 标记-清除算法"></a>3.1 标记-清除算法</h3><p>从GCRoots出发，标记所有被引用的对象，然后对堆内存遍历，回收那些未被标记的对象。</p>
+<p>缺点：效率不高；gc时需停止整个应用程序；<strong>有内存碎片</strong></p>
+<h3 id="3-2-标记-复制算法"><a href="#3-2-标记-复制算法" class="headerlink" title="3.2 标记-复制算法"></a>3.2 标记-复制算法</h3><p>将内存空间分为两块，每次只使用其中一块，gc时将存活对象复制到另一块内存，然后清空当前内存块</p>
+<p>优点：<strong>不会出现内存碎片</strong></p>
+<p>缺点：需要<strong>两倍的内存空间</strong>；若<strong>大量对象存活</strong>，则需复制的对象较多，效率低</p>
+<h3 id="3-3-标记-整理算法"><a href="#3-3-标记-整理算法" class="headerlink" title="3.3 标记-整理算法"></a>3.3 标记-整理算法</h3><p>从GCRoots出发，标记所有被引用的对象，然后将所有存活对象压缩到内存的一端，然后清理边界外的空间</p>
+<p>优点：消除了“标记-清除”中的内存碎片，内存地址连续；消除了“标记-复制”中内存减半的代价</p>
+<p>缺点：效率低于复制算法；移动对象需调整引用地址</p>
+<h2 id="4-Stop-the-World"><a href="#4-Stop-the-World" class="headerlink" title="4. Stop-the-World"></a>4. Stop-the-World</h2><p>STW，指gc发生过程中产生应用程序的停顿</p>
+<h2 id="5-引用"><a href="#5-引用" class="headerlink" title="5. 引用"></a>5. 引用</h2><ul>
+<li>强引用Strong Reference：代码中普遍存在的赋值引用，只要强引用关系还在，对象就不会被回收</li>
+<li>软引用Soft Reference：系统将要发生内存溢出时，才将这些对象纳入回收范围，回收后内存还是不足才报错OOM</li>
+<li>弱引用Weak Reference：弱引用对象只能存活到下一次gc</li>
+<li>虚引用Phantom Reference：一个对象是否有虚引用存在，不会对其生存时间产生影响，设置虚引用的唯一目的：这个对象被回收后收到一个系统通知</li>
+</ul>
+
                 
               </div>
             

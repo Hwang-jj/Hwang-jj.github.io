@@ -19,15 +19,23 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta property="og:type" content="article">
+    <meta name="description" content="JVM——垃圾回收器1. 垃圾回收器分类分类标准：串行&#x2F;并行、并发&#x2F;独占、压缩式&#x2F;非压缩式、年轻代&#x2F;老年代 2. 回收器评价标准 吞吐量：$\frac{t_{运行用户代码}}{t_{运行用户代码} + t_{垃圾回收}}$，即尽可能让单位时间内的STW时间最短 暂停时间：尽可能让单次STW时间最短  3. Serial回收器 串行；年轻代为Serial（标记">
+<meta property="og:type" content="article">
 <meta property="og:title" content="JVM-垃圾回收器">
 <meta property="og:url" content="http://example.com/2025/05/16/JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
+<meta property="og:description" content="JVM——垃圾回收器1. 垃圾回收器分类分类标准：串行&#x2F;并行、并发&#x2F;独占、压缩式&#x2F;非压缩式、年轻代&#x2F;老年代 2. 回收器评价标准 吞吐量：$\frac{t_{运行用户代码}}{t_{运行用户代码} + t_{垃圾回收}}$，即尽可能让单位时间内的STW时间最短 暂停时间：尽可能让单次STW时间最短  3. Serial回收器 串行；年轻代为Serial（标记">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338540.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338542.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338543.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338544.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338545.png">
 <meta property="article:published_time" content="2025-05-16T01:54:40.000Z">
-<meta property="article:modified_time" content="2025-05-16T01:54:40.060Z">
+<meta property="article:modified_time" content="2025-05-16T05:38:46.757Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338540.png">
   
   
   
@@ -224,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          0 字
+          608 字
         
       </span>
     
@@ -235,7 +243,7 @@
         
         
         
-          1 分钟
+          6 分钟
         
       </span>
     
@@ -277,13 +285,69 @@
             
               <div class="markdown-body">
                 
-                
+                <h1 id="JVM——垃圾回收器"><a href="#JVM——垃圾回收器" class="headerlink" title="JVM——垃圾回收器"></a>JVM——垃圾回收器</h1><h2 id="1-垃圾回收器分类"><a href="#1-垃圾回收器分类" class="headerlink" title="1. 垃圾回收器分类"></a>1. 垃圾回收器分类</h2><p>分类标准：串行&#x2F;并行、并发&#x2F;独占、压缩式&#x2F;非压缩式、年轻代&#x2F;老年代</p>
+<h2 id="2-回收器评价标准"><a href="#2-回收器评价标准" class="headerlink" title="2. 回收器评价标准"></a>2. 回收器评价标准</h2><ul>
+<li>吞吐量：$\frac{t_{运行用户代码}}{t_{运行用户代码} + t_{垃圾回收}}$，即尽可能让单位时间内的STW时间最短</li>
+<li>暂停时间：尽可能让单次STW时间最短</li>
+</ul>
+<h2 id="3-Serial回收器"><a href="#3-Serial回收器" class="headerlink" title="3. Serial回收器"></a>3. Serial回收器</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338540.png" srcset="/img/loading.gif" lazyload alt="Serial 收集器"></p>
+<p>串行；年轻代为Serial（标记-复制算法），老年代为Serial Old（标记-整理算法）</p>
+<h2 id="4-ParNew回收器"><a href="#4-ParNew回收器" class="headerlink" title="4. ParNew回收器"></a>4. ParNew回收器</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338542.png" srcset="/img/loading.gif" lazyload alt="ParNew 收集器 "></p>
+<p>并行；只能用于年轻代（标记-复制算法），老年代仍为Serial-Old</p>
+<h2 id="5-Parallel-Scavenge回收器"><a href="#5-Parallel-Scavenge回收器" class="headerlink" title="5. Parallel Scavenge回收器"></a>5. Parallel Scavenge回收器</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338543.png" srcset="/img/loading.gif" lazyload alt="Parallel Old收集器运行示意图"></p>
+<p>并行；关注吞吐量；年轻代为Parallel Scavenge（标记-复制算法），老年代为Parallel Old（标记-整理算法）</p>
+<h2 id="6-CMS回收器（Concurrent-Mark-Sweep）"><a href="#6-CMS回收器（Concurrent-Mark-Sweep）" class="headerlink" title="6. CMS回收器（Concurrent-Mark-Sweep）"></a>6. CMS回收器（Concurrent-Mark-Sweep）</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338544.png" srcset="/img/loading.gif" lazyload alt="CMS 收集器"></p>
+<p>并发；只能用于老年代，但无法与Parallel Scavenge一起使用</p>
+<h3 id="CMS回收器收集流程"><a href="#CMS回收器收集流程" class="headerlink" title="CMS回收器收集流程"></a>CMS回收器收集流程</h3><ol>
+<li>初始标记：只标记出与GCRoots<strong>直接关联</strong>的对象，会发生STW但时间短</li>
+<li>并发标记：从上面得到的与GCRoots直接关联的对象开始遍历标记，<strong>可与工作线程并发执行</strong>，无需STW</li>
+<li>重新标记：修正并发标记过程中，由于<strong>用户程序继续运行导致标记产生变动的一部分对象的标记记录</strong>，会产生STW但时间也不长</li>
+<li>并发清除：删除标记阶段判断死亡的对象，由于没移动对象（标记-清除），故可以与用户线程并发执行</li>
+</ol>
+<ul>
+<li>优点：并发；低延迟</li>
+<li>缺点：<ul>
+<li>由于采用的是标记-清除算法，会产生<strong>内存碎片</strong>；</li>
+<li>会产生**“浮动垃圾”**：由于并发清除阶段是与工作线程并发执行的，这期间产生的垃圾要等到下次gc次才能清除</li>
+</ul>
+</li>
+</ul>
+<h2 id="7-G1回收器（Garbage-First）"><a href="#7-G1回收器（Garbage-First）" class="headerlink" title="7. G1回收器（Garbage First）"></a>7. G1回收器（Garbage First）</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338545.png" srcset="/img/loading.gif" lazyload alt="G1 收集器"></p>
+<p>G1回收器将堆内存分割为许多个小区域region，<mark>G1跟踪各个region里垃圾堆积<strong>价值</strong>大小（回收获得空间大小 以及 回收所需时间的经验值）</mark>，在后台维护一个优先列表，每次根据允许时间，优先回收价值最大的region</p>
+<h3 id="G1回收器收集流程："><a href="#G1回收器收集流程：" class="headerlink" title="G1回收器收集流程："></a>G1回收器收集流程：</h3><ol>
+<li>初始标记</li>
+<li>并发标记</li>
+<li>重新标记</li>
+<li>筛选回收：制定回收计划，选择多个region作为回收集，把回收集中存活对象复制到空的region中，再清理旧region中的全部空间，需要STW</li>
+</ol>
+
                 
               </div>
             
             <hr/>
             <div>
               <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JVM/" class="category-chain-item">JVM</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
   
   
 </div>
