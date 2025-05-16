@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338544.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338545.png">
 <meta property="article:published_time" content="2025-05-16T01:54:40.000Z">
-<meta property="article:modified_time" content="2025-05-16T05:38:46.757Z">
+<meta property="article:modified_time" content="2025-05-16T09:10:08.580Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161338540.png">
@@ -232,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          608 字
+          813 字
         
       </span>
     
@@ -243,7 +243,7 @@
         
         
         
-          6 分钟
+          7 分钟
         
       </span>
     
@@ -320,6 +320,16 @@
 <li>重新标记</li>
 <li>筛选回收：制定回收计划，选择多个region作为回收集，把回收集中存活对象复制到空的region中，再清理旧region中的全部空间，需要STW</li>
 </ol>
+<h2 id="8-CMS-G1垃圾回收器的三色标记是什么？"><a href="#8-CMS-G1垃圾回收器的三色标记是什么？" class="headerlink" title="8. CMS G1垃圾回收器的三色标记是什么？"></a>8. <strong>CMS G1垃圾回收器的三色标记是什么？</strong></h2><p>三色标记是用于垃圾回收的标记算法，CMS 和 G1 垃圾回收器都有采用。它将对象分为三种颜色：</p>
+<ul>
+<li><p>白色：初始状态，代表<strong>尚未被垃圾回收器访问的对象</strong>。标记结束仍为白色的对象，意味着未被程序引用，会被当作垃圾回收。</p>
+</li>
+<li><p>灰色：表示对象已被访问，但<strong>它引用的其他对象还没全被访问</strong>，处于“中间状态”。</p>
+</li>
+<li><p>黑色：对<strong>象及其引用的所有对象都已被访问过</strong>。黑色对象在本轮标记中不会被回收。</p>
+</li>
+</ul>
+<p>三色标记能在并发标记时，和用户线程并发执行，提高效率，但可能产生浮动垃圾和对象消失问题。 </p>
 
                 
               </div>
