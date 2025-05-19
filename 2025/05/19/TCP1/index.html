@@ -19,28 +19,29 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="HTTP 引用：小林coding  1. HTTP基本知识1.1 HTTP是什么HTTP 是超文本传输协议，也就是HyperText Transfer Protocol。 1.2 HTTP常见的状态码有哪些  1xx  1xx 类状态码属于提示信息，是协议处理中的一种中间状态，实际用到的比较少。   2xx  2xx 类状态码表示服务器成功处理了客户端的请求，也是我们最愿意看到的状态。   「2">
+    <meta name="description" content="TCP1 引用：小林coding  1. 什么是TCPTCP 是面向连接的、可靠的、基于字节流的传输层通信协议。  2. TCP与UDP区别    TCP UDP    连接 TCP 是面向连接的传输层协议，传输数据前先要建立连接。 UDP 是不需要连接，即刻传输数据。   服务对象 TCP 是一对一的两点服务，即一条连接只有两个端点。 UDP 支持一对一、一对多、多对多的交互通信   可靠性 T">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HTTP">
-<meta property="og:url" content="http://example.com/2025/05/17/HTTP/index.html">
+<meta property="og:title" content="TCP">
+<meta property="og:url" content="http://example.com/2025/05/19/TCP1/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="HTTP 引用：小林coding  1. HTTP基本知识1.1 HTTP是什么HTTP 是超文本传输协议，也就是HyperText Transfer Protocol。 1.2 HTTP常见的状态码有哪些  1xx  1xx 类状态码属于提示信息，是协议处理中的一种中间状态，实际用到的比较少。   2xx  2xx 类状态码表示服务器成功处理了客户端的请求，也是我们最愿意看到的状态。   「2">
+<meta property="og:description" content="TCP1 引用：小林coding  1. 什么是TCPTCP 是面向连接的、可靠的、基于字节流的传输层通信协议。  2. TCP与UDP区别    TCP UDP    连接 TCP 是面向连接的传输层协议，传输数据前先要建立连接。 UDP 是不需要连接，即刻传输数据。   服务对象 TCP 是一对一的两点服务，即一条连接只有两个端点。 UDP 支持一对一、一对多、多对多的交互通信   可靠性 T">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171457205.jpg">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171457297.jpg">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171456914.jpeg">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171456663.png">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171455315.png">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171456048.jpg">
-<meta property="article:published_time" content="2025-05-17T05:58:41.000Z">
-<meta property="article:modified_time" content="2025-05-17T06:57:39.142Z">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110448.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110450.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110451.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110452.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110453.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110454.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110455.png">
+<meta property="article:published_time" content="2025-05-19T02:18:15.000Z">
+<meta property="article:modified_time" content="2025-05-19T03:10:58.809Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171457205.jpg">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110448.png">
   
   
   
-  <title>HTTP - Kon4tsu Blog</title>
+  <title>TCP - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -210,7 +211,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="HTTP"></span>
+            <span id="subtitle" data-typed-text="TCP"></span>
           
         </div>
 
@@ -221,8 +222,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-05-17 13:58" pubdate>
-          2025年5月17日 下午
+        <time datetime="2025-05-19 10:18" pubdate>
+          2025年5月19日 上午
         </time>
       </span>
     
@@ -233,7 +234,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.9k 字
+          1.5k 字
         
       </span>
     
@@ -244,7 +245,7 @@
         
         
         
-          17 分钟
+          13 分钟
         
       </span>
     
@@ -281,133 +282,121 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">HTTP</h1>
+            <h1 id="seo-header">TCP</h1>
             
             
               <div class="markdown-body">
                 
-                <p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171457205.jpg" srcset="/img/loading.gif" lazyload alt="图片"></p>
-<h1 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h1><blockquote>
+                <h1 id="TCP1"><a href="#TCP1" class="headerlink" title="TCP1"></a>TCP1</h1><blockquote>
 <p>引用：小林coding</p>
 </blockquote>
-<h2 id="1-HTTP基本知识"><a href="#1-HTTP基本知识" class="headerlink" title="1. HTTP基本知识"></a>1. HTTP基本知识</h2><h3 id="1-1-HTTP是什么"><a href="#1-1-HTTP是什么" class="headerlink" title="1.1 HTTP是什么"></a>1.1 HTTP是什么</h3><p>HTTP 是超文本传输协议，也就是<strong>H</strong>yperText <strong>T</strong>ransfer <strong>P</strong>rotocol。</p>
-<h3 id="1-2-HTTP常见的状态码有哪些"><a href="#1-2-HTTP常见的状态码有哪些" class="headerlink" title="1.2 HTTP常见的状态码有哪些"></a>1.2 HTTP常见的状态码有哪些</h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171457297.jpg" srcset="/img/loading.gif" lazyload alt="图片"></p>
-<ul>
-<li><p><em>1xx</em></p>
+<h2 id="1-什么是TCP"><a href="#1-什么是TCP" class="headerlink" title="1. 什么是TCP"></a>1. 什么是TCP</h2><p>TCP 是<strong>面向连接的、可靠的、基于字节流</strong>的传输层通信协议。</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110448.png" srcset="/img/loading.gif" lazyload alt="TCP 头格式"></p>
+<h2 id="2-TCP与UDP区别"><a href="#2-TCP与UDP区别" class="headerlink" title="2. TCP与UDP区别"></a>2. TCP与UDP区别</h2><table>
+<thead>
+<tr>
+<th></th>
+<th align="left">TCP</th>
+<th>UDP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>连接</td>
+<td align="left">TCP 是面向连接的传输层协议，传输数据前先要建立连接。</td>
+<td>UDP 是不需要连接，即刻传输数据。</td>
+</tr>
+<tr>
+<td>服务对象</td>
+<td align="left">TCP 是一对一的两点服务，即一条连接只有两个端点。</td>
+<td>UDP 支持一对一、一对多、多对多的交互通信</td>
+</tr>
+<tr>
+<td>可靠性</td>
+<td align="left">TCP 是可靠交付数据的，数据可以无差错、不丢失、不重复、按序到达。</td>
+<td>UDP 是尽最大努力交付，不保证可靠交付数据。</td>
+</tr>
+<tr>
+<td>拥塞控制、流量控制</td>
+<td align="left">TCP 有拥塞控制和流量控制机制，保证数据传输的安全性。</td>
+<td>UDP 则没有，即使网络非常拥堵了，也不会影响 UDP 的发送速率。</td>
+</tr>
+<tr>
+<td>首部开销</td>
+<td align="left">TCP 首部长度较长，会有一定的开销。</td>
+<td>UDP 首部只有 8 个字节，并且是固定不变的，开销较小。</td>
+</tr>
+<tr>
+<td>传输方式</td>
+<td align="left">TCP 是流式传输，没有边界，但保证顺序和可靠。</td>
+<td>UDP 是一个包一个包的发送，是有边界的，但可能会丢包和乱序。</td>
+</tr>
+<tr>
+<td>分片不同</td>
+<td align="left">TCP 的数据大小如果大于 MSS 大小，则会在传输层进行分片</td>
+<td>UDP 的数据大小如果大于 MTU 大小，则会在 IP 层进行分片</td>
+</tr>
+</tbody></table>
+<h2 id="3-TCP三次握手"><a href="#3-TCP三次握手" class="headerlink" title="3. TCP三次握手"></a>3. TCP三次握手</h2><h3 id="3-1-三次握手建立过程"><a href="#3-1-三次握手建立过程" class="headerlink" title="3.1 三次握手建立过程"></a>3.1 三次握手建立过程</h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110450.png" srcset="/img/loading.gif" lazyload alt="TCP 三次握手"></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110451.png" srcset="/img/loading.gif" lazyload alt="第一个报文 —— SYN 报文"></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110452.png" srcset="/img/loading.gif" lazyload alt="第二个报文 —— SYN + ACK 报文"></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110453.png" srcset="/img/loading.gif" lazyload alt="第三个报文 —— ACK 报文"></p>
+<p>其中第三次握手是<strong>可以携带数据</strong>的</p>
+<h3 id="3-2-为什么是三次握手，而不是两次、四次？"><a href="#3-2-为什么是三次握手，而不是两次、四次？" class="headerlink" title="3.2 为什么是三次握手，而不是两次、四次？"></a>3.2 为什么是三次握手，而不是两次、四次？</h3><ul>
+<li><p>三次握手可以<strong>阻止重复的历史连接</strong>（最重要）</p>
 <blockquote>
-<p><code>1xx</code> 类状态码属于<strong>提示信息</strong>，是协议处理中的一种中间状态，实际用到的比较少。</p>
+<p>由于网络超时导致客户端报文超时重发，序列号机制可以确保之前阻塞在网络中的报文不会起作用</p>
 </blockquote>
 </li>
-<li><p><em>2xx</em></p>
+<li><p>三次握手才可以同步双方的初始序列号</p>
 <blockquote>
-<p><code>2xx</code> 类状态码表示服务器<strong>成功</strong>处理了客户端的请求，也是我们最愿意看到的状态。</p>
-</blockquote>
+<p>客户端<code>SYN</code>报文告诉对方自己的初始序列号<code>client_isn</code>，服务端<code>ACK</code>这个报文<code>client_isn + 1</code>，<code>SYN</code>报文告诉对方自己的初始序列号<code>server_isn</code>，客户端<code>ACK</code>这个报文<code>server_isn + 1</code></p>
+<p>序列号是TCP可靠传输的一个重要机制：</p>
 <ul>
-<li>「<strong>200 OK</strong>」是最常见的成功状态码，表示一切正常。如果是非 <code>HEAD</code> 请求，服务器返回的响应头都会有 body 数据。</li>
-<li>「<strong>204 No Content</strong>」也是常见的成功状态码，与 200 OK 基本相同，但响应头没有 body 数据。</li>
-<li>「<strong>206 Partial Content</strong>」是应用于 HTTP 分块下载或断电续传，表示响应返回的 body 数据并不是资源的全部，而是其中的一部分，也是服务器处理成功的状态。</li>
+<li>接收方可以去除重复的数据；</li>
+<li>接收方可以根据数据包的序列号按序接收；</li>
+<li>可以标识发送出去的数据包中， 哪些是已经被对方收到的（通过 <code>ACK </code>报文中的序列号知道）；</li>
 </ul>
+</blockquote>
 </li>
-<li><p><em>3xx</em></p>
+<li><p>三次握手可以避免资源浪费</p>
 <blockquote>
-<p><code>3xx</code> 类状态码表示客户端请求的资源发送了变动，需要客户端用新的 URL 重新发送请求获取资源，也就是<strong>重定向</strong>。</p>
-</blockquote>
-<ul>
-<li><p>「<strong>301 Moved Permanently</strong>」表示永久重定向，说明请求的资源已经不存在了，需改用新的 URL 再次访问。</p>
-</li>
-<li><p>「<strong>302 Moved Permanently</strong>」表示临时重定向，说明请求的资源还在，但暂时需要用另一个 URL 来访问。</p>
-<p>301 和 302 都会在响应头里使用字段 <code>Location</code>，指明后续要跳转的 URL，浏览器会自动重定向新的 URL</p>
-</li>
-<li><p>「<strong>304 Not Modified</strong>」不具有跳转的含义，表示资源未修改，重定向已存在的缓冲文件，也称缓存重定向，用于缓存控制。</p>
-</li>
-</ul>
-</li>
-<li><p><em>4xx</em></p>
-<blockquote>
-<p><code>4xx</code> 类状态码表示<strong>客户端发送的报文有误</strong>，服务器无法处理，也就是错误码的含义。</p>
-</blockquote>
-<ul>
-<li>「<strong>400 Bad Request</strong>」表示客户端请求的报文有错误，但只是个笼统的错误。</li>
-<li>「<strong>403 Forbidden</strong>」表示服务器禁止访问资源，并不是客户端的请求出错。</li>
-<li>「<strong>404 Not Found</strong>」表示请求的资源在服务器上不存在或未找到，所以无法提供给客户端。</li>
-</ul>
-</li>
-<li><p><em>5xx</em></p>
-<blockquote>
-<p><code>5xx</code> 类状态码表示客户端请求报文正确，但是<strong>服务器处理时内部发生了错误</strong>，属于服务器端的错误码。</p>
-</blockquote>
-<ul>
-<li>「<strong>500 Internal Server Error</strong>」与 400 类型，是个笼统通用的错误码，服务器发生了什么错误，我们并不知道。</li>
-<li>「<strong>501 Not Implemented</strong>」表示客户端请求的功能还不支持，类似“即将开业，敬请期待”的意思。</li>
-<li>「<strong>502 Bad Gateway</strong>」通常是服务器作为网关或代理时返回的错误码，表示服务器自身工作正常，访问后端服务器发生了错误。</li>
-<li>「<strong>503 Service Unavailable</strong>」表示服务器当前很忙，暂时无法响应服务器，类似“网络服务正忙，请稍后重试”的意思。</li>
-</ul>
-</li>
-</ul>
-<h3 id="1-3-HTTP常见字段"><a href="#1-3-HTTP常见字段" class="headerlink" title="1.3 HTTP常见字段"></a>1.3 HTTP常见字段</h3><ul>
-<li><code>Host</code>：客户端发送请求时，用来指定服务器的域名。</li>
-<li><code>Content-Length</code>：服务器在返回数据时，会有 <code>Content-Length</code> 字段，表明本次回应的数据长度。</li>
-<li><code>Connection</code>：字段最常用于客户端要求服务器使用 TCP 持久连接，以便其他请求复用。（Connection：Keep-alive）</li>
-<li><code>Content-Type</code>：用于服务器回应时，告诉客户端，本次数据是什么格式。</li>
-<li><code>Content-Encoding</code>：说明数据的压缩方法。表示服务器返回的数据使用了什么压缩格式</li>
-</ul>
-<h2 id="2-HTTPS"><a href="#2-HTTPS" class="headerlink" title="2. HTTPS"></a>2. HTTPS</h2><h3 id="2-1-HTTP和HTTPS有什么区别"><a href="#2-1-HTTP和HTTPS有什么区别" class="headerlink" title="2.1 HTTP和HTTPS有什么区别"></a>2.1 HTTP和HTTPS有什么区别</h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171456914.jpeg" srcset="/img/loading.gif" lazyload alt="HTTP 与 HTTPS 网络层"></p>
-<ul>
-<li>HTTP明文传输，存在风险；HTTPS加入了SSL&#x2F;TLS协议，报文能够密文传输</li>
-<li>HTTP建立连接只需要TCP三次握手；HTTPS在TCP三次握手后还需要进行SSL&#x2F;TLS握手</li>
-<li>HTTP默认80端口；HTTPS默认443端口</li>
-</ul>
-<h3 id="2-2-TLS握手过程（RSA算法）"><a href="#2-2-TLS握手过程（RSA算法）" class="headerlink" title="2.2 TLS握手过程（RSA算法）"></a>2.2 TLS握手过程（RSA算法）</h3><blockquote>
-<p>SSL&#x2F;TLS 在加密过程中涉及到了两种类型的加密方法：</p>
-<ul>
-<li>非对称加密：服务器向客户端发送公钥，然后客户端用公钥加密自己的随机密钥，也就是会话密钥，发送给服务器，服务器用私钥解密，得到会话密钥。</li>
-<li>对称加密：双方用会话密钥加密通信内容。</li>
-</ul>
-</blockquote>
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171456663.png" srcset="/img/loading.gif" lazyload alt="img"></p>
-<h4 id="TLS第一次握手"><a href="#TLS第一次握手" class="headerlink" title="TLS第一次握手"></a>TLS第一次握手</h4><p>客户端首先会发一个<code>Client Hello</code>消息，这个消息里包含：客户端使用的TLS版本号、支持的密码套件列表（如RSA）、以及生成的<strong>随机数<code>Client Random</code></strong></p>
-<h4 id="TLS第二次握手"><a href="#TLS第二次握手" class="headerlink" title="TLS第二次握手"></a>TLS第二次握手</h4><p>当服务端收到客户端的<code>Client Hello</code>，会确认是否支持客户端的TLS版本号，然后从密码套件列表中选一个密码套件，以及生成一个<strong>随机数<code>Server Random</code></strong>，然后返回<code>Server Hello</code>消息</p>
-<p>然后，服务端为了证明自己的身份（没有被别人冒充），会发送<code>Server Certificate</code>给客户端，这个消息里含有<strong>数字证书</strong></p>
-<p>最后，服务端发送<code>Server Hello Done</code></p>
-<h4 id="数字证书"><a href="#数字证书" class="headerlink" title="数字证书"></a>数字证书</h4><p>一个证书通常包含了：</p>
-<ul>
-<li><strong>公钥</strong></li>
-<li>持有者消息</li>
-<li>证书认证机构（CA）的消息</li>
-<li>CA对这份文件的数字签名及使用的算法</li>
-<li>证书有效期</li>
-</ul>
-<p>下图为证书签发和验证流程：</p>
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171455315.png" srcset="/img/loading.gif" lazyload alt="img"></p>
-<h4 id="TLS第三次握手"><a href="#TLS第三次握手" class="headerlink" title="TLS第三次握手"></a>TLS第三次握手</h4><p>客户端验证完证书后，认为可信则继续往下走。</p>
-<p>客户端生成一个新的随机数<code>pre-master</code>，用服务器的RSA公钥加密<code>pre-master</code>，通过消息<code>Client Key Exchange</code>传给服务端，服务端收到后用RSA私钥解密</p>
-<p>至此，客户端和服务端都得到了三个随机数：<code>Client Random</code>、<code>Server Random</code>、<code>pre-master</code>，<strong>基于这三个随机数生成一个会话密钥</strong>，用于后续信息传递的加解密</p>
-<p>生成会话密钥后，客户端发一个<code>Change Cipher Spec</code>消息，告诉服务端开始使用加密方式发送消息</p>
-<p>然后客户端再发一个<code>Encrypted Handshake Message(Finished)</code>消息，把之前所有握手数据做一个摘要</p>
-<h4 id="TLS第四次握手"><a href="#TLS第四次握手" class="headerlink" title="TLS第四次握手"></a>TLS第四次握手</h4><p>服务端也发回<code>Change Cipher Spec</code>和<code>Encrypted Handshake Message</code>，握手正式完成</p>
-<p>然后就能用会话密钥进行加密报文传输了</p>
-<h2 id="3-HTTP1-0、1-1、2-0的区别"><a href="#3-HTTP1-0、1-1、2-0的区别" class="headerlink" title="3. HTTP1.0、1.1、2.0的区别"></a>3. HTTP1.0、1.1、2.0的区别</h2><h3 id="HTTP1-0"><a href="#HTTP1-0" class="headerlink" title="HTTP1.0"></a>HTTP1.0</h3><ul>
-<li><strong>无状态协议</strong>：HTTP 1.0 是无状态的，每个请求之间相互独立，服务器不保存任何请求的状态信息。</li>
-<li><strong>非持久连接</strong>：默认情况下，每个 HTTP 请求&#x2F;响应对之后，连接会被关闭，属于短连接。这意味着对于同一个网站的每个资源请求，如 HTML 页面上的图片和脚本，都需要建立一个新的 TCP 连接。可以设置<code>Connection: keep-alive</code> 强制开启长连接。</li>
-</ul>
-<h3 id="HTTP1-1"><a href="#HTTP1-1" class="headerlink" title="HTTP1.1"></a>HTTP1.1</h3><ul>
-<li><strong>持久连接</strong>：HTTP 1.1 引入了持久连接（也称为 HTTP keep-alive），默认情况下不会立即关闭连接，可以在一个连接上发送多个请求和响应。极大减轻了 TCP 连接的开销。</li>
-<li><strong>流水线处理</strong>：HTTP 1.1 支持客户端在前一个请求的响应到达之前发送下一个请求，以提高传输效率。</li>
-</ul>
-<h3 id="HTTP2-0"><a href="#HTTP2-0" class="headerlink" title="HTTP2.0"></a>HTTP2.0</h3><ul>
-<li><p><strong>二进制协议</strong>：HTTP 2.0 使用二进制而不是文本格式来传输数据，解析更加高效。</p>
-</li>
-<li><p><strong>多路复用</strong>：一个 TCP 连接上可以同时进行多个 HTTP 请求&#x2F;响应，解决了 HTTP 1.x 的队头阻塞问题。</p>
-<blockquote>
-<p>持久化连接允许多个请求通过同一个TCP连接发送，而管线化则允许客户端在不等待前一个请求响应的情况下发送多个请求。然而，响应必须按照请求的顺序接收，这就导致了队头阻塞的问题</p>
+<p>若只有两次握手，那么服务端回复<code>ACK</code>+<code>SYN</code>报文后，不知道对方能不能接收到，于是都会建立连接，如果客户端因为网络阻塞发送了多个<code>SYN</code>报文，服务端这边就会建立多个连接，造成资源浪费</p>
 </blockquote>
 </li>
-<li><p><strong>头部压缩</strong>：HTTP 协议不带状态，所以每次请求都必须附上所有信息。HTTP 2.0 引入了头部压缩机制，可以使用 gzip 或 compress 压缩后再发送，减少了冗余头部信息的带宽消耗。</p>
+</ul>
+<p>故不用「两次握手」与「四次握手」的原因：</p>
+<ul>
+<li>「两次握手」：无法防止历史连接的建立，会造成双方资源的浪费，也无法可靠的同步双方序列号；</li>
+<li>「四次握手」：三次握手就已经理论上最少可靠连接建立，所以不需要使用更多的通信次数。</li>
+</ul>
+<h3 id="3-3-为什么每次建立TCP连接时，初始序列号都不相同"><a href="#3-3-为什么每次建立TCP连接时，初始序列号都不相同" class="headerlink" title="3.3 为什么每次建立TCP连接时，初始序列号都不相同"></a>3.3 为什么每次建立TCP连接时，初始序列号都不相同</h3><p>若每次初始序列号都从0开始，<strong>很容易出现历史报文被下一个相同四元组的连接接收的问题</strong></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110454.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h3 id="3-4-三次握手丢失分别会发生什么？"><a href="#3-4-三次握手丢失分别会发生什么？" class="headerlink" title="3.4 三次握手丢失分别会发生什么？"></a>3.4 三次握手丢失分别会发生什么？</h3><ul>
+<li>第一次握手丢失：客户端由于没收到回应，超时重传<code>SYN</code>报文</li>
+<li>第二次握手丢失：客户端由于没收到回应，超时重传<code>SYN</code>报文；服务端由于没收到回应，超时重传<code>ACK</code>+<code>SYN</code>报文</li>
+<li>第三次握手丢失：<strong><code>ACK</code> 报文是不会有重传的，当 <code>ACK</code> 丢失了，就由对方重传对应的报文</strong>，即服务端超时重传<code>ACK</code>+<code>SYN</code>报文</li>
+</ul>
+<h2 id="4-TCP四次挥手"><a href="#4-TCP四次挥手" class="headerlink" title="4. TCP四次挥手"></a>4. TCP四次挥手</h2><h3 id="4-1-四次挥手建立过程"><a href="#4-1-四次挥手建立过程" class="headerlink" title="4.1 四次挥手建立过程"></a>4.1 四次挥手建立过程</h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505191110455.png" srcset="/img/loading.gif" lazyload alt="客户端主动关闭连接 —— TCP 四次挥手"></p>
+<ul>
+<li>关闭连接时，客户端向服务端发送 <code>FIN</code> 时，仅仅表示客户端不再发送数据了但是还能接收数据。</li>
+<li>服务端收到客户端的 <code>FIN</code> 报文时，先回一个 <code>ACK</code> 应答报文，<strong>服务端可能还有数据需要处理和发送</strong>，等服务端不再发送数据时，才发送 <code>FIN</code> 报文给客户端来表示同意现在关闭连接。</li>
+</ul>
+<p>从上面过程可知，服务端通常需要等待完成数据的发送和处理，所以服务端的 <code>ACK</code> 和 <code>FIN</code> 一般都会<strong>分开发送</strong>，因此是需要四次挥手。</p>
+<h3 id="4-2-四次挥手分别丢失会发生什么？"><a href="#4-2-四次挥手分别丢失会发生什么？" class="headerlink" title="4.2 四次挥手分别丢失会发生什么？"></a>4.2 四次挥手分别丢失会发生什么？</h3><ul>
+<li>第一次挥手丢失：客户端超时重发<code>FIN</code>报文</li>
+<li>第二次挥手丢失：由于<code>ACK</code>报文是不会重发的，故客户端超时重发<code>FIN</code>报文</li>
+<li>第三次挥手丢失：服务端超时重传<code>FIN</code>报文</li>
+<li>第四次挥手丢失：服务端超时重传<code>FIN</code>报文</li>
+</ul>
+<h3 id="4-3-为什么TIME-WAIT等待的时间是2MSL？"><a href="#4-3-为什么TIME-WAIT等待的时间是2MSL？" class="headerlink" title="4.3 为什么TIME_WAIT等待的时间是2MSL？"></a>4.3 为什么TIME_WAIT等待的时间是2MSL？</h3><p><code>MSL</code> 是 Maximum Segment Lifetime，<strong>报文最大生存时间</strong>，它是任何报文在网络上存在的最长时间，超过这个时间报文将被丢弃。</p>
+<p>当客户端第四次挥手<code>ACK</code>报文没有传到服务端，服务端会超时重传第三次挥手的<code>FIN</code>报文，<code>TIME_WAIT</code>设置成<code>2MSL</code>可以<strong>保证客户端能够收到这个重传的<code>FIN</code>报文</strong>，收到重传报文后刷新<code>TIME_WAIT</code>时间并重发<code>ACK</code></p>
+<p><code>TIME_WAIT</code>的作用：</p>
+<ul>
+<li><p>为了防止历史连接中的数据，被后面相同四元组的连接错误的接收，因此 TCP 设计了 TIME_WAIT 状态，状态会持续 <code>2MSL</code> 时长，这个时间<strong>足以让两个方向上的数据包都被丢弃，使得原来连接的数据包在网络中都自然消失，再出现的数据包一定都是新建立连接所产生的</strong></p>
 </li>
-<li><p><strong>服务端推送</strong>：服务器可以主动向客户端推送资源，而不需要客户端明确请求。</p>
+<li><p><strong>等待足够的时间以确保最后的 ACK 能让被动关闭方接收，从而帮助其正常关闭</strong></p>
 </li>
 </ul>
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505171456048.jpg" srcset="/img/loading.gif" lazyload></p>
 
                 
               </div>
@@ -446,8 +435,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>HTTP</div>
-      <div>http://example.com/2025/05/17/HTTP/</div>
+      <div>TCP</div>
+      <div>http://example.com/2025/05/19/TCP1/</div>
     </div>
     <div class="license-meta">
       
@@ -459,7 +448,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年5月17日</div>
+          <div>2025年5月19日</div>
         </div>
       
       
@@ -491,18 +480,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/05/19/TCP1/" title="TCP">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">TCP</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/05/17/Interceptor/" title="Interceptor">
-                        <span class="hidden-mobile">Interceptor</span>
+                      <a href="/2025/05/17/HTTP/" title="HTTP">
+                        <span class="hidden-mobile">HTTP</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
