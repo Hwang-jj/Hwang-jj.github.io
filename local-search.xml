@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>JVM-调优参数</title>
+    <link href="/2025/05/19/JVM-%E8%B0%83%E4%BC%98%E5%8F%82%E6%95%B0/"/>
+    <url>/2025/05/19/JVM-%E8%B0%83%E4%BC%98%E5%8F%82%E6%95%B0/</url>
+    
+    <content type="html"><![CDATA[<h1 id="JVM——调优参数"><a href="#JVM——调优参数" class="headerlink" title="JVM——调优参数"></a>JVM——调优参数</h1><p>JVM调优是通过调整Java虚拟机的配置来提升Java应用程序的性能的过程。这包括优化堆内存设置、选择合适的垃圾收集器以及调整其他性能相关的参数。JVM调优的目的是提高性能、优化资源利用，并增强稳定性。</p><h2 id="常用JVM调优参数"><a href="#常用JVM调优参数" class="headerlink" title="常用JVM调优参数"></a>常用JVM调优参数</h2><p>以下是一些常用的JVM调优参数，特别是对于JVM 8版本：</p><ul><li><strong>-Xms</strong> 和 <strong>-Xmx</strong>：设置堆的起始大小和最大大小。</li><li><strong>-XX:+UseG1GC</strong>：使用G1垃圾收集器，适合于大堆内存和多核处理器的场景。</li><li><strong>-XX:MaxGCPauseMillis</strong>：设置期望的最大GC暂停时间（毫秒），以便于优化延迟。</li><li><strong>-XX:ParallelGCThreads</strong>：设置并行垃圾收集线程数。一般设置为可用CPU核心数。</li><li><strong>-XX:ConcGCThreads</strong>：设置G1的并发标记线程数，一般为ParallelGCThreads的一半。</li><li><strong>-XX:MetaspaceSize</strong> 和 <strong>-XX:MaxMetaspaceSize</strong>：设置初始元空间大小和最大元空间大小，元空间用于存放类元数据。</li><li><strong>-XX:+PrintGCDetails</strong> 和 <strong>-XX:+PrintGCDateStamps</strong>：打印垃圾收集细节和时间戳。</li><li><strong>-Xloggc</strong>：将GC日志写入指定文件。</li><li><strong>-XX:+UseGCLogFileRotation</strong> 和 <strong>-XX:NumberOfGCLogFiles</strong>：开启GC日志文件的轮替和指定GC日志文件的数量。</li></ul><h2 id="JVM调优的步骤"><a href="#JVM调优的步骤" class="headerlink" title="JVM调优的步骤"></a>JVM调优的步骤</h2><p>JVM调优通常遵循以下步骤：</p><ol><li><strong>分析GC日志及dump文件</strong>：判断是否需要优化，确定瓶颈问题点。</li><li><strong>确定JVM调优量化目标</strong>：例如，Heap内存使用率应小于等于70%，Full GC次数应为0或平均间隔时间大于24小时。</li><li><strong>确定JVM调优参数</strong>：根据历史JVM参数来调整。</li><li><strong>依次调优内存、延迟、吞吐量等指标</strong>：对比观察调优前后的差异。</li><li><strong>不断的分析和调整</strong>：直到找到合适的JVM参数配置。</li></ol><h2 id="调优工具"><a href="#调优工具" class="headerlink" title="调优工具"></a>调优工具</h2><p>为了辅助JVM调优，可以使用如GCViewer等工具来分析GC日志文件。这些工具可以提供关于内存占用、GC次数和GC时长等的详细信息，帮助开发者更好地理解和优化JVM的性能。</p><h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><ul><li>JVM调优是一个复杂的过程，可能需要根据应用程序的具体需求进行调整和优化。</li><li>应用性能监控工具可以帮助更好地了解应用的运行情况和调优效果。</li><li>在生产环境中逐渐调整并观察每次调整的效果，避免一次性大规模变更。</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>JVM</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>TCP2</title>
     <link href="/2025/05/19/TCP2/"/>
     <url>/2025/05/19/TCP2/</url>
