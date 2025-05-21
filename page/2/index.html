@@ -231,6 +231,114 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/05/16/JVM-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/" target="_self">
+          JVM-执行引擎
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/05/16/JVM-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/" target="_self">
+        <div>
+          JVM——执行引擎为什么说JAVA是“半编译半解释型”语言？ JVM的编译器 Client Compiler（C1）：注重启动速度、局部优化 Server Compiler（C2）：注重全局优化  JVM的分层编译 层级0：解释器 层级1：C1编译器+轻量级优化 层级2：C1编译器+完整优化 层级3：C1编译器+分析数据收集 层级4：C2编译器
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-05-16 09:53" pubdate>
+              2025-05-16
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JVM/" class="category-chain-item">JVM</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/05/16/JVM-%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/" target="_self">
+          JVM-运行时数据区
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/05/16/JVM-%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/" target="_self">
+        <div>
+          JVM——运行时数据区 运行时数据区包含：PC寄存器、本地方法栈、虚拟机栈、堆、元数据区、CodeCache  1. PC寄存器存储下一条指令的地址（线程私有） 不存在StackOverflowError和OutofMemoryError 2. 本地方法栈管理本地方法的调用（线程私有） 存在StackOverflowError和OutofMemoryError 3. 虚拟机栈线程私有，内部保存一个
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-05-16 09:53" pubdate>
+              2025-05-16
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JVM/" class="category-chain-item">JVM</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/05/16/JVM-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%AD%90%E7%B3%BB%E7%BB%9F/" target="_self">
           JVM-类加载器子系统
         </a>
@@ -634,93 +742,6 @@
             <i class="iconfont icon-date"></i>
             <time datetime="2025-05-14 10:13" pubdate>
               2025-05-14
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%9D%82/" class="category-chain-item">杂</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/05/13/%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE%E9%9D%A2%E7%BB%8F%E6%80%BB%E7%BB%93/" target="_self">
-          点评项目面经总结
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/05/13/%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE%E9%9D%A2%E7%BB%8F%E6%80%BB%E7%BB%93/" target="_self">
-        <div>
-          点评项目面经总结1. 使用Redis解决了在集群模式下的Session共享问题，使用拦截器实现用户的登录校验和权限刷新 Session共享问题：在多台Tomcat服务器的集群模式下，多台Tomcat之间不会共享Session，导致在Tomcat1中携带有用户的登录信息，但Tomcat2中没有，当用户使用Tomcat2时，会判断为未登录   基于Redis实现： 将随机生成的token作为key值，
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-05-13 13:21" pubdate>
-              2025-05-13
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/05/13/Redisson%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E6%9C%BA%E5%88%B6/" target="_self">
-          Redisson分布式锁机制
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/05/13/Redisson%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E6%9C%BA%E5%88%B6/" target="_self">
-        <div>
-          Redisson分布式锁一、基于Redis的setnx实现的分布式锁存在的问题 不可重入：同一个线程无法多次获取同一把锁 不可重试：获取锁只尝试一次，失败就返回 false，没有重试机制 超时释放：锁超时释放虽然可以避免死锁，但如果是业务执行耗时较长，也会导致锁释放，存在安全隐患 主从一致性：如果 Redis 提供了主从集群，主从同步存在延迟，此时某个线程从主节点中获取到了锁，但是尚未同步给从节点
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-05-13 11:16" pubdate>
-              2025-05-13
             </time>
           </div>
         
