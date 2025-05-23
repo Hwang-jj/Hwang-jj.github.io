@@ -29,7 +29,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231033854.webp">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231033855.png">
 <meta property="article:published_time" content="2025-05-23T01:20:55.000Z">
-<meta property="article:modified_time" content="2025-05-23T02:33:54.896Z">
+<meta property="article:modified_time" content="2025-05-23T02:41:22.626Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231033854.webp">
@@ -319,6 +319,7 @@
 
 <p>ObjectMonitor中有两个队列，WaitSet 和 EntryList，用来保存ObjectWaiter对象列表( 每个等待锁的线程都会被封装成ObjectWaiter对象)，owner指向持有ObjectMonitor对象的线程。</p>
 <p>当多个线程同时访问一段同步代码时，首先会进入 EntryList 集合，<mark>当线程获取到对象的monitor 后把monitor中的owner变量设置为当前线程，同时monitor中的计数器count加1</mark>，竞争锁失败的线程则留在EntryList中。若线程调用 <code>wait()</code> 方法，将释放当前持有的monitor，owner变量恢复为null，count自减1，同时该线程进入 WaitSet集合中等待被唤醒。若当前线程执行完毕也将释放monitor并复位变量的值，以便其他线程获取monitor。</p>
+<p>后进入EntryList的线程被允许直接尝试获得锁，这说明<code>synchronized</code>是<strong>非公平锁</strong></p>
 <h3 id="3-1-为什么需要EntryList、WaitSet两个集合呢？集合里的元素不都是在等待锁吗？"><a href="#3-1-为什么需要EntryList、WaitSet两个集合呢？集合里的元素不都是在等待锁吗？" class="headerlink" title="3.1 为什么需要EntryList、WaitSet两个集合呢？集合里的元素不都是在等待锁吗？"></a>3.1 为什么需要EntryList、WaitSet两个集合呢？集合里的元素不都是在等待锁吗？</h3><p>EntryList里的元素是竞争锁失败的线程，这是锁的互斥问题；而WaitSet里的元素是调用<code>wait()</code> 方法主动释放锁并等待唤醒的线程，这是线程通信的问题</p>
 
                 
