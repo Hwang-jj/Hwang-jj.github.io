@@ -19,23 +19,23 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="sleep()和wait()、start()和run()1. sleep()、wait()1.1 相同点两者都可以暂停线程执行 1.2 区别 wait()方法释放了锁；sleep()方法没有释放锁 wait()方法通常被用于线程间的通信；sleep()方法通常被用于暂停执行 wait()方法调用后，需要别的线程使用notify()或notifyAll()方法唤醒当前线程，或者使用wait(long">
+    <meta name="description" content="synchronized3 引用：  https:&#x2F;&#x2F;www.cnblogs.com&#x2F;duanxz&#x2F;p&#x2F;4458342.html https:&#x2F;&#x2F;www.cnblogs.com&#x2F;vipstone&#x2F;p&#x2F;15121109.html   1. 自旋锁线程的阻塞和唤醒需要CPU从用户态转为核心态，频繁的阻塞和唤醒对CPU来说是一件负担很重的工作，势必会给系统的并发性能带来很大的压力。同时我们发现在许多应用">
 <meta property="og:type" content="article">
-<meta property="og:title" content="sleep()和wait()、start()和run()">
-<meta property="og:url" content="http://example.com/2025/05/22/sleep()%E5%92%8Cwait()%E3%80%81start()%E5%92%8Crun()/index.html">
+<meta property="og:title" content="synchronized3">
+<meta property="og:url" content="http://example.com/2025/05/23/synchronized3/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="sleep()和wait()、start()和run()1. sleep()、wait()1.1 相同点两者都可以暂停线程执行 1.2 区别 wait()方法释放了锁；sleep()方法没有释放锁 wait()方法通常被用于线程间的通信；sleep()方法通常被用于暂停执行 wait()方法调用后，需要别的线程使用notify()或notifyAll()方法唤醒当前线程，或者使用wait(long">
+<meta property="og:description" content="synchronized3 引用：  https:&#x2F;&#x2F;www.cnblogs.com&#x2F;duanxz&#x2F;p&#x2F;4458342.html https:&#x2F;&#x2F;www.cnblogs.com&#x2F;vipstone&#x2F;p&#x2F;15121109.html   1. 自旋锁线程的阻塞和唤醒需要CPU从用户态转为核心态，频繁的阻塞和唤醒对CPU来说是一件负担很重的工作，势必会给系统的并发性能带来很大的压力。同时我们发现在许多应用">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505222020161.png">
-<meta property="article:published_time" content="2025-05-22T12:03:46.000Z">
-<meta property="article:modified_time" content="2025-05-22T12:20:42.629Z">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231030451.png">
+<meta property="article:published_time" content="2025-05-23T02:17:41.000Z">
+<meta property="article:modified_time" content="2025-05-23T02:30:26.518Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505222020161.png">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231030451.png">
   
   
   
-  <title>sleep()和wait()、start()和run() - Kon4tsu Blog</title>
+  <title>synchronized3 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -205,7 +205,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="sleep()和wait()、start()和run()"></span>
+            <span id="subtitle" data-typed-text="synchronized3"></span>
           
         </div>
 
@@ -216,8 +216,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-05-22 20:03" pubdate>
-          2025年5月22日 晚上
+        <time datetime="2025-05-23 10:17" pubdate>
+          2025年5月23日 上午
         </time>
       </span>
     
@@ -228,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          330 字
+          1.5k 字
         
       </span>
     
@@ -239,7 +239,7 @@
         
         
         
-          3 分钟
+          13 分钟
         
       </span>
     
@@ -276,27 +276,35 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">sleep()和wait()、start()和run()</h1>
+            <h1 id="seo-header">synchronized3</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="sleep-和wait-、start-和run"><a href="#sleep-和wait-、start-和run" class="headerlink" title="sleep()和wait()、start()和run()"></a>sleep()和wait()、start()和run()</h1><h2 id="1-sleep-、wait"><a href="#1-sleep-、wait" class="headerlink" title="1. sleep()、wait()"></a>1. sleep()、wait()</h2><h3 id="1-1-相同点"><a href="#1-1-相同点" class="headerlink" title="1.1 相同点"></a>1.1 相同点</h3><p>两者都可以暂停线程执行</p>
-<h3 id="1-2-区别"><a href="#1-2-区别" class="headerlink" title="1.2 区别"></a>1.2 区别</h3><ul>
-<li><code>wait()</code>方法释放了锁；<code>sleep()</code>方法没有释放锁</li>
-<li><mark><code>wait()</code>方法通常被用于线程间的通信；<code>sleep()</code>方法通常被用于暂停执行</mark></li>
-<li><code>wait()</code>方法调用后，需要别的线程使用<code>notify()</code>或<code>notifyAll()</code>方法唤醒当前线程，或者使用<code>wait(long timeout)</code>方法指定线程的苏醒时间；<code>sleep()</code>方法执行完成后会自动苏醒</li>
-<li><code>wait()</code>方法属于<code>Object</code>类的本地方法；<code>sleep()</code>方法属于<code>Thread</code>类的静态方法</li>
+                <h1 id="synchronized3"><a href="#synchronized3" class="headerlink" title="synchronized3"></a>synchronized3</h1><blockquote>
+<p>引用：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/duanxz/p/4458342.html">https://www.cnblogs.com/duanxz/p/4458342.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/vipstone/p/15121109.html">https://www.cnblogs.com/vipstone/p/15121109.html</a></li>
 </ul>
-<h3 id="1-3-为什么wait-方法定义在Object类中"><a href="#1-3-为什么wait-方法定义在Object类中" class="headerlink" title="1.3 为什么wait()方法定义在Object类中"></a>1.3 为什么wait()方法定义在Object类中</h3><p><code>wait()</code>方法是让获得<strong>对象锁</strong>的线程实现等待，会释放当前线程占有的对象锁，对象锁是每个对象的拥有的，因此定义在<code>Object</code>类中</p>
-<p>同理，<code>sleep()</code>方法是让当前线程暂停执行，不涉及到对象类、对象锁，因此定义在<code>Thread</code>类中</p>
-<h2 id="2-start-、run"><a href="#2-start-、run" class="headerlink" title="2. start()、run()"></a>2. start()、run()</h2><ul>
-<li><code>start()</code>方法会启动一个线程，并自动执行它的<code>run()</code>方法，这是真正的多线程内容</li>
-<li>直接执行<code>run()</code>方法，会把<code>run()</code>方法当作main线程下一个普通的方法去执行，与多线程无关</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StartAndRun</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">MyThread</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            System.out.println(Thread.currentThread().getName());<br>        &#125;);<br><br>        MyThread.start();<br>        MyThread.run();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="1-自旋锁"><a href="#1-自旋锁" class="headerlink" title="1. 自旋锁"></a>1. 自旋锁</h2><p>线程的阻塞和唤醒需要CPU从用户态转为核心态，频繁的阻塞和唤醒对CPU来说是一件负担很重的工作，势必会给系统的并发性能带来很大的压力。同时我们发现在许多应用上面，对象锁的锁状态只会持续很短一段时间，为了这一段很短的时间频繁地阻塞和唤醒线程是非常不值得的。</p>
+<p>所谓自旋锁，就是让该线程等待一段时间，不会被立即挂起，看持有锁的线程是否会很快释放锁。怎么等待呢？执行一段无意义的循环即可（自旋）。<br>自旋等待不能替代阻塞，先不说对处理器数量的要求（多核，貌似现在没有单核的处理器了），虽然它可以避免线程切换带来的开销，但是它占用了处理器的时间。如果持有锁的线程很快就释放了锁，那么自旋的效率就非常好，反之，自旋的线程就会白白消耗掉处理的资源，它不会做任何有意义的工作，典型的占着茅坑不拉屎，这样反而会带来性能上的浪费。所以说，自旋等待的时间（自旋的次数）必须要有一个限度，如果自旋超过了定义的时间仍然没有获取到锁，则应该被挂起。</p>
+<h2 id="2-适应自旋锁"><a href="#2-适应自旋锁" class="headerlink" title="2. 适应自旋锁"></a>2. 适应自旋锁</h2><p>JDK 1.6引入了更加聪明的自旋锁，即自适应自旋锁。所谓自适应就意味着<strong>自旋的次数不再是固定</strong>的，它是<mark>由前一次在同一个锁上的自旋时间及锁的拥有者的状态来决定</mark>。它怎么做呢？线程如果自旋成功了，那么下次自旋的次数会更加多，因为虚拟机认为既然上次成功了，那么此次自旋也很有可能会再次成功，那么它就会允许自旋等待持续的次数更多。反之，如果对于某个锁，很少有自旋能够成功的，那么在以后要或者这个锁的时候自旋的次数会减少甚至省略掉自旋过程，以免浪费处理器资源。<br>有了自适应自旋锁，随着程序运行和性能监控信息的不断完善，虚拟机对程序锁的状况预测会越来越准确，虚拟机会变得越来越聪明。</p>
+<h2 id="3-锁消除"><a href="#3-锁消除" class="headerlink" title="3. 锁消除"></a>3. 锁消除</h2><p>为了保证数据的完整性，我们在进行操作时需要对这部分操作进行同步控制，但是在有些情况下，JVM检测到<strong>不可能存在共享数据竞争</strong>，这时JVM会对这些同步锁进行锁消除。锁消除的依据是逃逸分析的数据支持。<br>如果不存在竞争，为什么还需要加锁呢？所以<strong>锁消除可以节省毫无意义的请求锁的时间</strong>。变量是否逃逸，对于虚拟机来说需要使用数据流分析来确定，但是对于我们程序员来说这还不清楚么？我们会在明明知道不存在数据竞争的代码块前加上同步吗？但是有时候程序并不是我们所想的那样，我们虽然没有显式使用锁，但是我们在使用一些JDK的内置API时，如StringBuffer、Vector、HashTable等，这个时候会存在<strong>隐形的加锁操作</strong>。比如StringBuffer的append()方法，Vector的add()方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> String <span class="hljs-title function_">method</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">StringBuffer</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuffer</span>();<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) &#123;<br>        sb.append(<span class="hljs-string">&quot;i:&quot;</span> + i);<br>    &#125;<br>    <span class="hljs-keyword">return</span> sb.toString();<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505222020161.png" srcset="/img/loading.gif" lazyload alt="image-20250522202024437"></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231030451.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>在运行这段代码时，JVM可以明显检测到变量sb没有逃逸出方法method()之外，所以JVM可以大胆地将sb内部的加锁操作消除。从上述结果可以看出，之前我们写的线程安全的加锁的 StringBuffer 对象，在生成字节码之后就<strong>被替换成了不加锁不安全的 StringBuilder 对象</strong>了，原因是 StringBuffer 的变量属于一个局部变量，并且不会从该方法中逃逸出去，所以此时我们就可以使用锁消除（不加锁）来加速程序的运行。</p>
+<h2 id="4-锁粗化"><a href="#4-锁粗化" class="headerlink" title="4. 锁粗化"></a>4. 锁粗化</h2><p><strong>锁粗化是指，将多个连续的加锁、解锁操作连接在一起，扩展成一个范围更大的锁</strong>。</p>
+<p>我只听说锁“细化”可以提高程序的执行效率，也就是将锁的范围尽可能缩小，这样在锁竞争时，等待获取锁的线程才能更早的获取锁，从而提高程序的运行效率，但锁粗化是如何提高性能的呢？</p>
+<p>没错，锁细化的观点在大多数情况下都是成立了，但是一系列连续加锁和解锁的操作，也会导致不必要的性能开销，从而影响程序的执行效率，比如这段代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> String <span class="hljs-title function_">method</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) &#123;<br>        <span class="hljs-comment">// 伪代码：加锁操作</span><br>        sb.append(<span class="hljs-string">&quot;i:&quot;</span> + i);<br>        <span class="hljs-comment">// 伪代码：解锁操作</span><br>    &#125;<br>    <span class="hljs-keyword">return</span> sb.toString();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这里我们不考虑编译器优化的情况，<strong>如果在 for 循环中定义锁，那么锁的范围很小，但每次 for 循环都需要进行加锁和释放锁的操作，性能是很低的；但如果我们直接在 for 循环的外层加一把锁，那么对于同一个对象操作这段代码的性能就会提高很多</strong>，如下伪代码所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> String <span class="hljs-title function_">method</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br>    <span class="hljs-comment">// 伪代码：加锁操作</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) &#123;<br>        sb.append(<span class="hljs-string">&quot;i:&quot;</span> + i);<br>    &#125;<br>    <span class="hljs-comment">// 伪代码：解锁操作</span><br>    <span class="hljs-keyword">return</span> sb.toString();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>锁粗化的作用：如果检测到同一个对象执行了连续的加锁和解锁的操作，则会将这一系列操作合并成一个更大的锁，从而提升程序的执行效率</strong>。</p>
 
                 
               </div>
@@ -335,8 +343,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>sleep()和wait()、start()和run()</div>
-      <div>http://example.com/2025/05/22/sleep()和wait()、start()和run()/</div>
+      <div>synchronized3</div>
+      <div>http://example.com/2025/05/23/synchronized3/</div>
     </div>
     <div class="license-meta">
       
@@ -348,7 +356,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年5月22日</div>
+          <div>2025年5月23日</div>
         </div>
       
       
@@ -380,18 +388,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/05/23/synchronized2/" title="synchronized2">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">synchronized2</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/05/22/synchronized1/" title="synchronized1">
-                        <span class="hidden-mobile">synchronized1</span>
+                      <a href="/2025/05/23/synchronized2/" title="synchronized2">
+                        <span class="hidden-mobile">synchronized2</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
