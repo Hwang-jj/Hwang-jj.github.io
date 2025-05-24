@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231423535.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231444982.png">
 <meta property="article:published_time" content="2025-05-23T05:26:19.000Z">
-<meta property="article:modified_time" content="2025-05-23T06:44:45.511Z">
+<meta property="article:modified_time" content="2025-05-23T07:02:04.457Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231423531.jpeg">
@@ -346,7 +346,7 @@
 <ul>
 <li><strong>RUNNING</strong> 状态的线程池可以接收新任务，并处理阻塞队列中的任务；</li>
 <li><strong>SHUTDOWN</strong> 状态的线程池不会接收新任务，但会处理阻塞队列中的任务；</li>
-<li><strong>STOP</strong> 状态的线程池不会接收新任务，也不会处理阻塞队列中的任务，并且会尝试中断正在执行的任务；</li>
+<li><strong>STOP</strong> 状态的线程池不会接收新任务，也不会处理阻塞队列中的任务，并且会<strong>尝试中断</strong>正在执行的任务；</li>
 <li><strong>TIDYING</strong> 状态表示所有任务已经终止；</li>
 <li><strong>TERMINATED</strong> 状态表示线程池完全关闭，所有线程销毁。</li>
 </ul>
@@ -496,6 +496,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2025/05/24/AQS/" title="AQS">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">AQS</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
