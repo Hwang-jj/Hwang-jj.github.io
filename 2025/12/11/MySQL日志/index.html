@@ -19,21 +19,27 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="MySQL是怎么加行级锁的？假设有一张表 user，只有三个字段 id (主键索引) 、 age(非唯一索引)和name(无索引)。 表中现有数据：  id: 10, age: 10_v1, name: aaa id: 11, age: 10_v2, name: bbb id: 20, age: 20, name: ccc id: 30, age: 30, name: ddd  1. 唯一索引等值">
+    <meta name="description" content="MySQL日志1. undo log1.1 undo log的实现在事务提交之前，每当InnoDB引擎对一条记录进行增、删、改操作时，要把操作之前的信息记录到undo log中。如果事务还没提交就发生了崩溃，那么就可以通过undo log回滚到之前的数据。 一条记录的每一次更新操作产生的undo log格式都有一个roll pointer指针和trx_id事务id：  通过trx_id可以知道是那">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MySQL是怎么加行级锁的？">
-<meta property="og:url" content="http://example.com/2025/12/11/MySQL%E6%98%AF%E6%80%8E%E4%B9%88%E5%8A%A0%E8%A1%8C%E7%BA%A7%E9%94%81%E7%9A%84%EF%BC%9F/index.html">
+<meta property="og:title" content="MySQL日志">
+<meta property="og:url" content="http://example.com/2025/12/11/MySQL%E6%97%A5%E5%BF%97/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="MySQL是怎么加行级锁的？假设有一张表 user，只有三个字段 id (主键索引) 、 age(非唯一索引)和name(无索引)。 表中现有数据：  id: 10, age: 10_v1, name: aaa id: 11, age: 10_v2, name: bbb id: 20, age: 20, name: ccc id: 30, age: 30, name: ddd  1. 唯一索引等值">
+<meta property="og:description" content="MySQL日志1. undo log1.1 undo log的实现在事务提交之前，每当InnoDB引擎对一条记录进行增、删、改操作时，要把操作之前的信息记录到undo log中。如果事务还没提交就发生了崩溃，那么就可以通过undo log回滚到之前的数据。 一条记录的每一次更新操作产生的undo log格式都有一个roll pointer指针和trx_id事务id：  通过trx_id可以知道是那">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-12-11T07:09:56.000Z">
-<meta property="article:modified_time" content="2025-12-11T08:15:42.150Z">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914764.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914766.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914767.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914768.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914769.png">
+<meta property="article:published_time" content="2025-12-11T10:23:23.000Z">
+<meta property="article:modified_time" content="2025-12-11T11:14:37.484Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914764.png">
   
   
   
-  <title>MySQL是怎么加行级锁的？ - Kon4tsu Blog</title>
+  <title>MySQL日志 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -203,7 +209,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="MySQL是怎么加行级锁的？"></span>
+            <span id="subtitle" data-typed-text="MySQL日志"></span>
           
         </div>
 
@@ -214,8 +220,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-12-11 15:09" pubdate>
-          2025年12月11日 下午
+        <time datetime="2025-12-11 18:23" pubdate>
+          2025年12月11日 晚上
         </time>
       </span>
     
@@ -226,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.1k 字
+          2.2k 字
         
       </span>
     
@@ -237,7 +243,7 @@
         
         
         
-          10 分钟
+          18 分钟
         
       </span>
     
@@ -274,109 +280,86 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">MySQL是怎么加行级锁的？</h1>
+            <h1 id="seo-header">MySQL日志</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="MySQL是怎么加行级锁的？"><a href="#MySQL是怎么加行级锁的？" class="headerlink" title="MySQL是怎么加行级锁的？"></a>MySQL是怎么加行级锁的？</h1><p>假设有一张表 <code>user</code>，只有三个字段 <code>id</code> (主键索引) 、 <code>age</code>(非唯一索引)和<code>name</code>(无索引)。 表中现有数据：</p>
+                <h1 id="MySQL日志"><a href="#MySQL日志" class="headerlink" title="MySQL日志"></a>MySQL日志</h1><h2 id="1-undo-log"><a href="#1-undo-log" class="headerlink" title="1. undo log"></a>1. undo log</h2><h3 id="1-1-undo-log的实现"><a href="#1-1-undo-log的实现" class="headerlink" title="1.1 undo log的实现"></a>1.1 undo log的实现</h3><p>在事务提交之前，每当InnoDB引擎对一条记录进行增、删、改操作时，要把操作之前的信息记录到undo log中。如果事务还没提交就发生了崩溃，那么就可以通过undo log回滚到之前的数据。</p>
+<p>一条记录的每一次更新操作产生的undo log格式都有一个<code>roll pointer指针</code>和<code>trx_id事务id</code>：</p>
 <ul>
-<li><code>id: 10, age: 10_v1, name: aaa</code></li>
-<li><code>id: 11, age: 10_v2, name: bbb</code></li>
-<li><code>id: 20, age: 20, name: ccc</code></li>
-<li><code>id: 30, age: 30, name: ddd</code></li>
-</ul>
-<h2 id="1-唯一索引等值查询"><a href="#1-唯一索引等值查询" class="headerlink" title="1. 唯一索引等值查询"></a>1. 唯一索引等值查询</h2><h3 id="1-1-等值查询存在"><a href="#1-1-等值查询存在" class="headerlink" title="1.1 等值查询存在"></a>1.1 等值查询存在</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> id <span class="hljs-operator">=</span> <span class="hljs-number">10</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
-
-<p>先给<code>(-∞, 10]</code>加上next-key锁，然后退化成<code>id = 10</code>处的记录锁</p>
-<h3 id="1-2-等值查询不存在"><a href="#1-2-等值查询不存在" class="headerlink" title="1.2 等值查询不存在"></a>1.2 等值查询不存在</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> id <span class="hljs-operator">=</span> <span class="hljs-number">15</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
-
-<p>先给<code>(11, 20]</code>加上next-key锁，然后退化成<code>(11, 20)</code>的间隙锁</p>
-<h2 id="2-唯一索引范围查询"><a href="#2-唯一索引范围查询" class="headerlink" title="2. 唯一索引范围查询"></a>2. 唯一索引范围查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> id <span class="hljs-operator">&gt;=</span><span class="hljs-number">20</span> <span class="hljs-keyword">and</span> id <span class="hljs-operator">&lt;</span> <span class="hljs-number">25</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
-
-<ul>
-<li><code>id = 20</code>的记录锁：从<code>(11, 20]</code>的next-key锁退化而来</li>
-<li><code>(20, 30)</code>的间隙锁：从<code>(20, 30]</code>的next-key锁退化而来</li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> id <span class="hljs-operator">&gt;</span> <span class="hljs-number">15</span> <span class="hljs-keyword">and</span> id <span class="hljs-operator">&lt;=</span> <span class="hljs-number">30</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
-
-<ul>
-<li><code>(20, 30]</code>的next-key锁</li>
-<li><code>(11, 20]</code>的next-key锁</li>
-</ul>
-<h2 id="3-非唯一索引等值查询"><a href="#3-非唯一索引等值查询" class="headerlink" title="3. 非唯一索引等值查询"></a>3. 非唯一索引等值查询</h2><h3 id="3-1-等值查询存在"><a href="#3-1-等值查询存在" class="headerlink" title="3.1 等值查询存在"></a>3.1 等值查询存在</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> age <span class="hljs-operator">=</span> <span class="hljs-number">10</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
-
-<ul>
-<li><code>(-∞, 10_v1]</code>的next_key锁</li>
-<li><code>(10_v1, 10_v2]</code>的next_key锁</li>
-<li><code>(10_v2, 20)</code>的间隙锁</li>
-<li><code>id = 10</code>和<code>id = 11</code>的记录锁</li>
-</ul>
-<blockquote>
-<p>[!CAUTION]</p>
-<p>由于这里是select *，所以会<mark>触发回表，去查找主键索引的B+树</mark>，也就会给<code>id = 10</code>和<code>id = 11</code>这两条记录加上记录锁</p>
-<p>如果是select id且用的不是<code>for update</code>而是<code>lock in share mode</code>，会出现<mark>索引覆盖</mark>，不会触发回表，也就不会在主键上加锁</p>
-</blockquote>
-<h3 id="3-2-等值查询不存在"><a href="#3-2-等值查询不存在" class="headerlink" title="3.2 等值查询不存在"></a>3.2 等值查询不存在</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> age <span class="hljs-operator">=</span> <span class="hljs-number">15</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
-
-<ul>
-<li><code>(10_v2, 20)</code>的间隙锁</li>
-</ul>
-<h2 id="4-非唯一索引范围查询"><a href="#4-非唯一索引范围查询" class="headerlink" title="4. 非唯一索引范围查询"></a>4. 非唯一索引范围查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> id <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> age <span class="hljs-operator">&gt;=</span> <span class="hljs-number">10</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
-
-<ul>
-<li><p><code>(-∞, 10_v1]</code>的next-key锁</p>
-<blockquote>
-<p>[!CAUTION]</p>
-<p>这里貌似很反常识：为什么比10要小的区间也要锁起来呢？这是因为age不是唯一索引，如果不锁这个区间，那么就很有可能<mark>出现一条：id &#x3D; 9(&lt; 10), age &#x3D; 10_v0的记录插进来</mark>，这时候再执行这条语句就会出现三条记录，导致<strong>幻读</strong></p>
-</blockquote>
+<li><p>通过<code>trx_id</code>可以知道是那个事务修改的</p>
 </li>
-<li><p><code>(10_v1, 10_v2]</code>的next-key锁</p>
-</li>
-<li><p><code>(10_v2, 20]</code>的next-key锁</p>
-</li>
-<li><p><code>(20, 30]</code>的next-key锁</p>
-</li>
-<li><p><code>(30, +∞]</code>的next-key锁</p>
-</li>
-<li><p><code>id = 10, 11, 20, 30</code>的记录锁<mark>（虽然发生了索引覆盖，但是是for update，系统会认为你接下来要更新数据，因此会顺便给主键上满足条件的行加锁）</mark></p>
+<li><p>通过<code>roll pointer</code>可以将这些记录串成一条链，称为版本链：</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914764.png" srcset="/img/loading.gif" lazyload alt="版本链"></p>
 </li>
 </ul>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> age <span class="hljs-operator">&gt;=</span> <span class="hljs-number">10</span> <span class="hljs-keyword">and</span> age <span class="hljs-operator">&lt;</span> <span class="hljs-number">15</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
-
-<ul>
-<li><p><code>(-∞, 10_v1]</code>的next-key锁</p>
-</li>
-<li><p><code>(10_v1, 10_v2]</code>的next-key锁</p>
-</li>
-<li><p><code>(10_v2, 20]</code>的next-key锁</p>
-</li>
-<li><p><code>id = 10, 11</code>的记录锁</p>
-<blockquote>
-<p>[!CAUTION]</p>
-<p>注意，这里并没有退化成<code>(10_v2, 20)</code>的间隙锁，而是依然是<code>(10_v2, 20]</code>的next-key锁；所以如果此时有另一个事务想要执行：<code>insert into user values (16, 16, eee)</code>也会被阻塞，这似乎也很反直觉……</p>
-<h3 id="为什么不像等值查询那样退化？"><a href="#为什么不像等值查询那样退化？" class="headerlink" title="为什么不像等值查询那样退化？"></a>为什么不像等值查询那样退化？</h3><p>你可能会问：<em>“引擎明明已经判断出 20 &gt;&#x3D;15 了，为什么不把 20上的锁释放掉，只留间隙锁？”</em></p>
-<p>这是因为 MySQL 在代码实现上，<strong>“等值查询”和“范围查询”</strong>走的是不同的加锁逻辑分支：</p>
-<ol>
-<li><strong>等值查询 (Equality Search)</strong>：<ul>
-<li>MySQL 专门做了一个优化：如果查找的是 <code>age = 20</code>，当扫描到 <code>age = 30</code> 时，发现值不匹配，判定这是<strong>边界</strong>，且搜索类型是<strong>等值</strong>，于是将 Next-Key Lock 专门退化为 Gap Lock。</li>
-</ul>
-</li>
-<li><strong>范围查询 (Range Search)</strong>：<ul>
-<li>对于 <code>age &gt;= 10 AND age &lt; 15</code>，MySQL 将其视为一个范围扫描。</li>
-<li>在非唯一索引上，MySQL 的设计原则是<strong>“宁可多锁，不可漏锁”</strong>。当扫描到 <code>age = 20</code> 时，虽然它不满足 <code>&lt; 15</code>，但它作为扫描停止的边界，InnoDB 并没有为“非唯一索引的范围查询”做类似于等值查询的那种“退化优化”。<ul>
-<li>我的猜想：可能是因为在单边的范围查询如：上面的<code>age &gt;= 10</code>的情况下，锁全都是next-key锁，那么在这种双边的范围查询就不特殊处理了，和单边范围查询保持一致，也是全用next-key锁，处理起来更简便一些</li>
-</ul>
-</li>
-</ul>
-</li>
+<h3 id="1-2-undo-log的作用"><a href="#1-2-undo-log的作用" class="headerlink" title="1.2 undo log的作用"></a>1.2 undo log的作用</h3><ol>
+<li>undo log可以和ReadView配合，实现MVCC，实现了事务的隔离性C</li>
+<li>实现事务的回滚，保障事务原子性A</li>
 </ol>
-</blockquote>
-</li>
+<h2 id="2-Buffer-Pool"><a href="#2-Buffer-Pool" class="headerlink" title="2. Buffer Pool"></a>2. Buffer Pool</h2><p>如果每次取数据、写数据都直接对硬盘进行操作，那么时间开销会很大。最好的方法当然是先写到一个缓存中，后面再由缓存慢慢写到磁盘中去，这个缓存就是Buffer Pool</p>
+<p>Buffer Pool将数据划分为若干个 页 ，以页作为磁盘和内存的交互单位，一个页默认大小为16KB。当某一页中有数据发生了更改，那么这一页就会被标记为脏页，后续会将脏页回写到磁盘中。</p>
+<p>由于undo log也要回写到磁盘中去，所以Buffer Pool中也有对应的Undo页，undo log发生修改时，先写到Buffer Pool中的Undo页中，后续再回写到磁盘中。</p>
+<h2 id="3-redo-log"><a href="#3-redo-log" class="headerlink" title="3. redo log"></a>3. redo log</h2><p>Buffer Pool确实提升了读写效率，但是如果机器断电重启，此时内存中尚未写回磁盘中的脏页就丢失了，redo log就可以用来解决这个问题。</p>
+<p>当有一条记录需要更新时，先更新BufferPool中对应的页，并标记为脏页，然后将本次对这个页的修改以redo log的形式保留下来，这时候更新就算是完成了。后续会在适当时候，由后台线程将缓存在BufferPool中的脏页刷新到磁盘去。这就是<strong>WAL（Write-Ahead Logging）技术</strong></p>
+<p>也就是说，<mark>redo log记录的是：仍在BufferPool，尚未被刷入磁盘中的脏数据</mark>。（区别于undo log：记录事务提交前的数据）所以undo log对应的Undo页面也会记录到redo log中。</p>
+<h3 id="3-1-redo-log要写入到磁盘，数据也要写入磁盘，为什么需要多此一举"><a href="#3-1-redo-log要写入到磁盘，数据也要写入磁盘，为什么需要多此一举" class="headerlink" title="3.1 redo log要写入到磁盘，数据也要写入磁盘，为什么需要多此一举"></a>3.1 redo log要写入到磁盘，数据也要写入磁盘，为什么需要多此一举</h3><p>因为redo log属于是<strong>顺序写</strong>，而数据写入磁盘是<strong>随机写</strong>，相比之下肯定是顺序写的效率更高。</p>
+<p>所以redo log的作用：</p>
+<ol>
+<li>MySQL崩溃重启后以提交的记录不丢失（Buffer Pool中尚未刷入磁盘的脏页），实现事务持久性D</li>
+<li>将数据的随机写变为日志的顺序写，提升了效率</li>
+</ol>
+<p>redo log文件采用<mark>循环写</mark>的操作，分成两个文件ib_logfile0和ib_logfile1：</p>
+<ul>
+<li>write pos ~ checkpoint之间的部分：空闲的，用来记录新的更新操作</li>
+<li>checkpoint ～ write pos之间的部分：带落盘的脏页数据</li>
 </ul>
-<p>因此要记住：<mark>非唯一索引和主键索引的范围查询的加锁有所不同，不同之处在于非唯一索引范围查询，next-key lock 不会退化为间隙锁和记录锁。</mark></p>
-<h2 id="5-没有加索引的查询"><a href="#5-没有加索引的查询" class="headerlink" title="5. 没有加索引的查询"></a>5. 没有加索引的查询</h2><p>如果<code>select for update</code>查询语句，没有使用索引列作为查询条件，或者查询语句没有走索引查询，导致扫描是全表扫描。那么，每一条记录的索引上都会加上next-key锁（主键索引，因为扫描的是主键的B+树），这样就相当于锁住全表。</p>
-<p>同理<code>delete, update</code>语句查询条件不加索引也会导致锁全表的情况。</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914766.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom: 33%;" />
+
+<p>如果write pos追上了checkpoint，就意味redo log文件满了，此时MySQL不能再执行新的更新操作，会被阻塞。会停下来将脏页数据刷入磁盘直到redo log有空闲空间为止（对并发大的系统，redo log的大小很重要）</p>
+<h2 id="4-bin-log"><a href="#4-bin-log" class="headerlink" title="4. bin log"></a>4. bin log</h2><p>相较于redo log记录的是脏页数据，bin log记录的则是全量数据（默认记录的是每一条修改数据的SQL）</p>
+<p>binlog有3种格式类型，分别是STATEMENT（默认格式）、ROW、MIXED，区别如下：</p>
+<ul>
+<li>STATEMENT：<strong>每一条修改数据的SQL</strong>都会被记录到binlog中（相当于记录了逻辑操作，所以针对这种格式，binlog可以称为逻辑日志），主从复制中slave端再根据SQL语句重现。但STATEMENT有动态函数的问题，比如你用了uuid或者now这些函数，你在主库上执行的结果并不是你在从库执行的结果，这种随时在变的函数会导致复制的数据不一致；</li>
+<li>ROW：记录行数据<strong>最终被修改成什么样</strong>了（这种格式的日志，就不能称为逻辑日志了），不会出现STATEMENT下动态函数的问题。但ROW的缺点是每行数据的变化结果都会被记录，比如执行批量update语句，更新多少行数据就会产生多少条记录，使binlog文件过大，而在STATEMENT格式下只会记录一个update语句而已；</li>
+<li>MIXED：包含了STATEMENT和ROW模式，它会根据不同的情况自动使用ROW模式和STATEMENT模式；</li>
+</ul>
+<h3 id="4-1-bin-log和redo-log的区别"><a href="#4-1-bin-log和redo-log的区别" class="headerlink" title="4.1 bin log和redo log的区别"></a>4.1 bin log和redo log的区别</h3><ol>
+<li>binlog属于Server层，redolog属于Innodb引擎</li>
+<li>文件格式不同</li>
+<li>写入方式：binlog属于追加写，redolog属于循环写</li>
+<li>用途：binlog用于主从复制、数据库被删除时恢复，redolog用于故障恢复</li>
+</ol>
+<h3 id="4-2-bin-log主从复制"><a href="#4-2-bin-log主从复制" class="headerlink" title="4.2 bin log主从复制"></a>4.2 bin log主从复制</h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914767.png" srcset="/img/loading.gif" lazyload alt="image-20251211190300250"></p>
+<p>通过返回响应的区别，MySQL主从复制分为了如下三种模型：</p>
+<ol>
+<li>同步复制：主库要等所有从库成功响应</li>
+<li>异步复制：主库不等</li>
+<li>半同步复制：只要有一个从库成功响应就行</li>
+</ol>
+<h2 id="5-两阶段提交"><a href="#5-两阶段提交" class="headerlink" title="5. 两阶段提交"></a>5. 两阶段提交</h2><p>事务提交后，redo log 和 binlog 都要持久化到磁盘，但是这两个是独立的逻辑，可能出现半成功的状态，这样就造成<mark>两份日志之间的逻辑不一致</mark>。</p>
+<p>举个例子，假设 id &#x3D; 1 这行数据的字段 name 的值原本是 ‘jay’，然后执行 UPDATE t_user SET name &#x3D; ‘xiaolin’ WHERE id &#x3D; 1；如果在持久化 redo log 和 binlog 两个日志的过程中，出现了半成功状态，那么就有两种情况：</p>
+<ul>
+<li>如果在将 redo log 刷入到磁盘之后，MySQL 突然宕机了，而 binlog 还没有来得及写入。MySQL 重启后，通过 redo log 能将 Buffer Pool 中 id &#x3D; 1 这行数据的 name 字段恢复到新值 xiaolin，但是 binlog 里面没有记录这条更新语句，在主从架构中，binlog 会被复制到从库，由于 binlog 丢失了这条更新语句，从库的这一行 name 字段是旧值 jay，与主库的值不一致性；</li>
+<li>如果在将 binlog 刷入到磁盘之后，MySQL 突然宕机了，而 redo log 还没有来得及写入。由于 redo log 还没写，崩溃恢复以后这个事务无效，所以 id &#x3D; 1 这行数据的 name 字段还是旧值 jay，而 binlog 里面记录了这条更新语句，在主从架构中，binlog 会被复制到从库，从库执行了这条更新语句，那么这一行 name 字段是新值 xiaolin，与主库的值不一致性；</li>
+</ul>
+<p>所以两阶段提交就是为了解决redo log和bin log不一致的问题。</p>
+<h3 id="5-1-两阶段提交流程"><a href="#5-1-两阶段提交流程" class="headerlink" title="5.1 两阶段提交流程"></a>5.1 两阶段提交流程</h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914768.png" srcset="/img/loading.gif" lazyload alt="两阶段提交"></p>
+<p>从图中可看出，事务的提交过程有两个阶段，就是将redo log的写入拆成了两个步骤：prepare和commit，中间再穿插写入binlog，具体如下：</p>
+<ul>
+<li>prepare阶段：将XID（内部XA事务的ID）写入到redo log，同时将redo log对应的事务状态设置为prepare，然后将redo log持久化到磁盘（innodb_flush_log_at_trx_commit &#x3D; 1的作用）；</li>
+<li>commit阶段：把XID写入到binlog，然后将binlog持久化到磁盘（sync_binlog &#x3D; 1的作用），接着调用引擎的提交事务接口，将redo log状态设置为commit，此时该状态并不需要持久化到磁盘，只需要write到文件系统的page cache中就够了，因为只要binlog写磁盘成功，就算redo log的状态还是prepare也没有关系，一样会被认为事务已经执行成功；</li>
+</ul>
+<h3 id="5-2-两阶段提交如何解决异常"><a href="#5-2-两阶段提交如何解决异常" class="headerlink" title="5.2 两阶段提交如何解决异常"></a>5.2 两阶段提交如何解决异常</h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512111914769.png" srcset="/img/loading.gif" lazyload alt="时刻 A 与时刻 B"></p>
+<p>不管是时刻 A（redo log 已经写入磁盘，binlog 还没写入磁盘），还是时刻 B（redo log 和 binlog 都已经写入磁盘，还没写入 commit 标识）崩溃，<mark>此时的 redo log 都处于 prepare 状态</mark>。</p>
+<p>在 MySQL 重启后会按顺序扫描 redo log 文件，碰到处于 <strong>prepare</strong> 状态的 redo log，就拿着 redo log 中的 XID 去 binlog 查看是否存在此 XID：</p>
+<ul>
+<li>如果<mark> binlog 中没有当前内部 XA 事务的 XID，说明 redolog 完成刷盘，但是 binlog 还没有刷盘，则<strong>回滚</strong>事务</mark>。对应时刻 A 崩溃恢复的情况。</li>
+<li>如果<mark> binlog 中有当前内部 XA 事务的 XID，说明 redolog 和 binlog 都已经完成了刷盘，则<strong>提交</strong>事务</mark>。对应时刻 B 崩溃恢复的情况。</li>
+</ul>
+<p>可以看到，对于处于 prepare 阶段的 redo log，即可以提交事务，也可以回滚事务，这取决于是否能在 binlog 中查找到与 redo log 相同的 XID，如果有就提交事务，如果没有就回滚事务。这样就可以保证 redo log 和 binlog 这两份日志的一致性了。</p>
+<p>所以说，两阶段提交是以 binlog 写成功为事务提交成功的标识，因为 binlog 写成功了，就意味着能在 binlog 中查找到与 redo log 相同的 XID。</p>
 
                 
               </div>
@@ -415,8 +398,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>MySQL是怎么加行级锁的？</div>
-      <div>http://example.com/2025/12/11/MySQL是怎么加行级锁的？/</div>
+      <div>MySQL日志</div>
+      <div>http://example.com/2025/12/11/MySQL日志/</div>
     </div>
     <div class="license-meta">
       
@@ -460,18 +443,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/12/11/MySQL%E6%97%A5%E5%BF%97/" title="MySQL日志">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">MySQL日志</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/12/08/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F%E7%9A%84double-check%E4%B8%8Evolatile/" title="单例模式的double check与volatile">
-                        <span class="hidden-mobile">单例模式的double check与volatile</span>
+                      <a href="/2025/12/11/MySQL%E6%98%AF%E6%80%8E%E4%B9%88%E5%8A%A0%E8%A1%8C%E7%BA%A7%E9%94%81%E7%9A%84%EF%BC%9F/" title="MySQL是怎么加行级锁的？">
+                        <span class="hidden-mobile">MySQL是怎么加行级锁的？</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
