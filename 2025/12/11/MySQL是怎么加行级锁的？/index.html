@@ -19,24 +19,21 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="单例模式为什么需要使用单例模式节省内存、节省计算。 12345678910111213141516171819public class Singleton &#123;    private static volatile Singleton singleton;    private Singleton() &#123;    &#125;      public static Singleto">
+    <meta name="description" content="MySQL是怎么加行级锁的？假设有一张表 user，只有三个字段 id (主键索引) 、 age(非唯一索引)和name(无索引)。 表中现有数据：  id: 10, age: 10_v1, name: aaa id: 11, age: 10_v2, name: bbb id: 20, age: 20, name: ccc id: 30, age: 30, name: ddd  1. 唯一索引等值">
 <meta property="og:type" content="article">
-<meta property="og:title" content="单例模式的double check与volatile">
-<meta property="og:url" content="http://example.com/2025/12/08/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F%E7%9A%84double-check%E4%B8%8Evolatile/index.html">
+<meta property="og:title" content="MySQL是怎么加行级锁的？">
+<meta property="og:url" content="http://example.com/2025/12/11/MySQL%E6%98%AF%E6%80%8E%E4%B9%88%E5%8A%A0%E8%A1%8C%E7%BA%A7%E9%94%81%E7%9A%84%EF%BC%9F/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="单例模式为什么需要使用单例模式节省内存、节省计算。 12345678910111213141516171819public class Singleton &#123;    private static volatile Singleton singleton;    private Singleton() &#123;    &#125;      public static Singleto">
+<meta property="og:description" content="MySQL是怎么加行级锁的？假设有一张表 user，只有三个字段 id (主键索引) 、 age(非唯一索引)和name(无索引)。 表中现有数据：  id: 10, age: 10_v1, name: aaa id: 11, age: 10_v2, name: bbb id: 20, age: 20, name: ccc id: 30, age: 30, name: ddd  1. 唯一索引等值">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512081119677.png">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512081120378.png">
-<meta property="article:published_time" content="2025-12-08T03:13:19.000Z">
-<meta property="article:modified_time" content="2025-12-08T03:24:58.867Z">
+<meta property="article:published_time" content="2025-12-11T07:09:56.000Z">
+<meta property="article:modified_time" content="2025-12-11T08:00:32.636Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512081119677.png">
   
   
   
-  <title>单例模式的double check与volatile - Kon4tsu Blog</title>
+  <title>MySQL是怎么加行级锁的？ - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -206,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="单例模式的double check与volatile"></span>
+            <span id="subtitle" data-typed-text="MySQL是怎么加行级锁的？"></span>
           
         </div>
 
@@ -217,8 +214,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-12-08 11:13" pubdate>
-          2025年12月8日 上午
+        <time datetime="2025-12-11 15:09" pubdate>
+          2025年12月11日 下午
         </time>
       </span>
     
@@ -229,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          577 字
+          1.1k 字
         
       </span>
     
@@ -240,7 +237,7 @@
         
         
         
-          5 分钟
+          9 分钟
         
       </span>
     
@@ -277,25 +274,108 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">单例模式的double check与volatile</h1>
+            <h1 id="seo-header">MySQL是怎么加行级锁的？</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h1><h2 id="为什么需要使用单例模式"><a href="#为什么需要使用单例模式" class="headerlink" title="为什么需要使用单例模式"></a>为什么需要使用单例模式</h2><p><strong>节省内存、节省计算。</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">volatile</span> Singleton singleton;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br><br>    &#125;<br>  <br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (singleton == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class) &#123;<br>                <span class="hljs-keyword">if</span> (singleton == <span class="hljs-literal">null</span>) &#123;<br>                    singleton = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> singleton;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+                <h1 id="MySQL是怎么加行级锁的？"><a href="#MySQL是怎么加行级锁的？" class="headerlink" title="MySQL是怎么加行级锁的？"></a>MySQL是怎么加行级锁的？</h1><p>假设有一张表 <code>user</code>，只有三个字段 <code>id</code> (主键索引) 、 <code>age</code>(非唯一索引)和<code>name</code>(无索引)。 表中现有数据：</p>
+<ul>
+<li><code>id: 10, age: 10_v1, name: aaa</code></li>
+<li><code>id: 11, age: 10_v2, name: bbb</code></li>
+<li><code>id: 20, age: 20, name: ccc</code></li>
+<li><code>id: 30, age: 30, name: ddd</code></li>
+</ul>
+<h2 id="1-唯一索引等值查询"><a href="#1-唯一索引等值查询" class="headerlink" title="1. 唯一索引等值查询"></a>1. 唯一索引等值查询</h2><h3 id="1-1-等值查询存在"><a href="#1-1-等值查询存在" class="headerlink" title="1.1 等值查询存在"></a>1.1 等值查询存在</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> id <span class="hljs-operator">=</span> <span class="hljs-number">10</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
 
+<p>先给<code>(-∞, 10]</code>加上next-key锁，然后退化成<code>id = 10</code>处的记录锁</p>
+<h3 id="1-2-等值查询不存在"><a href="#1-2-等值查询不存在" class="headerlink" title="1.2 等值查询不存在"></a>1.2 等值查询不存在</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> id <span class="hljs-operator">=</span> <span class="hljs-number">15</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
 
+<p>先给<code>(11, 20]</code>加上next-key锁，然后退化成<code>(11, 20)</code>的间隙锁</p>
+<h2 id="2-唯一索引范围查询"><a href="#2-唯一索引范围查询" class="headerlink" title="2. 唯一索引范围查询"></a>2. 唯一索引范围查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> id <span class="hljs-operator">&gt;=</span><span class="hljs-number">20</span> <span class="hljs-keyword">and</span> id <span class="hljs-operator">&lt;</span> <span class="hljs-number">25</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
 
-<h2 id="单例模式为什么需要double-check"><a href="#单例模式为什么需要double-check" class="headerlink" title="单例模式为什么需要double check"></a>单例模式为什么需要double check</h2><p>我们先来看第二次的 check，这时你需要考虑这样一种情况，有两个线程同时调用 getInstance 方法，由于 singleton 是空的 ，因此两个线程都可以通过第一重的 if 判断；然后由于锁机制的存在，会有一个线程先进入同步语句，并进入第二重 if 判断 ，而另外的一个线程就会在外面等待。</p>
-<p>不过，当第一个线程执行完 new Singleton() 语句后，就会退出 synchronized 保护的区域，这时如果没有第二重 if (singleton &#x3D;&#x3D; null) 判断的话，那么<strong>第二个线程也会创建一个实例，此时就破坏了单例</strong>，这肯定是不行的。</p>
-<p>而对于第一个 check 而言，<strong>如果去掉它，那么所有线程都会串行执行，效率低下</strong>，所以两个 check 都是需要保留的。</p>
-<h2 id="单例模式为什么需要volatile"><a href="#单例模式为什么需要volatile" class="headerlink" title="单例模式为什么需要volatile"></a>单例模式为什么需要volatile</h2><p>那**为什么要用 volatile 呢？**主要就在于 singleton &#x3D; new Singleton() ，它并非是一个原子操作，事实上，在 JVM 中上述语句至少做了以下这 3 件事：</p>
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512081119677.png" srcset="/img/loading.gif" lazyload alt="Cgq2xl6BpWCAMBaVAACFIdffjfM852"></p>
-<p>这里需要留意一下 1-2-3 的顺序，因为存在指令重排序的优化，也就是说第2 步和第 3 步的顺序是不能保证的，最终的执行顺序，可能是 1-2-3，也有可能是 1-3-2。</p>
-<p>如果是 1-3-2，那么在第 3 步执行完以后，singleton 就不是 null 了，可是这时第 2 步并没有执行，singleton 对象未完成初始化，它的属性的值可能不是我们所预期的值。假设此时线程 2 进入 getInstance 方法，由于 singleton 已经不是 null 了，所以会通过第一重检查并直接返回，但其实这时的 singleton 并没有完成初始化，<strong>所以使用这个实例的时候</strong>会报错，详细流程如下图所示：</p>
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512081120378.png" srcset="/img/loading.gif" lazyload alt="Cgq2xl6BpWCAB6QQAAEKacFd0CE542"></p>
-<p>于是，使用volatile的意义在于：<mark>防止指令重排序，避免别的线程拿到未完成初始化的对象，从而保证了线程安全</mark></p>
+<ul>
+<li><code>id = 20</code>的记录锁：从<code>(11, 20]</code>的next-key锁退化而来</li>
+<li><code>(20, 30)</code>的间隙锁：从<code>(20, 30]</code>的next-key锁退化而来</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> id <span class="hljs-operator">&gt;</span> <span class="hljs-number">15</span> <span class="hljs-keyword">and</span> id <span class="hljs-operator">&lt;=</span> <span class="hljs-number">30</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><code>(20, 30]</code>的next-key锁</li>
+<li><code>(11, 20]</code>的next-key锁</li>
+</ul>
+<h2 id="3-非唯一索引等值查询"><a href="#3-非唯一索引等值查询" class="headerlink" title="3. 非唯一索引等值查询"></a>3. 非唯一索引等值查询</h2><h3 id="3-1-等值查询存在"><a href="#3-1-等值查询存在" class="headerlink" title="3.1 等值查询存在"></a>3.1 等值查询存在</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> age <span class="hljs-operator">=</span> <span class="hljs-number">10</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><code>(-∞, 10_v1]</code>的next_key锁</li>
+<li><code>(10_v1, 10_v2]</code>的next_key锁</li>
+<li><code>(10_v2, 20)</code>的间隙锁</li>
+<li><code>id = 10</code>和<code>id = 11</code>的记录锁</li>
+</ul>
+<blockquote>
+<p>[!CAUTION]</p>
+<p>由于这里是select *，所以会<mark>触发回表，去查找主键索引的B+树</mark>，也就会给<code>id = 10</code>和<code>id = 11</code>这两条记录加上记录锁</p>
+<p>如果是select id且用的不是<code>for update</code>而是<code>lock in share mode</code>，会出现<mark>索引覆盖</mark>，不会触发回表，也就不会在主键上加锁</p>
+</blockquote>
+<h3 id="3-2-等值查询不存在"><a href="#3-2-等值查询不存在" class="headerlink" title="3.2 等值查询不存在"></a>3.2 等值查询不存在</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> age <span class="hljs-operator">=</span> <span class="hljs-number">15</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><code>(10_v2, 20)</code>的间隙锁</li>
+</ul>
+<h2 id="4-非唯一索引范围查询"><a href="#4-非唯一索引范围查询" class="headerlink" title="4. 非唯一索引范围查询"></a>4. 非唯一索引范围查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> id <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> age <span class="hljs-operator">&gt;=</span> <span class="hljs-number">10</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p><code>(-∞, 10_v1]</code>的next-key锁</p>
+<blockquote>
+<p>[!CAUTION]</p>
+<p>这里貌似很反常识：为什么比10要小的区间也要锁起来呢？这是因为age不是唯一索引，如果不锁这个区间，那么就很有可能<mark>出现一条：id &#x3D; 9(&lt; 10), age &#x3D; 10_v0的记录插进来</mark>，这时候再执行这条语句就会出现三条记录，导致<strong>幻读</strong></p>
+</blockquote>
+</li>
+<li><p><code>(10_v1, 10_v2]</code>的next-key锁</p>
+</li>
+<li><p><code>(10_v2, 20]</code>的next-key锁</p>
+</li>
+<li><p><code>(20, 30]</code>的next-key锁</p>
+</li>
+<li><p><code>(30, +∞]</code>的next-key锁</p>
+</li>
+<li><p><code>id = 10, 11, 20, 30</code>的记录锁<mark>（虽然发生了索引覆盖，但是是for update，系统会认为你接下来要更新数据，因此会顺便给主键上满足条件的行加锁）</mark></p>
+</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">where</span> age <span class="hljs-operator">&gt;=</span> <span class="hljs-number">10</span> <span class="hljs-keyword">and</span> age <span class="hljs-operator">&lt;</span> <span class="hljs-number">15</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">update</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p><code>(-∞, 10_v1]</code>的next-key锁</p>
+</li>
+<li><p><code>(10_v1, 10_v2]</code>的next-key锁</p>
+</li>
+<li><p><code>(10_v2, 20]</code>的next-key锁</p>
+</li>
+<li><p><code>id = 10, 11</code>的记录锁</p>
+<blockquote>
+<p>[!CAUTION]</p>
+<p>注意，这里并没有退化成<code>(10_v2, 20)</code>的间隙锁，而是依然是<code>(10_v2, 20]</code>的next-key锁；所以如果此时有另一个事务想要执行：<code>insert into user values (16, 16, eee)</code>也会被阻塞，这似乎也很反直觉……</p>
+<h3 id="为什么不像等值查询那样退化？"><a href="#为什么不像等值查询那样退化？" class="headerlink" title="为什么不像等值查询那样退化？"></a>为什么不像等值查询那样退化？</h3><p>你可能会问：<em>“引擎明明已经判断出 20 &gt;&#x3D;15 了，为什么不把 20上的锁释放掉，只留间隙锁？”</em></p>
+<p>这是因为 MySQL 在代码实现上，**“等值查询”<strong>和</strong>“范围查询”**走的是不同的加锁逻辑分支：</p>
+<ol>
+<li><strong>等值查询 (Equality Search)</strong>：<ul>
+<li>MySQL 专门做了一个优化：如果查找的是 <code>age = 20</code>，当扫描到 <code>age = 30</code> 时，发现值不匹配，判定这是<strong>边界</strong>，且搜索类型是<strong>等值</strong>，于是将 Next-Key Lock 专门退化为 Gap Lock。</li>
+</ul>
+</li>
+<li><strong>范围查询 (Range Search)</strong>：<ul>
+<li>对于 <code>age &gt;= 10 AND age &lt; 15</code>，MySQL 将其视为一个范围扫描。</li>
+<li>在非唯一索引上，MySQL 的设计原则是**“宁可多锁，不可漏锁”**。当扫描到 <code>age = 20</code> 时，虽然它不满足 <code>&lt; 15</code>，但它作为扫描停止的边界，InnoDB 并没有为“非唯一索引的范围查询”做类似于等值查询的那种“退化优化”。<ul>
+<li>我的猜想：可能是因为在单边的范围查询如：上面的<code>age &gt;= 10</code>的情况下，锁全都是next-key锁，那么在这种双边的范围查询就不特殊处理了，和单边范围查询保持一致，处理起来更简便一些</li>
+</ul>
+</li>
+<li>只有在 **唯一索引 ** 的范围查询中，如果扫描到的边界记录不满足条件，才会退化（MySQL 8.0 之后的部分优化）。但对于普通索引，这个优化不存在。</li>
+</ul>
+</li>
+</ol>
+</blockquote>
+<p>因此要记住：<mark>非唯一索引和主键索引的范围查询的加锁有所不同，不同之处在于非唯一索引范围查询，next-key lock 不会退化为间隙锁和记录锁。但是非唯一索引的等值查询，next-key lock会退化成间隙锁和记录锁。</mark></p>
+</li>
+</ul>
 
                 
               </div>
@@ -314,7 +394,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/JUC/" class="category-chain-item">JUC</a>
+  <a href="/categories/MySQL/" class="category-chain-item">MySQL</a>
   
   
 
@@ -334,8 +414,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>单例模式的double check与volatile</div>
-      <div>http://example.com/2025/12/08/单例模式的double-check与volatile/</div>
+      <div>MySQL是怎么加行级锁的？</div>
+      <div>http://example.com/2025/12/11/MySQL是怎么加行级锁的？/</div>
     </div>
     <div class="license-meta">
       
@@ -347,7 +427,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年12月8日</div>
+          <div>2025年12月11日</div>
         </div>
       
       
@@ -379,18 +459,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/12/11/MySQL%E6%98%AF%E6%80%8E%E4%B9%88%E5%8A%A0%E8%A1%8C%E7%BA%A7%E9%94%81%E7%9A%84%EF%BC%9F/" title="MySQL是怎么加行级锁的？">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">MySQL是怎么加行级锁的？</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/05/24/AQS/" title="AQS">
-                        <span class="hidden-mobile">AQS</span>
+                      <a href="/2025/12/08/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F%E7%9A%84double-check%E4%B8%8Evolatile/" title="单例模式的double check与volatile">
+                        <span class="hidden-mobile">单例模式的double check与volatile</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
