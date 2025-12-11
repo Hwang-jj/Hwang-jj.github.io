@@ -27,7 +27,7 @@
 <meta property="og:description" content="MySQL是怎么加行级锁的？假设有一张表 user，只有三个字段 id (主键索引) 、 age(非唯一索引)和name(无索引)。 表中现有数据：  id: 10, age: 10_v1, name: aaa id: 11, age: 10_v2, name: bbb id: 20, age: 20, name: ccc id: 30, age: 30, name: ddd  1. 唯一索引等值">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-12-11T07:09:56.000Z">
-<meta property="article:modified_time" content="2025-12-11T08:10:52.890Z">
+<meta property="article:modified_time" content="2025-12-11T08:15:42.150Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          984 字
+          1.1k 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          9 分钟
+          10 分钟
         
       </span>
     
@@ -375,6 +375,8 @@
 </li>
 </ul>
 <p>因此要记住：<mark>非唯一索引和主键索引的范围查询的加锁有所不同，不同之处在于非唯一索引范围查询，next-key lock 不会退化为间隙锁和记录锁。</mark></p>
+<h2 id="5-没有加索引的查询"><a href="#5-没有加索引的查询" class="headerlink" title="5. 没有加索引的查询"></a>5. 没有加索引的查询</h2><p>如果<code>select for update</code>查询语句，没有使用索引列作为查询条件，或者查询语句没有走索引查询，导致扫描是全表扫描。那么，每一条记录的索引上都会加上next-key锁（主键索引，因为扫描的是主键的B+树），这样就相当于锁住全表。</p>
+<p>同理<code>delete, update</code>语句查询条件不加索引也会导致锁全表的情况。</p>
 
                 
               </div>
