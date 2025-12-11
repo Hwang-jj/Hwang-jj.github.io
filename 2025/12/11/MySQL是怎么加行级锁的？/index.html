@@ -27,7 +27,7 @@
 <meta property="og:description" content="MySQL是怎么加行级锁的？假设有一张表 user，只有三个字段 id (主键索引) 、 age(非唯一索引)和name(无索引)。 表中现有数据：  id: 10, age: 10_v1, name: aaa id: 11, age: 10_v2, name: bbb id: 20, age: 20, name: ccc id: 30, age: 30, name: ddd  1. 唯一索引等值">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-12-11T07:09:56.000Z">
-<meta property="article:modified_time" content="2025-12-11T08:00:32.636Z">
+<meta property="article:modified_time" content="2025-12-11T08:10:52.890Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.1k 字
+          984 字
         
       </span>
     
@@ -356,7 +356,7 @@
 <p>[!CAUTION]</p>
 <p>注意，这里并没有退化成<code>(10_v2, 20)</code>的间隙锁，而是依然是<code>(10_v2, 20]</code>的next-key锁；所以如果此时有另一个事务想要执行：<code>insert into user values (16, 16, eee)</code>也会被阻塞，这似乎也很反直觉……</p>
 <h3 id="为什么不像等值查询那样退化？"><a href="#为什么不像等值查询那样退化？" class="headerlink" title="为什么不像等值查询那样退化？"></a>为什么不像等值查询那样退化？</h3><p>你可能会问：<em>“引擎明明已经判断出 20 &gt;&#x3D;15 了，为什么不把 20上的锁释放掉，只留间隙锁？”</em></p>
-<p>这是因为 MySQL 在代码实现上，**“等值查询”<strong>和</strong>“范围查询”**走的是不同的加锁逻辑分支：</p>
+<p>这是因为 MySQL 在代码实现上，<strong>“等值查询”和“范围查询”</strong>走的是不同的加锁逻辑分支：</p>
 <ol>
 <li><strong>等值查询 (Equality Search)</strong>：<ul>
 <li>MySQL 专门做了一个优化：如果查找的是 <code>age = 20</code>，当扫描到 <code>age = 30</code> 时，发现值不匹配，判定这是<strong>边界</strong>，且搜索类型是<strong>等值</strong>，于是将 Next-Key Lock 专门退化为 Gap Lock。</li>
@@ -364,18 +364,17 @@
 </li>
 <li><strong>范围查询 (Range Search)</strong>：<ul>
 <li>对于 <code>age &gt;= 10 AND age &lt; 15</code>，MySQL 将其视为一个范围扫描。</li>
-<li>在非唯一索引上，MySQL 的设计原则是**“宁可多锁，不可漏锁”**。当扫描到 <code>age = 20</code> 时，虽然它不满足 <code>&lt; 15</code>，但它作为扫描停止的边界，InnoDB 并没有为“非唯一索引的范围查询”做类似于等值查询的那种“退化优化”。<ul>
-<li>我的猜想：可能是因为在单边的范围查询如：上面的<code>age &gt;= 10</code>的情况下，锁全都是next-key锁，那么在这种双边的范围查询就不特殊处理了，和单边范围查询保持一致，处理起来更简便一些</li>
+<li>在非唯一索引上，MySQL 的设计原则是<strong>“宁可多锁，不可漏锁”</strong>。当扫描到 <code>age = 20</code> 时，虽然它不满足 <code>&lt; 15</code>，但它作为扫描停止的边界，InnoDB 并没有为“非唯一索引的范围查询”做类似于等值查询的那种“退化优化”。<ul>
+<li>我的猜想：可能是因为在单边的范围查询如：上面的<code>age &gt;= 10</code>的情况下，锁全都是next-key锁，那么在这种双边的范围查询就不特殊处理了，和单边范围查询保持一致，也是全用next-key锁，处理起来更简便一些</li>
 </ul>
 </li>
-<li>只有在 **唯一索引 ** 的范围查询中，如果扫描到的边界记录不满足条件，才会退化（MySQL 8.0 之后的部分优化）。但对于普通索引，这个优化不存在。</li>
 </ul>
 </li>
 </ol>
 </blockquote>
-<p>因此要记住：<mark>非唯一索引和主键索引的范围查询的加锁有所不同，不同之处在于非唯一索引范围查询，next-key lock 不会退化为间隙锁和记录锁。但是非唯一索引的等值查询，next-key lock会退化成间隙锁和记录锁。</mark></p>
 </li>
 </ul>
+<p>因此要记住：<mark>非唯一索引和主键索引的范围查询的加锁有所不同，不同之处在于非唯一索引范围查询，next-key lock 不会退化为间隙锁和记录锁。</mark></p>
 
                 
               </div>
