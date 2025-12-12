@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>MVCC导致索引覆盖失效场景</title>
+    <link href="/2025/12/12/MVCC%E5%AF%BC%E8%87%B4%E7%B4%A2%E5%BC%95%E8%A6%86%E7%9B%96%E5%A4%B1%E6%95%88%E5%9C%BA%E6%99%AF/"/>
+    <url>/2025/12/12/MVCC%E5%AF%BC%E8%87%B4%E7%B4%A2%E5%BC%95%E8%A6%86%E7%9B%96%E5%A4%B1%E6%95%88%E5%9C%BA%E6%99%AF/</url>
+    
+    <content type="html"><![CDATA[<h1 id="MVCC导致索引覆盖失效场景"><a href="#MVCC导致索引覆盖失效场景" class="headerlink" title="MVCC导致索引覆盖失效场景"></a>MVCC导致索引覆盖失效场景</h1><p><strong>MVCC（多版本并发控制）确实会导致索引覆盖失效，从而触发回表。</strong></p><p>很多开发者认为只要 SQL 的字段都在联合索引里，就一定能走“索引覆盖（Using index）”，但在高并发写场景下，这并不绝对。</p><p>其根本原因在于 MySQL InnoDB 存储引擎的<strong>二级索引（Secondary Index）结构设计</strong>。</p><hr><h2 id="核心原因：二级索引“不完整”"><a href="#核心原因：二级索引“不完整”" class="headerlink" title="核心原因：二级索引“不完整”"></a>核心原因：二级索引“不完整”</h2><p>在 InnoDB 中，MVCC 的实现依赖于数据行中隐藏的两个字段：</p><ol><li><strong><code>DB_TRX_ID</code></strong>：最近修改该行数据的事务 ID。</li><li><strong><code>DB_ROLL_PTR</code></strong>：回滚指针，指向 Undo Log。</li></ol><p>关键点来了：</p><p><mark>这两列隐藏字段只存在于聚簇索引（主键索引）的叶子节点中。普通的二级索引（非主键索引）是不存储 DB_TRX_ID 的</mark></p><p>这意味着：<strong>当你扫描二级索引时，MySQL 无法仅凭二级索引中的数据判断这条记录“对于当前事务是否可见”。</strong></p><hr><h2 id="失效的具体过程"><a href="#失效的具体过程" class="headerlink" title="失效的具体过程"></a>失效的具体过程</h2><p>假设你有一个表 users，索引是 idx_name (name)。</p><p>SQL：SELECT name FROM users WHERE name &#x3D; ‘Alice’;（理论上应该走索引覆盖）</p><h3 id="1-正常情况（无并发修改）"><a href="#1-正常情况（无并发修改）" class="headerlink" title="1. 正常情况（无并发修改）"></a>1. 正常情况（无并发修改）</h3><p>InnoDB 在二级索引页（Page）头部维护了一个 <code>PAGE_MAX_TRX_ID</code> 属性，记录了修改过该页面的最大事务 ID。</p><ul><li>如果 <strong><code>PAGE_MAX_TRX_ID</code> &lt; 当前事务的 Read View 最小活跃事务 ID <code>min_trx_id</code></strong>。</li><li>说明该页面的所有数据都是“旧”的，肯定对当前事务可见。</li><li><strong>结果：</strong> 放心使用索引覆盖，<strong>不需要回表</strong>。</li></ul><h3 id="2-并发修改情况（MVCC-导致失效）"><a href="#2-并发修改情况（MVCC-导致失效）" class="headerlink" title="2. 并发修改情况（MVCC 导致失效）"></a>2. 并发修改情况（MVCC 导致失效）</h3><p>如果在你查询的同时，有其他事务（哪怕是刚提交的）修改了 <code>name=&#39;Alice&#39;</code> 所在的二级索引页（比如插入了 ‘Bob’，但他俩在一个 Page 上）：</p><ul><li>该 Page 的 <code>PAGE_MAX_TRX_ID</code> 变大，变得“太新了”（大于当前事务 Read View）。</li><li>此时，MySQL 扫描到 ‘Alice’ 这条索引记录时，心里会发慌：“这页被新事务动过，虽然 ‘Alice’ 看着没变，但我没法确定这条索引记录是不是最新版本，或者是不是被删了。”</li><li><strong>结果：</strong> 哪怕你需要的数据 <code>name</code> 就在手边，InnoDB 也不敢直接返回。它必须拿着主键 ID，<strong>回表</strong>到聚簇索引中，找到包含 <code>DB_TRX_ID</code> 的完整行，做一次 MVCC 可见性判断。</li><li><strong>结论：索引覆盖失效。</strong></li></ul><hr><h2 id="这种失效的特点"><a href="#这种失效的特点" class="headerlink" title="这种失效的特点"></a>这种失效的特点</h2><ol><li><strong>隐蔽性强：</strong> <code>EXPLAIN</code> 有时可能还会显示 <code>Using index</code>（因为执行计划是预测的），但实际执行时产生了大量的随机 I&#x2F;O 回表。</li><li><strong>瞬时性：</strong> 一旦那些活跃的事务提交，且相关的数据页不再频繁变动，后续的查询又会恢复成正常的索引覆盖。</li><li><strong>性能抖动：</strong> 这解释了为什么在数据更新频繁的业务高峰期，某些原本极快的“纯读”查询（Top SQL）耗时会偶尔飙升。</li></ol><h2 id="对比：PostgreSQL-的解决方案"><a href="#对比：PostgreSQL-的解决方案" class="headerlink" title="对比：PostgreSQL 的解决方案"></a>对比：PostgreSQL 的解决方案</h2><p>为了解决这个问题，PostgreSQL 引入了 Visibility Map（可见性映射表）。</p><p>它用一个位图标记哪些 Page 是“全可见”的。如果位图显示该页所有元组都可见，就直接走 Index Only Scan；否则才回表查 MVCC 版本。MySQL 目前主要依赖 PAGE_MAX_TRX_ID 做类似的判断，但粒度较粗（Page 级）。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>MVCC 机制决定了二级索引并不总是“可信”的。</strong> 当数据页处于“脏”或“由于并发写入导致版本过新”的状态时，为了保证数据一致性（Repeatable Read），MySQL 必须放弃索引覆盖，强制回表“验明正身”。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>MySQL</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>MySQL日志</title>
     <link href="/2025/12/11/MySQL%E6%97%A5%E5%BF%97/"/>
     <url>/2025/12/11/MySQL%E6%97%A5%E5%BF%97/</url>
