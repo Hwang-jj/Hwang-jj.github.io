@@ -27,7 +27,7 @@
 <meta property="og:description" content="Redis为什么这么快？原因 Redis基于内存的数据存储，内存的读写速度远高于硬盘 Redis提供了高效的数据结构 Redis使用了单线程模型处理命令执行，避免了多线程上下文切换开销、以及资源同步开销 Redis采用了高效的IO多路复用模型 Redis 客户端和服务端之间使用 RESP (Redis Serialization Protocol) 协议通信  为什么要用单线程？多线程难道不会更快">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-12-14T06:19:29.000Z">
-<meta property="article:modified_time" content="2025-12-14T06:45:04.999Z">
+<meta property="article:modified_time" content="2025-12-14T06:50:59.473Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -287,7 +287,7 @@
 <li>Redis 客户端和服务端之间使用 <strong>RESP (Redis Serialization Protocol)</strong> 协议通信</li>
 </ol>
 <h2 id="为什么要用单线程？多线程难道不会更快吗？"><a href="#为什么要用单线程？多线程难道不会更快吗？" class="headerlink" title="为什么要用单线程？多线程难道不会更快吗？"></a>为什么要用单线程？多线程难道不会更快吗？</h2><ol>
-<li>多线程一般是用来解决CPU密集型问题，在Redis这个数据库相关的场景下，CPU不是瓶颈，IO才是（后续为了解决网络数据IO的性能瓶颈，在网络IO操作使用了多线程），单线程已经足够胜任。redis相关的IO操作：<ul>
+<li>在Redis这个数据库相关的场景下，CPU不是瓶颈，内存和IO才是（后续为了解决网络数据IO的性能瓶颈，在网络IO操作使用了多线程），单线程已经足够胜任。redis相关的IO操作：<ul>
 <li>磁盘IO：如持久化机制，使用后台子进程解决</li>
 <li>网络IO：redis6.0后使用多线程处理</li>
 </ul>
