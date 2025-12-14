@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>Redis为什么这么快</title>
+    <link href="/2025/12/14/Redis%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E4%B9%88%E5%BF%AB/"/>
+    <url>/2025/12/14/Redis%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E4%B9%88%E5%BF%AB/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Redis为什么这么快？"><a href="#Redis为什么这么快？" class="headerlink" title="Redis为什么这么快？"></a>Redis为什么这么快？</h1><h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ol><li>Redis基于内存的数据存储，内存的读写速度远高于硬盘</li><li>Redis提供了高效的数据结构</li><li>Redis使用了<strong>单线程模型</strong>处理命令执行，避免了多线程上下文切换开销、以及资源同步开销</li><li>Redis采用了高效的<strong>IO多路复用</strong>模型</li><li>Redis 客户端和服务端之间使用 <strong>RESP (Redis Serialization Protocol)</strong> 协议通信</li></ol><h2 id="为什么要用单线程？多线程难道不会更快吗？"><a href="#为什么要用单线程？多线程难道不会更快吗？" class="headerlink" title="为什么要用单线程？多线程难道不会更快吗？"></a>为什么要用单线程？多线程难道不会更快吗？</h2><ol><li>多线程一般是用来解决CPU密集型问题，在Redis这个数据库相关的场景下，CPU不是瓶颈，IO才是（后续为了解决网络数据IO的性能瓶颈，在网络IO操作使用了多线程），单线程已经足够胜任。redis相关的IO操作：<ul><li>磁盘IO：如持久化机制，使用后台子进程解决</li><li>网络IO：redis6.0后使用多线程处理</li></ul></li><li>单线程能够避免多线程场景下的锁机制、线程切换的开销</li><li>单线程能够简化问题</li></ol><h2 id="Redis6-0引入了多线程"><a href="#Redis6-0引入了多线程" class="headerlink" title="Redis6.0引入了多线程"></a>Redis6.0引入了多线程</h2><p>Redis 6.0 引入了<strong>多线程 I&#x2F;O</strong>。这并不是说 Redis 变成了多线程数据库，而是指：</p><ul><li><strong>命令执行</strong>（读写内存数据）依然是 <strong>单线程</strong> 的（保证原子性，无需锁）。</li><li><strong>网络数据读写</strong>（Socket Read&#x2F;Write）变成了 <strong>多线程</strong> 处理。</li><li><strong>原因：</strong> 随着网卡速度越来越快，解析网络请求包成了瓶颈。多线程 I&#x2F;O 旨在解决网络带宽处理能力的瓶颈，进一步提升吞吐量。</li></ul><h2 id="IO多路复用和多线程IO"><a href="#IO多路复用和多线程IO" class="headerlink" title="IO多路复用和多线程IO"></a>IO多路复用和多线程IO</h2><blockquote><ul><li><strong>IO 多路复用</strong> 解决的是 <strong>“同时监听大量连接”</strong> 的问题（解决连接数并发）。</li><li><strong>多线程 IO</strong> 解决的是 <strong>“快速读写网络数据” </strong>的问题（解决数据吞吐量）。</li></ul></blockquote><h3 id="它们的关系：如何协作？"><a href="#它们的关系：如何协作？" class="headerlink" title="它们的关系：如何协作？"></a>它们的关系：如何协作？</h3><p>在 Redis 6.0 之前，Redis 是“单线程”的，意味着<strong>监听连接</strong>和<strong>读写网络数据</strong>都是同一个人（主线程）。 在 Redis 6.0 之后，Redis 引入了多线程 IO，它们开始分工合作。</p><ol><li><strong>监听 (IO 多路复用)</strong>: 主线程通过 <code>epoll</code> 监听所有连接。发现连接 A 有数据发过来了！</li><li><strong>读取 (多线程 IO):</strong> 主线程把连接 A 分配给<strong>IO 线程组</strong>。IO 线程并行地把数据从 Socket 读出来，并解析好命令。<ul><li><em>(注：此时主线程会等待 IO 线程组全部干完活)</em></li></ul></li><li><strong>执行 (主线程 - 依然单线程):</strong> 数据都读好、解析好了。<strong>主线程</strong>拿过来，执行 <code>SET key value</code>。<ul><li><em>(注：执行命令依然是排队单线程执行，不需要加锁，保证原子性)</em></li></ul></li><li><strong>发送 (多线程 IO):</strong> 执行完了，要返回 “OK”。主线程把结果打包好，再次分配给<strong>IO 线程组</strong>，让它们并行地把数据写回 Socket 发送给客户端。</li></ol><table><thead><tr><th><strong>组件</strong></th><th><strong>线程归属</strong></th><th><strong>职责</strong></th></tr></thead><tbody><tr><td><strong>IO 多路复用 (epoll_wait)</strong></td><td><strong>主线程</strong></td><td>负责“站岗放哨”。它监听所有连接，一旦发现有数据来了（可读）或者可以发数据了（可写），就通知下一步。</td></tr><tr><td><strong>IO 线程 (Worker Threads)</strong></td><td><strong>辅助线程组</strong></td><td>负责“搬运重活”。它们只负责从 Socket <strong>读取&#x2F;解析</strong>数据，或者把响应数据 <strong>写回</strong> Socket。它们<strong>不</strong>负责监听。</td></tr><tr><td><strong>命令执行 (Command Exec)</strong></td><td><strong>主线程</strong></td><td>负责“核心业务”。执行 <code>GET</code>, <code>SET</code> 等逻辑，修改内存数据。</td></tr></tbody></table><h3 id="为什么要有这种变化？"><a href="#为什么要有这种变化？" class="headerlink" title="为什么要有这种变化？"></a>为什么要有这种变化？</h3><p>您可能会问：<em>“以前没有多线程 IO，Redis 不也很快吗？”</em></p><p>是的，但瓶颈变了。</p><ul><li><strong>早期</strong>： 瓶颈是<strong>内存</strong>和<strong>CPU</strong>。单线程足以应付网络流量，因为以前是千兆网卡。</li><li><strong>现在</strong>： 瓶颈变成了<strong>网络带宽</strong>。现在的服务器动辄万兆网卡，每秒钟能进来的数据包太多了。<ul><li>如果还是单线程，主线程光是把这么巨大的数据从 Socket 读到内存里，CPU 就已经累趴下了，根本没时间去执行命令。</li><li>所以，引入<strong>多线程 IO</strong> 就是为了把“读写数据”这个消耗 CPU 的体力活分摊出去，让主线程专注于“执行命令”这个核心脑力活。</li></ul></li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>Redis</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>MVCC导致索引覆盖失效场景</title>
     <link href="/2025/12/12/MVCC%E5%AF%BC%E8%87%B4%E7%B4%A2%E5%BC%95%E8%A6%86%E7%9B%96%E5%A4%B1%E6%95%88%E5%9C%BA%E6%99%AF/"/>
     <url>/2025/12/12/MVCC%E5%AF%BC%E8%87%B4%E7%B4%A2%E5%BC%95%E8%A6%86%E7%9B%96%E5%A4%B1%E6%95%88%E5%9C%BA%E6%99%AF/</url>
