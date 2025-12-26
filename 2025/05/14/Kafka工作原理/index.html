@@ -29,7 +29,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151012092.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151012093.png">
 <meta property="article:published_time" content="2025-05-14T10:54:23.000Z">
-<meta property="article:modified_time" content="2025-05-15T02:17:55.346Z">
+<meta property="article:modified_time" content="2025-12-26T06:24:08.758Z">
 <meta property="article:author" content="Kon4tsu">
 <meta property="article:tag" content="MessageQueue">
 <meta name="twitter:card" content="summary_large_image">
@@ -230,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.1k 字
+          3.8k 字
         
       </span>
     
@@ -241,7 +241,7 @@
         
         
         
-          27 分钟
+          32 分钟
         
       </span>
     
@@ -392,6 +392,25 @@
 <h3 id="6-2-默认重试多少次？"><a href="#6-2-默认重试多少次？" class="headerlink" title="6.2 默认重试多少次？"></a>6.2 默认重试多少次？</h3><p>Kafka 消费者在<mark>默认配置下会进行最多 10 次 的重试，每次重试的时间间隔为 0，即立即进行重试</mark>。如果在 10 次重试后仍然无法成功消费消息，则不再进行重试，消息将被视为消费失败。</p>
 <h3 id="6-3-重试失败后的消息如何再次处理？"><a href="#6-3-重试失败后的消息如何再次处理？" class="headerlink" title="6.3 重试失败后的消息如何再次处理？"></a>6.3 重试失败后的消息如何再次处理？</h3><p><strong>死信队列（Dead Letter Queue，简称 DLQ）</strong> 是消息中间件中的一种特殊队列。它主要用于处理无法被消费者正确处理的消息，通常是因为消息格式错误、处理失败、消费超时等情况导致的消息被”丢弃”或”死亡”的情况。</p>
 <p>当消息进入队列后，消费者会尝试处理它。如果处理失败，或者超过一定的重试次数仍无法被成功处理，消息可以发送到死信队列中，而不是被永久性地丢弃。在死信队列中，可以进一步分析、处理这些无法正常消费的消息，以便定位问题、修复错误，并采取适当的措施。</p>
+<h2 id="7-Kafka高性能原因"><a href="#7-Kafka高性能原因" class="headerlink" title="7. Kafka高性能原因"></a>7. Kafka高性能原因</h2><h3 id="7-1-使用批量消息提升服务端处理能力"><a href="#7-1-使用批量消息提升服务端处理能力" class="headerlink" title="7.1 使用批量消息提升服务端处理能力"></a>7.1 使用批量消息提升服务端处理能力</h3><ul>
+<li>发送端：当我们调用send()方法发送一条消息后，无论我们是同步发送还是异步发送，Kafka并不会立刻把这条消息发送出去，它会先把这条消息存放在内存中，然后<mark>选择合适的时机把缓存的所有消息组成一批，一次性的发给Broker</mark>。</li>
+<li>Broker：整个处理流程中，无论是写入磁盘、从磁盘读出来、还是复制到其他副本，批消息都不会被解开，一直是作为一条“批消息”进行处理的</li>
+<li>消费端：消息同样是以批为单位进行传递的，Consumer从Broker拉到一批消息后，在客户端把批消息解开，再一条一条交给用户代码处理</li>
+</ul>
+<p>构建批消息和解开批消息分别在发送端和消费端的客户端完成，不仅减轻了Broker的压力，还减少了Broker处理请求的次数，提升了总体的处理能力</p>
+<h3 id="7-2-顺序读写提升磁盘IO性能"><a href="#7-2-顺序读写提升磁盘IO性能" class="headerlink" title="7.2 顺序读写提升磁盘IO性能"></a>7.2 顺序读写提升磁盘IO性能</h3><p>每个分区，它把从Producer收到的消息，顺序地写入对应的log文件中，一个文件写完了，就开启一个新的文件继续顺序写下去。消费的时候，也是从某个全局的位置开始，顺序地把消息读出来</p>
+<h3 id="7-3-利用PageCache加速消息读写"><a href="#7-3-利用PageCache加速消息读写" class="headerlink" title="7.3 利用PageCache加速消息读写"></a>7.3 利用PageCache加速消息读写</h3><h3 id="7-4-使用零拷贝技术加速消费流程"><a href="#7-4-使用零拷贝技术加速消费流程" class="headerlink" title="7.4 使用零拷贝技术加速消费流程"></a>7.4 使用零拷贝技术加速消费流程</h3><p>服务端，处理消费的逻辑步骤如下：</p>
+<ul>
+<li>首先，从文件中找到消息数据，读到内存中</li>
+<li>然后，把消息通过网络发送给客户端。</li>
+</ul>
+<p>这个过程中，数据实际上做了2到3次复制：</p>
+<ol>
+<li>从文件复制数据到PageCache中，如果命中PageCache，这一步可以忽略。</li>
+<li>从PageCache复制到应用程序的内存空间中。</li>
+<li>从应用程序的内存空间复制到Socket缓冲区。</li>
+</ol>
+<p>Kafka使用零拷贝技术把上述复制次数减少一次，上面的第2步和第3步的两次复制合并成一次复制。直接从PageCache中将数据复制到Socket缓冲区，这样<mark>不仅减少了一次数据复制，而且由于不用把数据复制到用户内存空间</mark>，DMA控制器就可以直接完成数据复制，不需要CPU参与，速度更快。</p>
 
                 
               </div>
