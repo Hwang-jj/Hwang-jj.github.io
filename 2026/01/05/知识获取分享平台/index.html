@@ -19,21 +19,21 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Redis为什么这么快？原因 Redis基于内存的数据存储，内存的读写速度远高于硬盘 Redis提供了高效的数据结构 Redis使用了单线程模型处理命令执行，避免了多线程上下文切换开销、以及资源同步开销 Redis采用了高效的IO多路复用模型 Redis 客户端和服务端之间使用 RESP (Redis Serialization Protocol) 协议通信  为什么要用单线程？多线程难道不会更快">
+    <meta name="description" content="知识获取与分享平台 知识社区App，支持发布知识、点赞&#x2F;收藏、关注取关、首页Feed展示、AI生成摘要等等。项目各模块进行了充分详细的设计以满足高并发和高可用需求  一、认证系统 开发JWT双令牌认证系统，采用RS256签名 + Redis刷新令牌白名单，实现15分钟访问令牌 + 7天刷新令牌的安全会话管理，支持即时令牌撤销，兼顾高安全和高性能。  1.1 有状态身份验证和无状态身份验证">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Redis为什么这么快">
-<meta property="og:url" content="http://example.com/2025/12/14/Redis%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E4%B9%88%E5%BF%AB/index.html">
+<meta property="og:title" content="知识获取分享平台">
+<meta property="og:url" content="http://example.com/2026/01/05/%E7%9F%A5%E8%AF%86%E8%8E%B7%E5%8F%96%E5%88%86%E4%BA%AB%E5%B9%B3%E5%8F%B0/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="Redis为什么这么快？原因 Redis基于内存的数据存储，内存的读写速度远高于硬盘 Redis提供了高效的数据结构 Redis使用了单线程模型处理命令执行，避免了多线程上下文切换开销、以及资源同步开销 Redis采用了高效的IO多路复用模型 Redis 客户端和服务端之间使用 RESP (Redis Serialization Protocol) 协议通信  为什么要用单线程？多线程难道不会更快">
+<meta property="og:description" content="知识获取与分享平台 知识社区App，支持发布知识、点赞&#x2F;收藏、关注取关、首页Feed展示、AI生成摘要等等。项目各模块进行了充分详细的设计以满足高并发和高可用需求  一、认证系统 开发JWT双令牌认证系统，采用RS256签名 + Redis刷新令牌白名单，实现15分钟访问令牌 + 7天刷新令牌的安全会话管理，支持即时令牌撤销，兼顾高安全和高性能。  1.1 有状态身份验证和无状态身份验证">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-12-14T06:19:29.000Z">
-<meta property="article:modified_time" content="2025-12-14T06:50:59.473Z">
+<meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
+<meta property="article:modified_time" content="2026-01-05T11:45:43.442Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Redis为什么这么快 - Kon4tsu Blog</title>
+  <title>知识获取分享平台 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -203,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Redis为什么这么快"></span>
+            <span id="subtitle" data-typed-text="知识获取分享平台"></span>
           
         </div>
 
@@ -214,8 +214,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-12-14 14:19" pubdate>
-          2025年12月14日 下午
+        <time datetime="2026-01-05 17:28" pubdate>
+          2026年1月5日 下午
         </time>
       </span>
     
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1k 字
+          1.5k 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          9 分钟
+          13 分钟
         
       </span>
     
@@ -274,84 +274,95 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Redis为什么这么快</h1>
+            <h1 id="seo-header">知识获取分享平台</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="Redis为什么这么快？"><a href="#Redis为什么这么快？" class="headerlink" title="Redis为什么这么快？"></a>Redis为什么这么快？</h1><h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ol>
-<li>Redis基于内存的数据存储，内存的读写速度远高于硬盘</li>
-<li>Redis提供了高效的数据结构</li>
-<li>Redis使用了<strong>单线程模型</strong>处理命令执行，避免了多线程上下文切换开销、以及资源同步开销</li>
-<li>Redis采用了高效的<strong>IO多路复用</strong>模型</li>
-<li>Redis 客户端和服务端之间使用 <strong>RESP (Redis Serialization Protocol)</strong> 协议通信</li>
-</ol>
-<h2 id="为什么要用单线程？多线程难道不会更快吗？"><a href="#为什么要用单线程？多线程难道不会更快吗？" class="headerlink" title="为什么要用单线程？多线程难道不会更快吗？"></a>为什么要用单线程？多线程难道不会更快吗？</h2><ol>
-<li>在Redis这个数据库相关的场景下，CPU不是瓶颈，内存和IO才是（后续为了解决网络数据IO的性能瓶颈，在网络IO操作使用了多线程），单线程已经足够胜任。redis相关的IO操作：<ul>
-<li>磁盘IO：如持久化机制，使用后台子进程解决</li>
-<li>网络IO：redis6.0后使用多线程处理</li>
-</ul>
-</li>
-<li>单线程能够避免多线程场景下的锁机制、线程切换的开销</li>
-<li>单线程能够简化问题</li>
-</ol>
-<h2 id="Redis6-0引入了多线程"><a href="#Redis6-0引入了多线程" class="headerlink" title="Redis6.0引入了多线程"></a>Redis6.0引入了多线程</h2><p>Redis 6.0 引入了<strong>多线程 I&#x2F;O</strong>。这并不是说 Redis 变成了多线程数据库，而是指：</p>
-<ul>
-<li><strong>命令执行</strong>（读写内存数据）依然是 <strong>单线程</strong> 的（保证原子性，无需锁）。</li>
-<li><strong>网络数据读写</strong>（Socket Read&#x2F;Write）变成了 <strong>多线程</strong> 处理。</li>
-<li><strong>原因：</strong> 随着网卡速度越来越快，解析网络请求包成了瓶颈。多线程 I&#x2F;O 旨在解决网络带宽处理能力的瓶颈，进一步提升吞吐量。</li>
-</ul>
-<h2 id="IO多路复用和多线程IO"><a href="#IO多路复用和多线程IO" class="headerlink" title="IO多路复用和多线程IO"></a>IO多路复用和多线程IO</h2><blockquote>
-<ul>
-<li><strong>IO 多路复用</strong> 解决的是 <strong>“同时监听大量连接”</strong> 的问题（解决连接数并发）。</li>
-<li><strong>多线程 IO</strong> 解决的是 <strong>“快速读写网络数据” </strong>的问题（解决数据吞吐量）。</li>
-</ul>
+                <h1 id="知识获取与分享平台"><a href="#知识获取与分享平台" class="headerlink" title="知识获取与分享平台"></a>知识获取与分享平台</h1><blockquote>
+<p>知识社区App，支持发布知识、点赞&#x2F;收藏、关注取关、首页Feed展示、AI生成摘要等等。项目各模块进行了充分详细的设计以满足高并发和高可用需求</p>
 </blockquote>
-<h3 id="它们的关系：如何协作？"><a href="#它们的关系：如何协作？" class="headerlink" title="它们的关系：如何协作？"></a>它们的关系：如何协作？</h3><p>在 Redis 6.0 之前，Redis 是“单线程”的，意味着<strong>监听连接</strong>和<strong>读写网络数据</strong>都是同一个人（主线程）。 在 Redis 6.0 之后，Redis 引入了多线程 IO，它们开始分工合作。</p>
-<ol>
-<li><strong>监听 (IO 多路复用)</strong>: 主线程通过 <code>epoll</code> 监听所有连接。发现连接 A 有数据发过来了！</li>
-<li><strong>读取 (多线程 IO):</strong> 主线程把连接 A 分配给<strong>IO 线程组</strong>。IO 线程并行地把数据从 Socket 读出来，并解析好命令。<ul>
-<li><em>(注：此时主线程会等待 IO 线程组全部干完活)</em></li>
+<h2 id="一、认证系统"><a href="#一、认证系统" class="headerlink" title="一、认证系统"></a>一、认证系统</h2><blockquote>
+<p>开发JWT双令牌认证系统，采用RS256签名 + Redis刷新令牌白名单，实现15分钟访问令牌 + 7天刷新令牌的安全会话管理，支持即时令牌撤销，兼顾高安全和高性能。</p>
+</blockquote>
+<h3 id="1-1-有状态身份验证和无状态身份验证"><a href="#1-1-有状态身份验证和无状态身份验证" class="headerlink" title="1.1 有状态身份验证和无状态身份验证"></a>1.1 有状态身份验证和无状态身份验证</h3><ul>
+<li>有状态身份验证：服务器端保存用户的会话状态信息，当用户访问时会携带上会话标识（如sessionid），服务器查找是否有这个会话来判断是否放行</li>
+<li>无状态身份验证：服务器端不保存用户的会话状态信息，用户登录时，服务器使用私钥加密生成一个token返回给客户端，用户访问时带上这个token，若能用私钥解密，则允许访问。</li>
 </ul>
-</li>
-<li><strong>执行 (主线程 - 依然单线程):</strong> 数据都读好、解析好了。<strong>主线程</strong>拿过来，执行 <code>SET key value</code>。<ul>
-<li><em>(注：执行命令依然是排队单线程执行，不需要加锁，保证原子性)</em></li>
-</ul>
-</li>
-<li><strong>发送 (多线程 IO):</strong> 执行完了，要返回 “OK”。主线程把结果打包好，再次分配给<strong>IO 线程组</strong>，让它们并行地把数据写回 Socket 发送给客户端。</li>
-</ol>
+<h3 id="1-2-什么是双令牌机制"><a href="#1-2-什么是双令牌机制" class="headerlink" title="1.2 什么是双令牌机制"></a>1.2 什么是双令牌机制</h3><p>服务器返回两个token给客户端，一个access token（AT）用于访问，一个refresh token（RT）用于刷新access token。</p>
 <table>
 <thead>
 <tr>
-<th><strong>组件</strong></th>
-<th><strong>线程归属</strong></th>
-<th><strong>职责</strong></th>
+<th></th>
+<th><strong>Access Token</strong></th>
+<th><strong>Refresh Token</strong></th>
 </tr>
 </thead>
 <tbody><tr>
-<td><strong>IO 多路复用 (epoll_wait)</strong></td>
-<td><strong>主线程</strong></td>
-<td>负责“站岗放哨”。它监听所有连接，一旦发现有数据来了（可读）或者可以发数据了（可写），就通知下一步。</td>
+<td>持续时间</td>
+<td>短，15min</td>
+<td>长，7d</td>
 </tr>
 <tr>
-<td><strong>IO 线程 (Worker Threads)</strong></td>
-<td><strong>辅助线程组</strong></td>
-<td>负责“搬运重活”。它们只负责从 Socket <strong>读取&#x2F;解析</strong>数据，或者把响应数据 <strong>写回</strong> Socket。它们<strong>不</strong>负责监听。</td>
+<td>用途</td>
+<td>用于客户端访问</td>
+<td>用于刷新AT</td>
 </tr>
 <tr>
-<td><strong>命令执行 (Command Exec)</strong></td>
-<td><strong>主线程</strong></td>
-<td>负责“核心业务”。执行 <code>GET</code>, <code>SET</code> 等逻辑，修改内存数据。</td>
+<td>是否无状态</td>
+<td>是</td>
+<td>否，需要将RT存储在Redis中，通过查询Redis中是否有对应RT来判断RT是否过期，这样的好处是能够方便强制踢人下线，保障了安全管控能力</td>
 </tr>
 </tbody></table>
-<h3 id="为什么要有这种变化？"><a href="#为什么要有这种变化？" class="headerlink" title="为什么要有这种变化？"></a>为什么要有这种变化？</h3><p>您可能会问：<em>“以前没有多线程 IO，Redis 不也很快吗？”</em></p>
-<p>是的，但瓶颈变了。</p>
+<p>所以本项目实现的是一个<mark>半无状态的</mark>双token机制，兼顾高安全与高性能。</p>
+<h2 id="二、计数系统"><a href="#二、计数系统" class="headerlink" title="二、计数系统"></a>二、计数系统</h2><blockquote>
+<p>计数系统：笔记维度(点赞收藏)与用户维度(关注取关) 以 Redis 作为底层存储系统，采用<mark>定制化 Redis SDS 二进制</mark>紧凑计数，使用 Lua 脚本进行原子更新，并实现了采样一致性校验与自愈重建。</p>
+</blockquote>
+<h3 id="2-1-为什么要单独把计数模块抽出来，有什么好处？"><a href="#2-1-为什么要单独把计数模块抽出来，有什么好处？" class="headerlink" title="2.1 为什么要单独把计数模块抽出来，有什么好处？"></a>2.1 为什么要单独把计数模块抽出来，有什么好处？</h3><p>计数类数据（浏览量、点赞数、收藏数、关注数、粉丝数等）有几个典型特征：</p>
 <ul>
-<li><strong>早期</strong>： 瓶颈是<strong>内存</strong>和<strong>CPU</strong>。单线程足以应付网络流量，因为以前是千兆网卡。</li>
-<li><strong>现在</strong>： 瓶颈变成了<strong>网络带宽</strong>。现在的服务器动辄万兆网卡，每秒钟能进来的数据包太多了。<ul>
-<li>如果还是单线程，主线程光是把这么巨大的数据从 Socket 读到内存里，CPU 就已经累趴下了，根本没时间去执行命令。</li>
-<li>所以，引入<strong>多线程 IO</strong> 就是为了把“读写数据”这个消耗 CPU 的体力活分摊出去，让主线程专注于“执行命令”这个核心脑力活。</li>
+<li><b>读写极高频</b>：一个热门用户&#x2F;热门作品，计数每秒都在变。</li>
+<li><b>更新粒度小且随机</b>：每次只改一个数，还可能集中打在少数热点 Key 上。</li>
+<li><b>对“绝对强一致”要求没那么死</b>：10001 和 9999 对用户来说差别不大，比起“页面加载很慢&#x2F;操作失败”，用户更在乎“流畅”。</li>
 </ul>
+<p>如果计数都落在 MySQL：</p>
+<ul>
+<li>热点行会频繁 UPDATE，行锁、redo log 压力巨大，很容易撑爆。</li>
+<li>想做分库分表，计数又和业务数据纠缠在一起，拆分困难。</li>
+<li>任意一个计数维度新增或变更，都要改表结构，DDL 成本很高。</li>
+</ul>
+<p>所以：把计数抽出成一个独立的“计数服务 + Redis 存储”，是更合理的架构拆分。</p>
+<h3 id="2-2-选择Redis作为底层存储系统可靠吗？"><a href="#2-2-选择Redis作为底层存储系统可靠吗？" class="headerlink" title="2.2 选择Redis作为底层存储系统可靠吗？"></a>2.2 选择Redis作为底层存储系统可靠吗？</h3><ol>
+<li>可以使用 <mark>RDB + AOF</mark> 混合持久化的方式，将数据持久化到本地；AOF开启策略everysec，理论上最多丢失1s的数据</li>
+<li>如果担心redis宕机，可以使用 <mark>多副本 + 主从</mark> 的模式，确保一台redis服务器宕机了，另一台能立马顶上</li>
+<li>对于 RDB + AOF 可能丢失的1s的数据，也可能与数据库事实表出现不一致，可以通过执行<mark>定时对账任务</mark>，和事实表进行对账来修正（本项目的：采样一致性校验与自愈重建）</li>
+<li>在极端情况下，比如硬盘损坏，也可以通过和事实表定期对账，来找回丢失的数据 &#x2F; 修正错误的数据</li>
+</ol>
+<h3 id="2-3-为什么采用自定义的二进制Redis-SDS来计数，讲一下存储计数的实现细节"><a href="#2-3-为什么采用自定义的二进制Redis-SDS来计数，讲一下存储计数的实现细节" class="headerlink" title="2.3 为什么采用自定义的二进制Redis SDS来计数，讲一下存储计数的实现细节"></a>2.3 为什么采用自定义的二进制Redis SDS来计数，讲一下存储计数的实现细节</h3><p>对于作品维度，有点赞数、收藏数；对于用户维度，有关注数、粉丝数、作品数、获赞数、获收藏数，乍一看来，好像是使用Hash来存储更加合适：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs nix"><span class="hljs-params">key:</span> 作品id		<span class="hljs-params">field:</span> like<span class="hljs-symbol">/fav</span>		<span class="hljs-params">value:</span> likeNum<span class="hljs-symbol">/favNum</span><br><br><span class="hljs-params">key:</span> userId<br><span class="hljs-params">field:</span> followCount, fanCount, workCount, likeCount, favCount<br><span class="hljs-params">value:</span> <span class="hljs-number">100</span>, <span class="hljs-number">50</span>, <span class="hljs-number">1</span>, <span class="hljs-number">100</span>, <span class="hljs-number">20</span><br></code></pre></td></tr></table></figure>
+
+<p>但是随着业务规模上涨，用户数、作品数增加，如果每个用户&#x2F;作品都在Redis里维护一个这样的Hash结构，先不谈数据多少，<mark>元数据的字段名就占了很多重复的空间，浪费内存</mark></p>
+<p>我们设计的紧凑计数：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs nix"><span class="hljs-params">key:</span> userId<br><span class="hljs-params">value:</span> 一个连续的二进制块<br>[<span class="hljs-params">offset0:</span> followCount][<span class="hljs-params">offset1:</span> fanCount][<span class="hljs-params">offset2:</span> workCount][<span class="hljs-params">offset3:</span> likeCount][<span class="hljs-params">offset4:</span> favCount]<br></code></pre></td></tr></table></figure>
+
+<p><mark>没有字段名，只存值，节省空间；寻找对应的数据只需：“起始地址 + 类型偏移”即可</mark>。我们为每一个key分配了20KB的value，每个value分成5段，每段4KB存储对应数值。</p>
+<h3 id="2-4-采样一致性校验和自愈重建是怎么做的？"><a href="#2-4-采样一致性校验和自愈重建是怎么做的？" class="headerlink" title="2.4 采样一致性校验和自愈重建是怎么做的？"></a>2.4 采样一致性校验和自愈重建是怎么做的？</h3><p>每隔300s，在查询Redis SDS中数量的时候，去对比和数据库中事实表的实际值，如果不一致，就触发重建。</p>
+<p><mark>采样 &#x3D; 不是每次请求都校验，而是按一定频率抽样检查</mark>：</p>
+<ol>
+<li>限流机制：使用 setIfAbsent (相当于 SETNX) 实现分布式锁，过期时间300s<ol>
+<li>如果 300 秒内第一次访问：key 不存在，设置成功 → doCheck &#x3D; true，执行校验</li>
+<li>如果 300 秒内已校验过：key 已存在 → doCheck &#x3D; false，跳过校验</li>
+</ol>
+</li>
+<li>校验内容：对比 Redis SDS 中的关注&#x2F;粉丝数与数据库实际值</li>
+<li>修复机制：发现不一致时，触发 rebuildAllCounters() 全量重建</li>
+</ol>
+<p>为什么需要采样校验？</p>
+<ul>
+<li><p>性能考虑：每次查询都去数据库校验会严重影响性能</p>
+</li>
+<li><p>最终一致性：通过定期采样保证缓存与数据库的<strong>最终一致性</strong></p>
+</li>
+<li><p>自动修复：自动检测并修复可能出现的数据不一致问题</p>
 </li>
 </ul>
 
@@ -372,7 +383,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  <a href="/categories/%E9%A1%B9%E7%9B%AE/" class="category-chain-item">项目</a>
   
   
 
@@ -392,8 +403,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Redis为什么这么快</div>
-      <div>http://example.com/2025/12/14/Redis为什么这么快/</div>
+      <div>知识获取分享平台</div>
+      <div>http://example.com/2026/01/05/知识获取分享平台/</div>
     </div>
     <div class="license-meta">
       
@@ -405,7 +416,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年12月14日</div>
+          <div>2026年1月5日</div>
         </div>
       
       
@@ -437,18 +448,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/01/05/%E7%9F%A5%E8%AF%86%E8%8E%B7%E5%8F%96%E5%88%86%E4%BA%AB%E5%B9%B3%E5%8F%B0/" title="知识获取分享平台">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">知识获取分享平台</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/12/12/MVCC%E5%AF%BC%E8%87%B4%E7%B4%A2%E5%BC%95%E8%A6%86%E7%9B%96%E5%A4%B1%E6%95%88%E5%9C%BA%E6%99%AF/" title="MVCC导致索引覆盖失效场景">
-                        <span class="hidden-mobile">MVCC导致索引覆盖失效场景</span>
+                      <a href="/2025/12/14/Redis%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E4%B9%88%E5%BF%AB/" title="Redis为什么这么快">
+                        <span class="hidden-mobile">Redis为什么这么快</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
