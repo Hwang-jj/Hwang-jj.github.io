@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
 <meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
-<meta property="article:modified_time" content="2026-01-06T11:04:32.282Z">
+<meta property="article:modified_time" content="2026-01-06T11:26:07.520Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
@@ -228,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4.8k 字
+          4.9k 字
         
       </span>
     
@@ -239,7 +239,7 @@
         
         
         
-          40 分钟
+          41 分钟
         
       </span>
     
@@ -347,7 +347,7 @@
 <figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs nix"><span class="hljs-params">key:</span> userId<br><span class="hljs-params">value:</span> 一个连续的二进制块<br>[<span class="hljs-params">offset0:</span> followCount][<span class="hljs-params">offset1:</span> fanCount][<span class="hljs-params">offset2:</span> workCount][<span class="hljs-params">offset3:</span> likeCount][<span class="hljs-params">offset4:</span> favCount]<br></code></pre></td></tr></table></figure>
 
 <p><mark>没有字段名，只存值，节省空间；寻找对应的数据只需：“起始地址 + 类型偏移”即可</mark>。我们为每一个key分配了20KB的value，每个value分成5段，每段4KB存储对应数值。</p>
-<h3 id="2-4-采样一致性校验和自愈重建是怎么做的？"><a href="#2-4-采样一致性校验和自愈重建是怎么做的？" class="headerlink" title="2.4 采样一致性校验和自愈重建是怎么做的？"></a>2.4 采样一致性校验和自愈重建是怎么做的？</h3><p>每隔300s，在查询Redis SDS中数量的时候，去对比和数据库中事实表的实际值，如果不一致，就触发重建。</p>
+<h3 id="2-4-采样一致性校验和自愈重建是怎么做的？"><a href="#2-4-采样一致性校验和自愈重建是怎么做的？" class="headerlink" title="2.4 采样一致性校验和自愈重建是怎么做的？"></a>2.4 采样一致性校验和自愈重建是怎么做的？</h3><p>每隔300s，在查询Redis SDS中数量的时候，去对比和数据库中事实表的实际值，如果不一致，就触发重建<mark>（用户关系每隔300s检查是否一致；而点赞系统每次获取数量都判断最终计数结构是否完整，只有结构不完整才会重建）</mark>。</p>
 <p><mark>采样 &#x3D; 不是每次请求都校验，而是按一定频率抽样检查</mark>：</p>
 <ol>
 <li>限流机制：使用 <mark>setIfAbsent (相当于 SETNX) 实现分布式锁</mark>，过期时间300s，保证300s内只有一个线程能够校验并重建<ol>
@@ -431,6 +431,7 @@
 <li>Kafka也采用手动提交offset的方式，只有消息都被成功消费了，才会提交</li>
 <li>而对于消费者中每一个用户关注事件，通过<mark>Redis分布式锁（10min的setnx）</mark>，来实现一个用户关注事件只被消费一次，保证了幂等性</li>
 </ol>
+<h3 id="3-6-用户关系系统如何实现重建？"><a href="#3-6-用户关系系统如何实现重建？" class="headerlink" title="3.6 用户关系系统如何实现重建？"></a>3.6 用户关系系统如何实现重建？</h3><p>采样校验：使用 Redis 锁限流，每用户<b> 300s 触发一次</b>，去和数据库中的事实表做比较，不一致则重建。</p>
 <h2 id="四、点赞系统"><a href="#四、点赞系统" class="headerlink" title="四、点赞系统"></a>四、点赞系统</h2><blockquote>
 <p>采用<b>异步写+写聚合</b>的形式应对高并发写场景。采用<b>分片位图</b>的结构高效实现幂等和判重。读取遇到异常或缺失时，基于位图做按需重建，保证最终一致。</p>
 </blockquote>
@@ -486,7 +487,7 @@
 </li>
 <li><p><strong>重建场景的幂等</strong></p>
 <ul>
-<li>使用<strong>Redisson分布式锁</strong>保证只有一个线程重建（启用Redisson的看门狗机制去自动给锁续期，防止<code>BITCOUNT</code>统计没统计完就释放锁，因为这个执行多个分片的<code>BITCOUNT</code>可能是很耗时的操作）</li>
+<li>使用<strong>Redisson分布式锁</strong>保证只有一个线程重建，这个过程中其他获取锁失败的线程降级返回0（启用Redisson的看门狗机制去自动给锁续期，防止<code>BITCOUNT</code>统计没统计完就释放锁，因为这个执行多个分片的<code>BITCOUNT</code>可能是很耗时的操作）</li>
 <li>重建完成后删除对应的聚合字段，<mark>避免 位图重建值 + 聚合增量 被重复计算</mark></li>
 </ul>
 </li>
