@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
 <meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
-<meta property="article:modified_time" content="2026-01-06T11:49:44.736Z">
+<meta property="article:modified_time" content="2026-01-06T11:52:12.427Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
@@ -454,7 +454,7 @@
 
 <p>这样就实现了：大量更新操作不会直接达到最终的计数存储SDS处，而是<mark>在中间的Hash聚合桶累计一段时间，再批量直接写入最终存储，将多次写入变为一次写入</mark>；同时，时间窗口的划分，也能够<mark>保证对一个作品的大量点赞操作不会打到同一个聚合桶的key上</mark></p>
 </li>
-<li><p>最后，再设计一个定时任务，每隔1s去读取聚合桶里累积的点赞数&#x2F;收藏数，批量写入最终计数，写入成功后再删除已刷写的聚合字段删除，防止重复计算</p>
+<li><p>最后，再设计一个定时任务，每隔1s去读取聚合桶里累积的点赞数&#x2F;收藏数，批量写入最终计数，写入成功后再删除已刷写的聚合字段，防止重复计算</p>
 </li>
 </ol>
 <h3 id="4-3-什么是分片位图？为什么需要分片？"><a href="#4-3-什么是分片位图？为什么需要分片？" class="headerlink" title="4.3 什么是分片位图？为什么需要分片？"></a>4.3 什么是分片位图？为什么需要分片？</h3><p>当前用户量少的情况下，一个作品的所有点赞用户通过一个位图bitmap来记录是可以的；但是随着用户量的增加，如果还用一个位图bitmap来记录，那么这个key就会非常大，对这个key的操作也会变得非常重，所以需要将一个作品的key分成多个，本项目中设计每个分片位数为32K位（即可以记录32K &#x3D; 32768个用户的点赞数据），即每个分片4KB；<mark>通过<code>usedId / 32768</code>得到该用户的点赞数据在哪个分片，再通过<code>userId % 32768</code>得到该用户的点赞数据在该分片的哪一位</mark>。</p>
