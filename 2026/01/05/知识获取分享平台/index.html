@@ -26,10 +26,12 @@
 <meta property="og:site_name" content="Kon4tsu Blog">
 <meta property="og:description" content="知识获取与分享平台 知识社区App，支持发布知识、点赞&#x2F;收藏、关注取关、首页Feed展示、AI生成摘要等等。项目各模块进行了充分详细的设计以满足高并发和高可用需求  一、认证系统 开发JWT双令牌认证系统，采用RS256签名 + Redis刷新令牌白名单，实现15分钟访问令牌 + 7天刷新令牌的安全会话管理，支持即时令牌撤销，兼顾高安全和高性能。  1.1 有状态身份验证和无状态身份验证">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
 <meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
-<meta property="article:modified_time" content="2026-01-06T08:30:33.137Z">
+<meta property="article:modified_time" content="2026-01-06T11:04:32.282Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
   
   
   
@@ -226,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.9k 字
+          4.8k 字
         
       </span>
     
@@ -237,7 +239,7 @@
         
         
         
-          25 分钟
+          40 分钟
         
       </span>
     
@@ -348,7 +350,7 @@
 <h3 id="2-4-采样一致性校验和自愈重建是怎么做的？"><a href="#2-4-采样一致性校验和自愈重建是怎么做的？" class="headerlink" title="2.4 采样一致性校验和自愈重建是怎么做的？"></a>2.4 采样一致性校验和自愈重建是怎么做的？</h3><p>每隔300s，在查询Redis SDS中数量的时候，去对比和数据库中事实表的实际值，如果不一致，就触发重建。</p>
 <p><mark>采样 &#x3D; 不是每次请求都校验，而是按一定频率抽样检查</mark>：</p>
 <ol>
-<li>限流机制：使用 setIfAbsent (相当于 SETNX) 实现分布式锁，过期时间300s<ol>
+<li>限流机制：使用 <mark>setIfAbsent (相当于 SETNX) 实现分布式锁</mark>，过期时间300s，保证300s内只有一个线程能够校验并重建<ol>
 <li>如果 300 秒内第一次访问：key 不存在，设置成功 → doCheck &#x3D; true，执行校验</li>
 <li>如果 300 秒内已校验过：key 已存在 → doCheck &#x3D; false，跳过校验</li>
 </ol>
@@ -407,7 +409,7 @@
 <td>可延时，可修正</td>
 </tr>
 </tbody></table>
-<p>我们通过一个新的表：outbox表，来记录following主表的事件，一个事务里只需要完成following表 + outbox表的更新即可。然后通过Canal去订阅outbox表的binlog，再通过Kafka去异步消费outbox表中的事件以更新下游的follower表、Redis计数、缓存。这就是“一主多从 + 事件驱动”。</p>
+<p>我们通过一个新的表：outbox表，来记录following主表的事件，一个事务里只需要完成following表 + outbox表的更新即可。然后通过Canal去订阅outbox表的binlog，再通过Kafka去异步消费outbox表中的事件以更新下游的follower表、Redis计数、缓存<mark>（kafka带上userId作为key，保证一个用户的所有事件都进入同一个分区，确保顺序消费）</mark>。这就是“一主多从 + 事件驱动”。</p>
 <h3 id="3-2-这种模式有什么好处？"><a href="#3-2-这种模式有什么好处？" class="headerlink" title="3.2 这种模式有什么好处？"></a>3.2 这种模式有什么好处？</h3><ol>
 <li>高可扩展性：在没有使用outbox表之前，如果想在下游添加新的任务，需要放在一个事务里，拖垮性能。使用outbox表之后，新来的任务只需要新增一个消费者去订阅Kafka事件，就能够无限扩展下游服务。</li>
 <li>高可用性：在没有outbox表时，如果不把所有任务放在一个事务里，那么follower表只要有一次失败，那就永远不一致；Redis计数也是同理。添加outbox + canal + kafka之后：<ul>
@@ -427,10 +429,71 @@
 <h3 id="3-5-用户关系系统中如何保障消息的幂等性？"><a href="#3-5-用户关系系统中如何保障消息的幂等性？" class="headerlink" title="3.5 用户关系系统中如何保障消息的幂等性？"></a>3.5 用户关系系统中如何保障消息的幂等性？</h3><ol>
 <li>Canal每次拉取outbox表中一批未确认的消息，只有消息解析成功并被成功发送到Kafka，才会ack这一批消息，保证了Canal中的幂等</li>
 <li>Kafka也采用手动提交offset的方式，只有消息都被成功消费了，才会提交</li>
-<li>而对于消费者中每一个用户关注事件，通过Redis分布式锁（10min的setnx），来实现一个用户关注事件只被消费一次，保证了幂等性</li>
+<li>而对于消费者中每一个用户关注事件，通过<mark>Redis分布式锁（10min的setnx）</mark>，来实现一个用户关注事件只被消费一次，保证了幂等性</li>
 </ol>
 <h2 id="四、点赞系统"><a href="#四、点赞系统" class="headerlink" title="四、点赞系统"></a>四、点赞系统</h2><blockquote>
 <p>采用<b>异步写+写聚合</b>的形式应对高并发写场景。采用<b>分片位图</b>的结构高效实现幂等和判重。读取遇到异常或缺失时，基于位图做按需重建，保证最终一致。</p>
+</blockquote>
+<h3 id="4-1-点赞系统是怎么设计的？"><a href="#4-1-点赞系统是怎么设计的？" class="headerlink" title="4.1 点赞系统是怎么设计的？"></a>4.1 点赞系统是怎么设计的？</h3><p>点赞系统存在如下“矛盾”：</p>
+<ul>
+<li>一方面，用户操作后需要<mark>“即时生效”的交互反馈（如点击点赞后立即显示“已点赞”状态）</mark>，这要求用户维度的状态具备强一致性；</li>
+<li>另一方面，实体的<mark>总计数（如点赞数）对实时性要求较低</mark>，允许秒级最终一致。</li>
+</ul>
+<p>于是，点赞系统也效仿用户关系系统，采用“一主多从 + 事件驱动”的设计。记录用户是否点赞&#x2F;收藏的位图bitmap（key为作品id）作为主表，需要强一致性；而作品点赞数、收藏数等这些不需要非常精确的计数作为从表，通过消费事件来同步<b>（异步写）</b>，保证最终一致性。只要确保主表bitmap正确，即使计数有不一致，也可以通过正确的bitmap进行重建。</p>
+<h3 id="4-2-什么是“写聚合”"><a href="#4-2-什么是“写聚合”" class="headerlink" title="4.2 什么是“写聚合”"></a>4.2 什么是“写聚合”</h3><p>如果每发生一次点赞操作，更新位图bitmap的同时，直接去更新最终计数存储（Redis SDS），会导致形成高频次、细粒度的写请求，特别是对于热点帖子，它们的计数键会成为热点行，集中占用存储节点的资源。单条行为的计数更新数据量极小，但高频请求会占用大量网络带宽；同时，存储层需要处理海量零散写请求，硬件资源利用率低，导致成本浪费。</p>
+<p>所以需要一个中间层，去将 <mark>同一实体（同一帖子）、同一指标（点赞&#x2F;收藏）在同一时间窗口内的多次增量更新聚合为一次批量更新</mark>，减少最终存储层的写次数，这就是<b>“写聚合”</b>。具体通过Redis的一个Hash结构实现，架构图如下：</p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png" srcset="/img/loading.gif" lazyload alt="点赞操作流程"></p>
+<ol>
+<li><p>用户发起点赞操作，去更新位图（这一步需要强一致），然后即时返回点赞结果</p>
+</li>
+<li><p>位图更新成功后，产出事件供kafka去消费（更新点赞数、触发点赞数缓存失效）,<mark>以作品id为key，保证同一个作品的所有事件都进入同一个分区，保证顺序消费</mark></p>
+</li>
+<li><p>kafka消费事件时，并不是直接写入最终存储层的自定义SDS，而是先写入一个Redis Hash聚合桶里，聚合桶结构如下：</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs avrasm"><span class="hljs-symbol">key:</span> 作品id + 指标（点赞 <span class="hljs-keyword">or</span> 收藏） + 时间窗口<br><span class="hljs-symbol">field:</span> 点赞、收藏<br><span class="hljs-symbol">value:</span> 这段时间窗口累积的点赞数、这段时间窗口累积的收藏数<br></code></pre></td></tr></table></figure>
+
+<p>这样就实现了：大量更新操作不会直接达到最终的计数存储SDS处，而是<mark>在中间的Hash聚合桶累计一段时间，再批量直接写入最终存储，将多次写入变为一次写入</mark>；同时，时间窗口的划分，也能够<mark>保证对一个作品的大量点赞操作不会打到同一个聚合桶的key上</mark></p>
+</li>
+<li><p>最后，再设计一个定时任务，每隔1s去读取聚合桶里累积的点赞数&#x2F;收藏数，批量写入最终计数，写入成功后再删除已刷写的聚合字段删除，防止重复计算</p>
+</li>
+</ol>
+<h3 id="4-3-什么是分片位图？为什么需要分片？"><a href="#4-3-什么是分片位图？为什么需要分片？" class="headerlink" title="4.3 什么是分片位图？为什么需要分片？"></a>4.3 什么是分片位图？为什么需要分片？</h3><p>当前用户量少的情况下，一个作品的所有点赞用户通过一个位图bitmap来记录是可以的；但是随着用户量的增加，如果还用一个位图bitmap来记录，那么这个key就会非常大，对这个key的操作也会变得非常重，所以需要将一个作品的key分成多个，本项目中设计每个分片位数为32K位（即可以记录32K &#x3D; 32768个用户的点赞数据），即每个分片4KB；<mark>通过<code>usedId / 32768</code>得到该用户的点赞数据在哪个分片，再通过<code>userId % 32768</code>得到该用户的点赞数据在该分片的哪一位</mark>。</p>
+<p>分片的好处：</p>
+<ul>
+<li>避免bigkey</li>
+<li>统计总点赞数时，可以对多个分片<mark>并行</mark>执行 <code>BITCOUNT</code> 再汇总</li>
+<li>某些分片冷了，可以整体迁移到冷实例&#x2F;冷存储</li>
+<li>用户量级上去，只需要增加分片数或调整映射规则，无需推倒重来</li>
+</ul>
+<h3 id="4-4-点赞系统是如何实现重建的？"><a href="#4-4-点赞系统是如何实现重建的？" class="headerlink" title="4.4 点赞系统是如何实现重建的？"></a>4.4 点赞系统是如何实现重建的？</h3><p>对需要重建点赞&#x2F;收藏数的内容，列出该内容的所有分片位图键，对每个位图bitmap执行<code>BITCOUNT</code>统计1的数量，求和即为真实点赞&#x2F;收藏数量，再写回对应的最终计数存储。（注意：重建过程需要加锁，重建结束删除对应的过时聚合字段）</p>
+<h3 id="4-5-点赞系统是如何保障幂等性的？"><a href="#4-5-点赞系统是如何保障幂等性的？" class="headerlink" title="4.5 点赞系统是如何保障幂等性的？"></a>4.5 点赞系统是如何保障幂等性的？</h3><ol>
+<li><p><strong>位图层面、事件生产的幂等</strong></p>
+<p>使用Lua脚本，只有位图对应位发生改变时，才会产生事件；否则不产生任何事件，也就不会多算点赞&#x2F;收藏数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 位图状态切换：仅在状态变化时返回成功，并产出增量事件。</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> etype 实体类型</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> eid 实体 ID</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> uid 用户 ID</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> metric 指标名称（like/fav）</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> idx 指标索引（用于 SDS 固定结构定位）</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> add 是否置位（true=添加，false=移除）</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">toggle</span><span class="hljs-params">(String etype, String eid, <span class="hljs-type">long</span> uid, String metric, <span class="hljs-type">int</span> idx, <span class="hljs-type">boolean</span> add)</span> &#123;<br>    <span class="hljs-comment">// 固定分片定位：按用户ID映射到 chunk 与分片内 bit 偏移，避免单键膨胀与热点</span><br>    <span class="hljs-type">long</span> <span class="hljs-variable">chunk</span> <span class="hljs-operator">=</span> BitmapShard.chunkOf(uid);<br>    <span class="hljs-comment">// 分片内位偏移</span><br>    <span class="hljs-type">long</span> <span class="hljs-variable">bit</span> <span class="hljs-operator">=</span> BitmapShard.bitOf(uid);<br>    <span class="hljs-type">String</span> <span class="hljs-variable">bmKey</span> <span class="hljs-operator">=</span> CounterKeys.bitmapKey(metric, etype, eid, chunk);<br>    List&lt;String&gt; keys = List.of(bmKey);<br>    List&lt;String&gt; args = List.of(String.valueOf(bit), add ? <span class="hljs-string">&quot;add&quot;</span> : <span class="hljs-string">&quot;remove&quot;</span>);<br>    <span class="hljs-type">Long</span> <span class="hljs-variable">changed</span> <span class="hljs-operator">=</span> redis.execute(toggleScript, keys, args.toArray());<br>    <span class="hljs-type">boolean</span> <span class="hljs-variable">ok</span> <span class="hljs-operator">=</span> changed == <span class="hljs-number">1L</span>;<br>    <span class="hljs-keyword">if</span> (ok) &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">delta</span> <span class="hljs-operator">=</span> add ? <span class="hljs-number">1</span> : -<span class="hljs-number">1</span>;<br>        <span class="hljs-comment">// 产出计数事件（异步聚合），分区按实体维度保证同实体事件顺序</span><br>        eventProducer.publish(CounterEvent.of(etype, eid, metric, idx, uid, delta));<br>        <span class="hljs-comment">// 本地事件：触发缓存失效/旁路更新等快速路径</span><br>        eventPublisher.publishEvent(CounterEvent.of(etype, eid, metric, idx, uid, delta));<br>    &#125;<br>    <span class="hljs-keyword">return</span> ok;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><strong>聚合刷写的幂等</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">redis.execute(incrScript, List.of(cntKey),<br>        String.valueOf(CounterSchema.SCHEMA_LEN),<br>        String.valueOf(CounterSchema.FIELD_SIZE),<br>        String.valueOf(idx),<br>        String.valueOf(delta));<br><span class="hljs-comment">// 成功后删除该字段，避免重复加算</span><br>redis.opsForHash().delete(aggKey, field);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>事件先写入聚合桶（Hash）</p>
+</li>
+<li><p>定时任务（每1秒）将增量折叠到SDS</p>
+</li>
+<li><p>刷写成功后立即删除聚合字段</p>
+</li>
+<li><p>即使定时任务多次执行，每个增量只会被刷写一次</p>
+</li>
+</ul>
+</li>
+<li><p><strong>重建场景的幂等</strong></p>
+<ul>
+<li>使用<strong>Redisson分布式锁</strong>保证只有一个线程重建（启用Redisson的看门狗机制去自动给锁续期，防止<code>BITCOUNT</code>统计没统计完就释放锁，因为这个执行多个分片的<code>BITCOUNT</code>可能是很耗时的操作）</li>
+<li>重建完成后删除对应的聚合字段，<mark>避免 位图重建值 + 聚合增量 被重复计算</mark></li>
+</ul>
+</li>
+</ol>
+<h3 id="4-6-使用位图判断点赞与否不会存在内存浪费的问题吗？"><a href="#4-6-使用位图判断点赞与否不会存在内存浪费的问题吗？" class="headerlink" title="4.6 使用位图判断点赞与否不会存在内存浪费的问题吗？"></a>4.6 使用位图判断点赞与否不会存在内存浪费的问题吗？</h3><p>用户量很小时不会产生稀疏问题，后续可更换为稀疏位图，比如 roaring bitmap</p>
+<h2 id="五、Feed信息流"><a href="#五、Feed信息流" class="headerlink" title="五、Feed信息流"></a>五、Feed信息流</h2><blockquote>
+<p>采用<b>三级缓存</b>架构且设计了缓存一致性策略，本地 Caffeine + Redis 页面缓存 + Redis 片段缓存。<b>自定义 hotkey 探测机制</b>，基于热点检测按层级延长缓存时长，叠加随机抖动抗雪崩。并设置<b>单飞锁(single-flight)</b>避免同一页并发回源风暴</p>
 </blockquote>
 
                 
