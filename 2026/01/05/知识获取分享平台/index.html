@@ -27,7 +27,7 @@
 <meta property="og:description" content="知识获取与分享平台 知识社区App，支持发布知识、点赞&#x2F;收藏、关注取关、首页Feed展示、AI生成摘要等等。项目各模块进行了充分详细的设计以满足高并发和高可用需求  一、认证系统 开发JWT双令牌认证系统，采用RS256签名 + Redis刷新令牌白名单，实现15分钟访问令牌 + 7天刷新令牌的安全会话管理，支持即时令牌撤销，兼顾高安全和高性能。  1.1 有状态身份验证和无状态身份验证">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
-<meta property="article:modified_time" content="2026-01-05T11:45:43.442Z">
+<meta property="article:modified_time" content="2026-01-06T08:30:33.137Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.5k 字
+          2.9k 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          13 分钟
+          25 分钟
         
       </span>
     
@@ -365,6 +365,73 @@
 <li><p>自动修复：自动检测并修复可能出现的数据不一致问题</p>
 </li>
 </ul>
+<h2 id="三、用户关系系统"><a href="#三、用户关系系统" class="headerlink" title="三、用户关系系统"></a>三、用户关系系统</h2><blockquote>
+<p>实现关注功能，采用<b>一主多从+事件驱动</b>模型。粉丝表，计数系统，列表缓存都作为关注表的伪从。关注事件发生时，在同一事务中插入关注表和 Outbox 表，使用 Canal 订阅 Outbox 表的 binlog，并将变更事件发布到 Kafka 异步更新其他数据源。</p>
+</blockquote>
+<h3 id="3-1-用户关系系统是怎么实现的？什么是“一主多从-事件驱动”？"><a href="#3-1-用户关系系统是怎么实现的？什么是“一主多从-事件驱动”？" class="headerlink" title="3.1 用户关系系统是怎么实现的？什么是“一主多从+事件驱动”？"></a>3.1 用户关系系统是怎么实现的？什么是“一主多从+事件驱动”？</h3><p>当用户A关注用户B时，以下多张表会发生更新：</p>
+<ol>
+<li>关注表（MySQL）需要新增：A -&gt; B</li>
+<li>粉丝表（MySQL）需要新增：B -&gt; A</li>
+<li>A关注数 + 1，B粉丝数 + 1（Redis）</li>
+<li>A关注列表缓存、B粉丝列表缓存更新（Redis）</li>
+</ol>
+<p>这么多操作，如果有一个发生错误，就会导致<mark>数据不一致</mark>的情况。为了解决一致性的问题，可能会想到，使用<mark>分布式事务</mark>，将这多个任务都放在一个事务里，就能解决多张表之间的一致性问题。</p>
+<p>但是，随之而来的新问题，<mark>多个任务放在同一个事务里，会导致性能变差，特别是对于热点用户</mark>，后续如果有新的任务需要添加，性能只会越来越差。而且，多个任务放在同一个事务里，如果有一个组件挂了，整体就会一起挂，<mark>耦合性</mark>变得非常高。</p>
+<p>而在我们的用户关系系统里，当用户A关注了用户B后，用户B的粉丝表、用户A的关注数、用户B的粉丝数等这些都不需要非常强的一致性，只需要保证最终一致即可。<mark>于是我们将关注表作为主表，其他作为从表，我们只关注主表是否成功，主表成功就算业务成功，下游任务可以容忍慢一点，甚至短暂挂掉，后续只要通过重建措施来保证最终一致性即可</mark>。</p>
+<table>
+<thead>
+<tr>
+<th>表</th>
+<th>性质</th>
+<th>是否必须一致</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>following（关注表）</td>
+<td>唯一真相</td>
+<td>必须准确</td>
+</tr>
+<tr>
+<td>follower（粉丝表）</td>
+<td>粉丝投影表</td>
+<td>可延时，但必须可修正</td>
+</tr>
+<tr>
+<td>计数（Redis SDS）</td>
+<td>聚合投影</td>
+<td>可延时，可修正</td>
+</tr>
+<tr>
+<td>列表缓存（ZSet &#x2F; Caffeine）</td>
+<td>性能投影</td>
+<td>可延时，可修正</td>
+</tr>
+</tbody></table>
+<p>我们通过一个新的表：outbox表，来记录following主表的事件，一个事务里只需要完成following表 + outbox表的更新即可。然后通过Canal去订阅outbox表的binlog，再通过Kafka去异步消费outbox表中的事件以更新下游的follower表、Redis计数、缓存。这就是“一主多从 + 事件驱动”。</p>
+<h3 id="3-2-这种模式有什么好处？"><a href="#3-2-这种模式有什么好处？" class="headerlink" title="3.2 这种模式有什么好处？"></a>3.2 这种模式有什么好处？</h3><ol>
+<li>高可扩展性：在没有使用outbox表之前，如果想在下游添加新的任务，需要放在一个事务里，拖垮性能。使用outbox表之后，新来的任务只需要新增一个消费者去订阅Kafka事件，就能够无限扩展下游服务。</li>
+<li>高可用性：在没有outbox表时，如果不把所有任务放在一个事务里，那么follower表只要有一次失败，那就永远不一致；Redis计数也是同理。添加outbox + canal + kafka之后：<ul>
+<li><mark>kafka具有重试机制，同时消息会持久化到本地，保证了不会丢消息</mark></li>
+<li>下游任务可以通过outbox表，进行重建</li>
+<li>由于我们保证了following是强一致的，即使下游Redis计数任务有不一致，也可以通过<mark>每日自动比对following聚合值与Redis计数是否一致，并自动修复</mark>，来保证计数任务的一致性</li>
+</ul>
+</li>
+</ol>
+<h3 id="3-3-讲一下Canal的原理"><a href="#3-3-讲一下Canal的原理" class="headerlink" title="3.3 讲一下Canal的原理"></a>3.3 讲一下Canal的原理</h3><p>canal的工作原理就是把自己<b>伪装成MySQL slave，模拟MySQL slave的交互协议向MySQL Mater发送 dump协议</b>，MySQL mater收到canal发送过来的dump请求，开始推送bin log给canal，然后canal解析bin log，再发送到存储目的地，比如MySQL，Kafka，Elastic Search等等。</p>
+<h3 id="3-4-讲一下Outbox设计模式"><a href="#3-4-讲一下Outbox设计模式" class="headerlink" title="3.4 讲一下Outbox设计模式"></a>3.4 讲一下Outbox设计模式</h3><p>Outbox模式主要用于解决在微服务架构中，数据库更新与消息发送之间可能出现的不一致性问题。其基本思想是：</p>
+<ol>
+<li><strong>创建Outbox表</strong>：在数据库中增加一个专用的Outbox表，用于存储待发送的事件或消息。</li>
+<li><strong>原子性操作</strong>：在同一个数据库事务中，先更新业务相关的数据库表（如订单表），然后将事件记录插入到Outbox表中。这样可以确保这两个操作要么同时成功，要么同时失败，保证数据的一致性。</li>
+<li><strong>异步发送</strong>：一个独立的进程（如消息中继或调度器）定期查询Outbox表（本项目中的Canal），将待发送的消息发布到外部消息代理（如Kafka、RabbitMQ等）。在消息成功发送后，更新Outbox表中对应消息的状态</li>
+</ol>
+<h3 id="3-5-用户关系系统中如何保障消息的幂等性？"><a href="#3-5-用户关系系统中如何保障消息的幂等性？" class="headerlink" title="3.5 用户关系系统中如何保障消息的幂等性？"></a>3.5 用户关系系统中如何保障消息的幂等性？</h3><ol>
+<li>Canal每次拉取outbox表中一批未确认的消息，只有消息解析成功并被成功发送到Kafka，才会ack这一批消息，保证了Canal中的幂等</li>
+<li>Kafka也采用手动提交offset的方式，只有消息都被成功消费了，才会提交</li>
+<li>而对于消费者中每一个用户关注事件，通过Redis分布式锁（10min的setnx），来实现一个用户关注事件只被消费一次，保证了幂等性</li>
+</ol>
+<h2 id="四、点赞系统"><a href="#四、点赞系统" class="headerlink" title="四、点赞系统"></a>四、点赞系统</h2><blockquote>
+<p>采用<b>异步写+写聚合</b>的形式应对高并发写场景。采用<b>分片位图</b>的结构高效实现幂等和判重。读取遇到异常或缺失时，基于位图做按需重建，保证最终一致。</p>
+</blockquote>
 
                 
               </div>
