@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
 <meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
-<meta property="article:modified_time" content="2026-01-07T06:32:05.734Z">
+<meta property="article:modified_time" content="2026-01-07T07:14:00.779Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
@@ -228,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          6.5k 字
+          6.9k 字
         
       </span>
     
@@ -239,7 +239,7 @@
         
         
         
-          55 分钟
+          58 分钟
         
       </span>
     
@@ -614,7 +614,29 @@
 <li>缓存雪崩：设置缓存过期时间时，加上一个随机抖动值，防止大量key同时过期；同时还采用自定义的hotkey探测，动态延长热点key的TTL</li>
 <li>缓存击穿：采用single-flight锁，热点key过期时只允许一个线程操作数据库查询数据并执行重建工作</li>
 </ul>
-<h2 id="六、AI问答系统"><a href="#六、AI问答系统" class="headerlink" title="六、AI问答系统"></a>六、AI问答系统</h2>
+<h2 id="六、AI问答系统"><a href="#六、AI问答系统" class="headerlink" title="六、AI问答系统"></a>六、AI问答系统</h2><h3 id="6-1-向量检索用的是哪个数据库？为什么选择它？索引维度是多少？召回率是多少？"><a href="#6-1-向量检索用的是哪个数据库？为什么选择它？索引维度是多少？召回率是多少？" class="headerlink" title="6.1 向量检索用的是哪个数据库？为什么选择它？索引维度是多少？召回率是多少？"></a>6.1 向量检索用的是哪个数据库？为什么选择它？索引维度是多少？召回率是多少？</h3><p>Elasticsearch</p>
+<ul>
+<li><p>Elasticsearch 是成熟的分布式搜索引擎，支持向量检索的同时也支持传统的全文检索</p>
+</li>
+<li><p>Spring AI 原生支持：Spring AI 框架提供了开箱即用的 Elasticsearch Vector Store 集成</p>
+</li>
+</ul>
+<p>索引维度是1536 维，使用的是阿里云 DashScope 的 text-embedding-v4 模型</p>
+<p>采用了<mark>宽召回策略</mark>来提高召回率：</p>
+<ul>
+<li><p>采用 <code>fetchK = max(topK × 3, 20)</code> 的宽召回策略，即召回 3 倍目标数量的候选，再进行后过滤</p>
+</li>
+<li><p>通过 metadata.postId 进行服务端过滤，避免跨帖子污染</p>
+</li>
+</ul>
+<h3 id="6-2-“合理分块”的策略是什么？-块大小如何确定？块之间有重叠吗？如何处理跨块的语义信息？"><a href="#6-2-“合理分块”的策略是什么？-块大小如何确定？块之间有重叠吗？如何处理跨块的语义信息？" class="headerlink" title="6.2 “合理分块”的策略是什么？ 块大小如何确定？块之间有重叠吗？如何处理跨块的语义信息？"></a>6.2 “合理分块”的策略是什么？ 块大小如何确定？块之间有重叠吗？如何处理跨块的语义信息？</h3><p>先按 <b>Markdown 标题（以 # 开头的行）进行段落划分</b>，保持逻辑结构的完整性；再对每个段落进行进一步切分，<b>每个chunk &lt;&#x3D; 800字符</b>，避免单个 chunk 过长，同时块之间保留<b>100个字符的重叠</b>，确保跨块的关键信息不会被切断。</p>
+<h3 id="6-3-“幂等删除保持单一版本”具体怎么实现？如果用户编辑了知文，旧版本的向量如何清理？如何避免检索到过期内容？"><a href="#6-3-“幂等删除保持单一版本”具体怎么实现？如果用户编辑了知文，旧版本的向量如何清理？如何避免检索到过期内容？" class="headerlink" title="6.3 “幂等删除保持单一版本”具体怎么实现？如果用户编辑了知文，旧版本的向量如何清理？如何避免检索到过期内容？"></a>6.3 “幂等删除保持单一版本”具体怎么实现？如果用户编辑了知文，旧版本的向量如何清理？如何避免检索到过期内容？</h3><p>项目采用指纹检测 + 先删后写的策略来保持单一版本：</p>
+<ul>
+<li>先检测文章的指纹，如果未发生变化则跳过重建</li>
+<li>否则先删除所有旧版本向量</li>
+<li>再重新写入新版本向量，并携带新的指纹信息</li>
+</ul>
+
                 
               </div>
             
