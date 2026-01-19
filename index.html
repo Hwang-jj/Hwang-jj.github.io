@@ -231,6 +231,60 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/01/19/%E4%B8%BA%E4%BB%80%E4%B9%88HashMap%E7%9A%84%E9%94%AE%E5%80%BC%E5%8F%AF%E4%BB%A5%E4%B8%BAnull%EF%BC%8C%E8%80%8CConcurrentHashMap%E4%B8%8D%E8%A1%8C%EF%BC%9F/" target="_self">
+          为什么HashMap的键值可以为null，而ConcurrentHashMap不行？
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/19/%E4%B8%BA%E4%BB%80%E4%B9%88HashMap%E7%9A%84%E9%94%AE%E5%80%BC%E5%8F%AF%E4%BB%A5%E4%B8%BAnull%EF%BC%8C%E8%80%8CConcurrentHashMap%E4%B8%8D%E8%A1%8C%EF%BC%9F/" target="_self">
+        <div>
+          为什么HashMap的键值可以为null，而ConcurrentHashMap不行？根本原因：二义性问题，无法判断get(key)返回的Null值到底是因为不存在这个key，还是因为这个key对应的value就是Null 1. HashMapHashMap允许一个Null key和多个Null value，为什么HashMap没有二义性问题？ 因为HashMap是为单线程设计的，在单线程的情况下，
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-19 14:39" pubdate>
+              2026-01-19
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JUC/" class="category-chain-item">JUC</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/01/14/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%89%8B%E6%92%95/" target="_self">
           多线程手撕
         </a>
@@ -680,60 +734,6 @@
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
             <time datetime="2025-05-23 13:26" pubdate>
-              2025-05-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/JUC/" class="category-chain-item">JUC</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/05/23/synchronized3/" target="_self">
-          synchronized3
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/05/23/synchronized3/" target="_self">
-        <div>
-          synchronized3 引用：  https://www.cnblogs.com/duanxz/p/4458342.html https://www.cnblogs.com/vipstone/p/15121109.html   1. 自旋锁线程的阻塞和唤醒需要CPU从用户态转为核心态，频繁的阻塞和唤醒对CPU来说是一件负担很重的工作，势必会给系统的并发性能带来很大的压力。同时我们发现在许多应用
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-05-23 10:17" pubdate>
               2025-05-23
             </time>
           </div>

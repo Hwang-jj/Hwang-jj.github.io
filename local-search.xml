@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>为什么HashMap的键值可以为null，而ConcurrentHashMap不行？</title>
+    <link href="/2026/01/19/%E4%B8%BA%E4%BB%80%E4%B9%88HashMap%E7%9A%84%E9%94%AE%E5%80%BC%E5%8F%AF%E4%BB%A5%E4%B8%BAnull%EF%BC%8C%E8%80%8CConcurrentHashMap%E4%B8%8D%E8%A1%8C%EF%BC%9F/"/>
+    <url>/2026/01/19/%E4%B8%BA%E4%BB%80%E4%B9%88HashMap%E7%9A%84%E9%94%AE%E5%80%BC%E5%8F%AF%E4%BB%A5%E4%B8%BAnull%EF%BC%8C%E8%80%8CConcurrentHashMap%E4%B8%8D%E8%A1%8C%EF%BC%9F/</url>
+    
+    <content type="html"><![CDATA[<h1 id="为什么HashMap的键值可以为null，而ConcurrentHashMap不行？"><a href="#为什么HashMap的键值可以为null，而ConcurrentHashMap不行？" class="headerlink" title="为什么HashMap的键值可以为null，而ConcurrentHashMap不行？"></a>为什么HashMap的键值可以为null，而ConcurrentHashMap不行？</h1><p><mark>根本原因：二义性问题，无法判断get(key)返回的Null值到底是因为不存在这个key，还是因为这个key对应的value就是Null</mark></p><h2 id="1-HashMap"><a href="#1-HashMap" class="headerlink" title="1. HashMap"></a>1. HashMap</h2><p>HashMap允许一个Null key和多个Null value，为什么HashMap没有二义性问题？</p><p>因为HashMap是为单线程设计的，在单线程的情况下，即便get(key)返回了Null，也可以通过containsKey(key)来判断是否存在这个key，从而破除了二义性问题。</p><h2 id="2-ConcurrentHashMap"><a href="#2-ConcurrentHashMap" class="headerlink" title="2. ConcurrentHashMap"></a>2. ConcurrentHashMap</h2><p>ConcurrentHashMap不允许Null key和Null value</p><p>ConcurrentHashMap使用的场景是多线程，假设ConcurrentHashMap可以存入Null值，有这样一个场景，现在有一个线程A先调用concurrentHashMap.get(key)，由于key不存在，返回了Null值；这时候再去调concurrentHashMap.containsKey(key)，在返回结果之前，线程B又调用了concurrentHashMap.put(key,Null)存入了Null值，那么线程A最终返回的结果就是true，按照这个结果，线程A就会做出判断：前面调用get(key)方法返回Null值的原因是因为key所对应的value就是Null，这显然是不对的，因为线程A调用get(key)方法时，Null值还没被存入</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>JUC</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>多线程手撕</title>
     <link href="/2026/01/14/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%89%8B%E6%92%95/"/>
     <url>/2026/01/14/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%89%8B%E6%92%95/</url>
