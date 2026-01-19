@@ -29,7 +29,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512081119677.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512081120378.png">
 <meta property="article:published_time" content="2025-12-08T03:13:19.000Z">
-<meta property="article:modified_time" content="2026-01-19T05:44:21.200Z">
+<meta property="article:modified_time" content="2026-01-19T05:53:07.846Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202512081119677.png">
@@ -229,7 +229,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          601 字
+          870 字
         
       </span>
     
@@ -240,7 +240,7 @@
         
         
         
-          6 分钟
+          8 分钟
         
       </span>
     
@@ -298,6 +298,11 @@
 <p>于是，使用volatile的意义在于：<mark>防止指令重排序，避免别的线程拿到未完成初始化的对象，从而保证了线程安全</mark></p>
 <h2 id="静态内部类实现单例模式"><a href="#静态内部类实现单例模式" class="headerlink" title="静态内部类实现单例模式"></a>静态内部类实现单例模式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span>&#123;<br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SingletonHolder</span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">final</span> <span class="hljs-variable">INSTANCE</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>  &#125;<br>  <br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-keyword">return</span> SingletonHolder.INSTANCE;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
+<p><code>getInstance()</code> 调用的是 <code>SingletonHolder.INSTANCE</code> ，跟上面DCL方法不同的是， <code>getInstance()</code> 方法并没有多次去 new 对象，故不管多少个线程去调用 <code>getInstance()</code> ，取的都是同一个 <code>INSTANCE</code> 对象，而不用去重新创建</p>
+<blockquote>
+<p>1、 虚拟机会保证一个类的 <code>&lt;clinit&gt;()</code> 在 多线程环境中被正确地加锁、同步 。<br>2、 <mark>如果多个线程同时去初始化一个类，那么，只会有一个线程去执行这个类的 <code>&lt;clinit&gt;()</code> ，其他线程都需要阻塞等待</mark>。<br>3、 需要注意的是，<b>第一个活动线程</b> 执行 <code>&lt;clinit&gt;()</code> 后，其他线程被唤醒之后，不会再次进入 <code>&lt;clinit&gt;()</code> 。同一个类加载器下，一个类型只会初始化一次。在实际应用中，这种阻塞往往是很隐蔽的。</p>
+</blockquote>
+<p>因此，可以看出 <code>INSTANCE</code> 在创建过程中是线程安全的，所以说 <b>静态内部类</b> 形式的单例 可保证线程安全，也能保证单例的唯一性，同时也延迟了单例的实例化。</p>
 
                 
               </div>
