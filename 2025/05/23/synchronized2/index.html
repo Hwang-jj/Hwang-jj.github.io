@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231033855.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601191616846.png">
 <meta property="article:published_time" content="2025-05-23T01:20:55.000Z">
-<meta property="article:modified_time" content="2026-01-19T08:17:10.158Z">
+<meta property="article:modified_time" content="2026-01-19T08:19:13.474Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231033854.webp">
@@ -230,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          2.1k 字
         
       </span>
     
@@ -241,7 +241,7 @@
         
         
         
-          17 分钟
+          18 分钟
         
       </span>
     
@@ -300,6 +300,9 @@
 <h3 id="2-3-偏向锁"><a href="#2-3-偏向锁" class="headerlink" title="2.3 偏向锁"></a>2.3 偏向锁</h3><p>何谓“偏向”？就是<strong>锁对象会偏向于第一个获得它的线程</strong>。</p>
 <p>当一个线程访问同步代码块并获取锁时，该锁会进入偏向模式，锁的拥有者被设置为当前线程。当该线程执行完同步代码块后，<strong>线程并不会主动释放偏向锁</strong>。当线程再次进入同步代码块时，会首先判断此时持有锁的线程与它是否为同一线程，如果是则正常往下执行，由于<strong>此前是没有释放锁的</strong>，所以这次就不会有任何的获取锁操作。</p>
 <p><strong>偏向锁的锁释放</strong>是一个<strong>被动过程</strong>，线程不会主动释放偏向锁。如果有别的线程来竞争偏向锁时，通过CAS操作竞争，竞争成功则更改锁拥有者；否则说明有多线程竞争锁的情况，当到达<strong>全局安全点</strong>（所有线程会暂停），获得偏向锁的线程被挂起，偏向锁升级为轻量级锁，然后被阻塞在安全点的线程继续往下执行同步代码块</p>
+<blockquote>
+<p>偏向锁的撤销过程特别值得关注。当第二个线程尝试获取锁时，JVM需要检查偏向的线程是否还在执行同步代码。<mark>如果偏向线程已经退出同步块，JVM会直接将偏向锁撤销并升级；如果偏向线程还在同步块内，JVM需要等到安全点才能执行撤销操作。</mark></p>
+</blockquote>
 <p>所以，引入偏向锁的目的是<mark>认为当前环境下是不存在多线程竞争的场景，可以认为是单线程环境，同一个线程多次持有锁，减少单线程环境下获取锁带来的不必要</mark>。</p>
 <h3 id="2-4-轻量级锁"><a href="#2-4-轻量级锁" class="headerlink" title="2.4 轻量级锁"></a>2.4 轻量级锁</h3><p>当一个线程持有偏向锁时且仍处于活动状态时，另外一个线程来竞争锁，这时偏向锁就会升级为轻量级锁。</p>
 <p>轻量级锁的竞争方式是一种比较轻量级的竞争方式，<mark>当某个线程没有获取到锁，它并不是立刻被阻塞，而是采取CAS+自旋的方式来竞争锁资源</mark>。在竞争较少的情况下，轻量级锁通过<strong>减少线程阻塞和唤醒操作</strong>，可以提高性能。</p>
