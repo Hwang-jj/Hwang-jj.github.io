@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>LongAdder相比AtomicLong的优势</title>
+    <link href="/2026/01/19/LongAdder%E7%9B%B8%E6%AF%94AtomicLong%E7%9A%84%E4%BC%98%E5%8A%BF/"/>
+    <url>/2026/01/19/LongAdder%E7%9B%B8%E6%AF%94AtomicLong%E7%9A%84%E4%BC%98%E5%8A%BF/</url>
+    
+    <content type="html"><![CDATA[<h1 id="LongAdder相比AtomicLong的优势"><a href="#LongAdder相比AtomicLong的优势" class="headerlink" title="LongAdder相比AtomicLong的优势"></a>LongAdder相比AtomicLong的优势</h1><p>LongAdder相比AtomicLong最核心的优势在于<mark>大幅降低了高并发场景下的CAS竞争开销</mark>。当多个线程频繁对AtomicLong进行递增操作时，所有线程都会竞争同一个内存位置，导致<b>大量CAS失败重试，性能急剧下降</b>。这就像几十个人同时去抢一把锁，成功率极低，大家都在空转浪费CPU。</p><p>LongAdder采用<b>分段累加</b>策略巧妙地解决了这个问题。它的核心思想其实很朴素，就是”分而治之”—既然大家抢一个资源会冲突，那就准备多个资源让大家分开抢。LongAdder内部维护<b>一个Cell数组和一个base值</b>，当发生竞争时会动态扩容Cell数组。每个线程通过ThreadLocalRandom计算出一个probe值，映射到不同的Cell槽位进行累加操作，这样就把竞争分散到多个内存位置上。<mark>读取总值时会遍历所有Cell求和再加上base值</mark>。</p><p>具体工作机制是：初始状态所有操作都在base上进行，一旦检测到CAS竞争失败，就会初始化Cell数组并重新哈希线程到不同槽位。如果某个Cell仍然竞争激烈，会继续扩容数组直到达到CPU核心数。这种设计让写操作几乎无锁化，但读操作相对较重，因此<mark>LongAdder特别适合写多读少的计数场景</mark>，比如监控系统的QPS统计、缓存命中率计算等。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>JUC</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>为什么HashMap的键值可以为null，而ConcurrentHashMap不行？</title>
     <link href="/2026/01/19/%E4%B8%BA%E4%BB%80%E4%B9%88HashMap%E7%9A%84%E9%94%AE%E5%80%BC%E5%8F%AF%E4%BB%A5%E4%B8%BAnull%EF%BC%8C%E8%80%8CConcurrentHashMap%E4%B8%8D%E8%A1%8C%EF%BC%9F/"/>
     <url>/2026/01/19/%E4%B8%BA%E4%BB%80%E4%B9%88HashMap%E7%9A%84%E9%94%AE%E5%80%BC%E5%8F%AF%E4%BB%A5%E4%B8%BAnull%EF%BC%8C%E8%80%8CConcurrentHashMap%E4%B8%8D%E8%A1%8C%EF%BC%9F/</url>
