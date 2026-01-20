@@ -27,7 +27,7 @@
 <meta property="og:description" content="MySQL索引优化手段假设有一张表 user，三个字段 id (主键索引) 、 age(非唯一索引)、name(联合索引idx_name_age)、gender、empid（联合索引idx_gender_empid）。 表中现有数据：  id: 10, age: 10_v1, name: aaa，gender: M，empid: 10 id: 11, age: 10_v2, name: bbb，g">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-01-20T06:21:35.000Z">
-<meta property="article:modified_time" content="2026-01-20T06:40:23.199Z">
+<meta property="article:modified_time" content="2026-01-20T06:43:49.614Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -281,10 +281,10 @@
                 
                 <h1 id="MySQL索引优化手段"><a href="#MySQL索引优化手段" class="headerlink" title="MySQL索引优化手段"></a>MySQL索引优化手段</h1><p>假设有一张表 <code>user</code>，三个字段 <code>id</code> (主键索引) 、 <code>age</code>(非唯一索引)、<code>name</code>(联合索引<code>idx_name_age</code>)、<code>gender</code>、<code>empid</code>（联合索引<code>idx_gender_empid</code>）。 表中现有数据：</p>
 <ul>
-<li><code>id: 10, age: 10_v1, name: aaa</code>，<code>gender: M</code>，<code>empid: 10</code></li>
-<li><code>id: 11, age: 10_v2, name: bbb</code>，<code>gender: F</code>，<code>empid: 11</code></li>
-<li><code>id: 20, age: 20, name: aac</code>，<code>gender: M</code>，<code>empid: 20</code></li>
-<li><code>id: 30, age: 30, name: ddd</code>，<code>gender: F</code>，<code>empid: 30</code></li>
+<li><code>id: 10, age: 10_v1, name: aaa，gender: M，empid: 10</code></li>
+<li><code>id: 11, age: 10_v2, name: bbb，gender: F，empid: 11</code></li>
+<li><code>id: 20, age: 20, name: aac，gender: M，empid: 20</code></li>
+<li><code>id: 30, age: 30, name: ddd，gender: F，empid: 30</code></li>
 </ul>
 <h2 id="1-索引覆盖"><a href="#1-索引覆盖" class="headerlink" title="1. 索引覆盖"></a>1. 索引覆盖</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span><br>	id, age<br><span class="hljs-keyword">FROM</span><br>	<span class="hljs-keyword">user</span><br><span class="hljs-keyword">WHERE</span><br>	age <span class="hljs-operator">=</span> <span class="hljs-number">20</span><br></code></pre></td></tr></table></figure>
 
