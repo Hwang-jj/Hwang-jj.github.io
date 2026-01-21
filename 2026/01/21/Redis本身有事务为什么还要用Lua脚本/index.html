@@ -19,21 +19,21 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="MySQL-MVCC MySQL通过ReadView和undo log实现了MVCC  ReadView   创建该ReadView的事务id（creator_trx_id） 创建该ReadView时，当前活跃且未提交事务id列表（m_ids） 创建该ReadView时，最小活跃未提交事务id（min_trx_id） 创建该ReadView时，下一个事务id（max_trx_id）    记录的隐">
+    <meta name="description" content="Redis本身有事务为什么还要用Lua脚本?Redis有事务（MULTI&#x2F;EXEC），但更青睐Lua脚本，主要因为Lua提供更强大的逻辑灵活性（可依赖前一步结果）、更好的性能（减少网络往返）和更适合实现复杂原子操作，如分布式锁、限流等，而Redis事务在复杂场景下难以处理依赖关系且有执行错误不回滚的限制，因此Lua脚本成为处理复杂业务逻辑的优选方案。  Redis事务（MULTI&amp;#x2">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MySQL-MVCC">
-<meta property="og:url" content="http://example.com/2026/01/21/MySQL-MVCC/index.html">
+<meta property="og:title" content="Redis本身有事务为什么还要用Lua脚本?">
+<meta property="og:url" content="http://example.com/2026/01/21/Redis%E6%9C%AC%E8%BA%AB%E6%9C%89%E4%BA%8B%E5%8A%A1%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E8%A6%81%E7%94%A8Lua%E8%84%9A%E6%9C%AC/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="MySQL-MVCC MySQL通过ReadView和undo log实现了MVCC  ReadView   创建该ReadView的事务id（creator_trx_id） 创建该ReadView时，当前活跃且未提交事务id列表（m_ids） 创建该ReadView时，最小活跃未提交事务id（min_trx_id） 创建该ReadView时，下一个事务id（max_trx_id）    记录的隐">
+<meta property="og:description" content="Redis本身有事务为什么还要用Lua脚本?Redis有事务（MULTI&#x2F;EXEC），但更青睐Lua脚本，主要因为Lua提供更强大的逻辑灵活性（可依赖前一步结果）、更好的性能（减少网络往返）和更适合实现复杂原子操作，如分布式锁、限流等，而Redis事务在复杂场景下难以处理依赖关系且有执行错误不回滚的限制，因此Lua脚本成为处理复杂业务逻辑的优选方案。  Redis事务（MULTI&amp;#x2">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-01-21T03:43:02.000Z">
-<meta property="article:modified_time" content="2026-01-21T05:33:47.566Z">
+<meta property="article:published_time" content="2026-01-21T07:24:51.000Z">
+<meta property="article:modified_time" content="2026-01-21T07:28:48.730Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>MySQL-MVCC - Kon4tsu Blog</title>
+  <title>Redis本身有事务为什么还要用Lua脚本? - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -203,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="MySQL-MVCC"></span>
+            <span id="subtitle" data-typed-text="Redis本身有事务为什么还要用Lua脚本?"></span>
           
         </div>
 
@@ -214,8 +214,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-01-21 11:43" pubdate>
-          2026年1月21日 中午
+        <time datetime="2026-01-21 15:24" pubdate>
+          2026年1月21日 下午
         </time>
       </span>
     
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          446 字
+          502 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          4 分钟
+          5 分钟
         
       </span>
     
@@ -274,49 +274,24 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">MySQL-MVCC</h1>
+            <h1 id="seo-header">Redis本身有事务为什么还要用Lua脚本?</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="MySQL-MVCC"><a href="#MySQL-MVCC" class="headerlink" title="MySQL-MVCC"></a>MySQL-MVCC</h1><blockquote>
-<p>MySQL通过ReadView和undo log实现了MVCC</p>
-</blockquote>
-<h2 id="ReadView"><a href="#ReadView" class="headerlink" title="ReadView"></a>ReadView</h2><table>
-<thead>
-<tr>
-<th>创建该ReadView的事务id（creator_trx_id）</th>
-<th>创建该ReadView时，当前<mark>活跃且未提交</mark>事务id列表（m_ids）</th>
-<th>创建该ReadView时，<mark>最小活跃未提交</mark>事务id（min_trx_id）</th>
-<th>创建该ReadView时，下一个事务id（max_trx_id）</th>
-</tr>
-</thead>
-</table>
-<p>记录的隐藏列（只存在聚簇索引，非聚簇索引内不存在隐藏列）：</p>
-<table>
-<thead>
-<tr>
-<th>创建该记录的事务id（trx_id）</th>
-<th>roll_pointer指向前一个版本记录</th>
-</tr>
-</thead>
-</table>
-<ol>
-<li>若<code>trx_id &lt; min_trx_id</code>，说明创建该ReadView时，修改该版本记录的事务已提交，则该版本记录对事务<code>creator_trx_id</code>可见</li>
-<li>若<code>trx_id &gt;= max_trx_id</code>，说明这个版本记录的事务是在ReadView创建后才启动的，则该版本记录对事务<code>creator_trx_id</code>不可见</li>
-<li>否则：<code>min_trx_id &lt; trx_id &lt; max_trx_id</code>，若：<ul>
-<li><code>trx_id in m_ids</code>，说明在该ReadView创建时，修改这个版本记录的事务尚未提交，则不可见</li>
-<li><code>trx_id not in m_ids</code>，说明在该ReadView创建时，修改这个版本记录的事务已提交，则可见</li>
-<li>例：启动1 2 3 4四个事务，3执行非常快，已结束了；若此时启动事务5，则此时ReadView中<code>m_ids</code>为1 2 4，事务3的改动对事务5可见</li>
+                <h1 id="Redis本身有事务为什么还要用Lua脚本"><a href="#Redis本身有事务为什么还要用Lua脚本" class="headerlink" title="Redis本身有事务为什么还要用Lua脚本?"></a>Redis本身有事务为什么还要用Lua脚本?</h1><p>Redis有事务（MULTI&#x2F;EXEC），但更青睐Lua脚本，主要因为Lua提供<b>更强大的逻辑灵活性</b>（可依赖前一步结果）、<b>更好的性能</b>（减少网络往返）和更适合实现<b>复杂原子操作</b>，如分布式锁、限流等，而Redis事务在复杂场景下难以处理依赖关系且有执行错误不回滚的限制，因此Lua脚本成为处理复杂业务逻辑的优选方案。 </p>
+<h2 id="Redis事务（MULTI-EXEC）的局限"><a href="#Redis事务（MULTI-EXEC）的局限" class="headerlink" title="Redis事务（MULTI&#x2F;EXEC）的局限"></a>Redis事务（MULTI&#x2F;EXEC）的局限</h2><ul>
+<li><b>不支持依赖</b>： 事务中的命令排队执行，但<b>无法在事务内获取前一个命令的结果</b>，对后续命令的依赖处理很弱。</li>
+<li><b>不回滚</b>： 执行过程中命令出错（如类型错误）不会回滚，会继续执行其他命令，与传统数据库事务不同。</li>
+<li><b>网络开销</b>： 每个命令都需要一次网络往返，累积起来开销较大。</li>
 </ul>
-</li>
-</ol>
-<h2 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h2><ul>
-<li>可重复读Repeatable Read：启动事务时创建一个ReadView，<mark>整个事务期间都用这个ReadView</mark></li>
-<li>读提交Read Comitted：<mark>每次读数据时都会生成一个新的ReadView</mark></li>
+<h2 id="Lua脚本的优势"><a href="#Lua脚本的优势" class="headerlink" title="Lua脚本的优势"></a>Lua脚本的优势</h2><ul>
+<li><b>原子性与隔离性</b>： Redis将Lua脚本视为一个整体，在服务器端<b>一次性、原子性地执行</b>，期间不会被其他命令打断，保证了执行过程中的数据一致性。</li>
+<li><b>强大的逻辑处理</b>： 可以在脚本内编写条件判断、循环，<b>支持命令结果的链式调用</b>，实现复杂业务逻辑（如分布式锁、计数器）。</li>
+<li><b>性能更优</b>： 脚本将多个命令打包成<b>一次远程调用</b>，大幅减少网络延迟和通信开销。</li>
+<li><b>功能互补</b>： Lua脚本能做事务能做的，还能做事务做不到的，是事务功能的<b>强大补充</b>。</li>
 </ul>
-<p>通过MVCC，RR很大程度上避免了幻读，但不能完全避免：事务2插入一条新记录并提交，然后<mark>事务1虽然读不到这条新纪录，但是能够修改这条数据，修改完再读就能读到了</mark>。这是因为修改后，这条记录的<code>trx_id</code>变成事务1，对于事务1的ReadView而言是可见的。</p>
-<p>所以要彻底解决幻读还是需要使用锁。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>事务适用于简单的命令批处理，而 Lua脚本则用于处理需要<b>复杂逻辑、依赖和高性能的场景</b>，如分布式锁、限流、队列操作等，它们共同构成了Redis的原子性操作方案，满足不同业务需求。</p>
 
                 
               </div>
@@ -335,7 +310,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/MySQL/" class="category-chain-item">MySQL</a>
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
   
   
 
@@ -355,8 +330,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>MySQL-MVCC</div>
-      <div>http://example.com/2026/01/21/MySQL-MVCC/</div>
+      <div>Redis本身有事务为什么还要用Lua脚本?</div>
+      <div>http://example.com/2026/01/21/Redis本身有事务为什么还要用Lua脚本/</div>
     </div>
     <div class="license-meta">
       
@@ -400,18 +375,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/01/21/Redis%E6%9C%AC%E8%BA%AB%E6%9C%89%E4%BA%8B%E5%8A%A1%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E8%A6%81%E7%94%A8Lua%E8%84%9A%E6%9C%AC/" title="Redis本身有事务为什么还要用Lua脚本?">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Redis本身有事务为什么还要用Lua脚本?</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/01/20/MySQL%E6%B7%B1%E5%88%86%E9%A1%B5%E9%97%AE%E9%A2%98/" title="MySQL深分页问题">
-                        <span class="hidden-mobile">MySQL深分页问题</span>
+                      <a href="/2026/01/21/MySQL-MVCC/" title="MySQL-MVCC">
+                        <span class="hidden-mobile">MySQL-MVCC</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
