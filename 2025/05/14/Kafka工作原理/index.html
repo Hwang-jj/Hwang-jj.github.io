@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601221406419.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601221416264.png">
 <meta property="article:published_time" content="2025-05-14T10:54:23.000Z">
-<meta property="article:modified_time" content="2026-01-22T06:21:34.933Z">
+<meta property="article:modified_time" content="2026-01-22T07:37:23.008Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151012092.png">
@@ -231,7 +231,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4.7k 字
+          5.1k 字
         
       </span>
     
@@ -242,7 +242,7 @@
         
         
         
-          39 分钟
+          43 分钟
         
       </span>
     
@@ -294,11 +294,11 @@
 </li>
 <li><p>Broker：Broker是kafka实例，每个服务器上有一个或多个kafka的实例，我们姑且认为每个broker对应一台服务器。每个kafka集群内的broker都有一个不重复的编号，如图中的broker-0、broker-1等……</p>
 </li>
-<li><p>主题（Topic）：主题是Kafka中用于<strong>消息分类</strong>的概念，类似于数据库中的表。每个主题都可以包含多个消息，生产者将消息发送到主题，消费者从主题中读取消息。通过主题，我们可以将不同类型的消息分开管理。在每个Broker都可以创建多个Topic。</p>
+<li><p>主题（Topic）：主题是Kafka中用于<strong>消息分类</strong>的概念，类似于数据库中的表。每个主题都可以包含多个消息，生产者将消息发送到主题，消费者从主题中读取消息。通过主题，我们可以将不同类型的消息分开管理。在每个Broker都可以创建多个Topic。（<b>Topic是逻辑上的消息分类</b>）</p>
 </li>
-<li><p>分区（Partition）：为了方便扩展和管理，Kafka中的每个主题可以分为多个分区。分区使得Kafka能够横向扩展，将消息分布在多个节点上。单个分区内的消息是有序的，但在多个分区间无法保证全局有序。如果希望消息全局有序，可以将分区数设置为一。</p>
+<li><p>分区（Partition）：为了方便扩展和管理，Kafka中的每个Topic可以分为多个Partition。分区使得Kafka能够横向扩展，将消息分布在多个节点上。单个分区内的消息是有序的，但在多个分区间无法保证全局有序。如果希望消息全局有序，可以将分区数设置为一。（<b>Partition是物理上的消息分类</b>）</p>
 <blockquote>
-<p>每个topic可以有多个partition，partition的作用是做负载，提高kafka的吞吐量。同一个topic在不同的分区的数据是不重复的，partition的表现形式就是一个一个的文件夹！</p>
+<p>每个topic可以有多个partition，<mark>partition的作用是做负载，提高kafka的吞吐量</mark>。同一个topic在不同的分区的数据是不重复的，partition的表现形式就是一个一个的文件夹（里面存储Segment）！</p>
 </blockquote>
 </li>
 <li><p>副本（Replication）：每一个分区都有多个副本，副本的作用是做备胎。当主分区（Leader）故障的时候会选择一个备胎（Follower）上位，成为Leader。在kafka中默认副本的最大数量是10个，且副本的数量不能大于Broker的数量，<mark>follower和leader绝对是在不同的机器</mark>，同一机器对同一个分区也只可能存放一个副本（包括自己）。<mark>副本机制是Kafka高可靠性的基础</mark>。</p>
@@ -312,7 +312,7 @@
 </li>
 <li><p>消费者（Consumer）：消费者，即消息的消费方，是消息的出口。</p>
 </li>
-<li><p>消费者组（Consumer Group）：我们可以将多个消费者组成一个消费者组，在kafka的设计中同一个分区的数据只能被消费者组中的某一个消费者消费。同一个消费者组的消费者可以消费同一个topic的不同分区的数据，这也是为了提高kafka的吞吐量！</p>
+<li><p>消费者组（Consumer Group）：我们可以将多个消费者组成一个消费者组，在kafka的设计中<mark>同一个分区的数据只能被消费者组中的某一个消费者消费</mark>。同一个消费者组的消费者可以消费同一个topic的不同分区的数据，这也是为了提高kafka的吞吐量！(<b>一个消费者去处理一个Topic下的多个Partition效率 肯定不如 一个消费者组里的多个消费者一起去消费一个Topic下的不同Partition吧！  ————&gt;  消费者组也引出了rebalance的问题 </b>)</p>
 </li>
 </ul>
 <h2 id="2-Kafka的优点"><a href="#2-Kafka的优点" class="headerlink" title="2. Kafka的优点"></a>2. Kafka的优点</h2><ul>
@@ -371,24 +371,27 @@
 </ul>
 <h2 id="5-Kafka如何保证消息不被重复消费"><a href="#5-Kafka如何保证消息不被重复消费" class="headerlink" title="5. Kafka如何保证消息不被重复消费"></a>5. Kafka如何保证消息不被重复消费</h2><p><strong>kafka 出现消息重复消费的原因：</strong></p>
 <ul>
+<li><p>生产阶段由于网络波动导致同一条消息被重复发送</p>
+</li>
 <li><p>服务端侧已经消费的数据没有成功提交 offset（根本原因）。</p>
 </li>
 <li><p>Kafka 侧 由于服务端处理业务时间长或者网络链接等等原因让 Kafka 认为服务假死，触发了分区 <strong>rebalance</strong>。</p>
 <blockquote>
-<p>为了维持Consumer与Consumer Group之间的关系，Consumer 会周期性地发送 hearbeat 到 coodinator（协调者），如果有 hearbeat 超时或未收到 hearbeat，coordinator 会认为该Consumer已经退出，那么它所订阅的Partition会分配到同一组内的其他Consumer上，这个过程称为 rebalance（再平衡）</p>
+<p>为了维持Consumer与Consumer Group之间的关系，Consumer 会周期性地发送 hearbeat 到 Group Coodinator，如果有 hearbeat 超时或未收到 hearbeat，coordinator 会认为该Consumer已经退出，那么它所订阅的Partition会分配到同一组内的其他Consumer上，这个过程称为 rebalance。<mark>rebalance期间所有消费者暂停消费，提交当前消费状态，等待coordinator重新分配分区</mark></p>
 </blockquote>
 </li>
 </ul>
 <p><strong>解决方案：</strong></p>
 <ul>
-<li>消费消息服务做<strong>幂等校验</strong>，比如 Redis 的 set、MySQL 的主键等天然的幂等功能。这种方法最有效。</li>
+<li>Kafka幂等性生产：通过<code>Producer ID + 消息序列号Seq Number</code>来唯一标识一条消息，避免重复发送</li>
+<li>消费消息服务做<strong>幂等校验</strong>，比如 Redis 的 set（消息的uuid存入Redis set中，消费前先检查是否存在）、MySQL 的主键等天然的幂等功能。这种方法最有效。</li>
 <li>将 <code>enable.auto.commit</code>参数设置为 false，关闭自动提交，开发者在代码中手动提交 offset。那么这里会有个问题：什么时候提交 offset 合适？<ul>
 <li>处理完消息再提交：依旧有消息重复消费的风险，和自动提交一样</li>
 <li>拉取到消息即提交：会有消息丢失的风险。允许消息延时的场景，一般会采用这种方式。然后，通过定时任务在业务不繁忙（比如凌晨）的时候做数据兜底。</li>
 </ul>
 </li>
 </ul>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="6-Kafka重试机制"><a href="#6-Kafka重试机制" class="headerlink" title="6. Kafka重试机制"></a>6. Kafka重试机制</h2><h3 id="6-1-消费失败会怎么样？"><a href="#6-1-消费失败会怎么样？" class="headerlink" title="6.1 消费失败会怎么样？"></a>6.1 消费失败会怎么样？</h3><p>在消费过程中，当其中一个消息消费异常时，会不会卡住后续队列消息的消费？这样业务岂不是卡住了？</p>
+<h2 id="6-Kafka重试机制"><a href="#6-Kafka重试机制" class="headerlink" title="6. Kafka重试机制"></a>6. Kafka重试机制</h2><h3 id="6-1-消费失败会怎么样？"><a href="#6-1-消费失败会怎么样？" class="headerlink" title="6.1 消费失败会怎么样？"></a>6.1 消费失败会怎么样？</h3><p>在消费过程中，当其中一个消息消费异常时，会不会卡住后续队列消息的消费？这样业务岂不是卡住了？</p>
 <p>在默认配置下，当消费异常会进行重试，<mark>重试多次后会跳过当前消息，继续进行后续消息的消费</mark>，不会一直卡在当前消息。</p>
 <h3 id="6-2-默认重试多少次？"><a href="#6-2-默认重试多少次？" class="headerlink" title="6.2 默认重试多少次？"></a>6.2 默认重试多少次？</h3><p>Kafka 消费者在<mark>默认配置下会进行最多 10 次 的重试，每次重试的时间间隔为 0，即立即进行重试</mark>。如果在 10 次重试后仍然无法成功消费消息，则不再进行重试，消息将被视为消费失败。</p>
 <h3 id="6-3-重试失败后的消息如何再次处理？"><a href="#6-3-重试失败后的消息如何再次处理？" class="headerlink" title="6.3 重试失败后的消息如何再次处理？"></a>6.3 重试失败后的消息如何再次处理？</h3><p><strong>死信队列（Dead Letter Queue，简称 DLQ）</strong> 是消息中间件中的一种特殊队列。它主要用于处理无法被消费者正确处理的消息，通常是因为消息格式错误、处理失败、消费超时等情况导致的消息被”丢弃”或”死亡”的情况。</p>
@@ -430,7 +433,23 @@
 <li>操作系统将数据的描述符拷贝到Socket缓冲区中。<mark>Socket缓冲区仅仅会拷贝一个描述符过去，不会拷贝数据</mark>。</li>
 <li>操作系统直接将数据从内核空间的缓存区传输到网卡中，并通过网卡将数据发送给接收方，这也是通过DMA来做的，不过这里的DMA叫SG-DMA，基本上现阶段的网卡都是支持SG-DMA的，所以没有什么特别的，知道它是一种加强的DMA技术就行了，甚至面试时候就说是DMA也是一样的。</li>
 </ol>
-
+<h3 id="7-5-消息压缩"><a href="#7-5-消息压缩" class="headerlink" title="7.5 消息压缩"></a>7.5 消息压缩</h3><p><mark>Kafka支持在生产端或Broker端对消息进行压缩，以减少网络传输的数据体积</mark>。数据压缩适合带宽资源紧张而CPU资源相对宽裕的场景，能有效提升整体传输效率，是Kafka保持高吞吐的重要机制之一。</p>
+<h2 id="8-Kafka的分层设计机制"><a href="#8-Kafka的分层设计机制" class="headerlink" title="8. Kafka的分层设计机制"></a>8. Kafka的分层设计机制</h2><p>Kafka采用 <code>Topic - Partition - Segment</code> 的分层设计机制：</p>
+<ul>
+<li><p>Topic作为<mark>业务逻辑隔离</mark>的基本单位，实现数据独立性；</p>
+</li>
+<li><p>每个Topic进一步拆分为多个Partition，通过并行写入与消费实现<mark>横向扩展</mark>以提升吞吐能力；</p>
+</li>
+<li><p>每个Partition由多个按大小（默认1GB，可配置log.segment.size）滚动生成的Segment组成，每个Segment包含：</p>
+<ul>
+<li>.log数据文件</li>
+<li>用于快速定位的.index（偏移量索引）</li>
+<li>.timeindex（时间索引）文件</li>
+</ul>
+<p>索引文件加载至内存以优化查询效率，通过该分层结构实现高并发、高吞吐场景下的数据高效管理与扩展。</p>
+</li>
+</ul>
+<h2 id="9-消息队列常见应用场景"><a href="#9-消息队列常见应用场景" class="headerlink" title="9. 消息队列常见应用场景"></a>9. 消息队列常见应用场景</h2><h3 id="9-1-解耦"><a href="#9-1-解耦" class="headerlink" title="9.1 解耦"></a>9.1 解耦</h3><h3 id="9-2-削峰"><a href="#9-2-削峰" class="headerlink" title="9.2 削峰"></a>9.2 削峰</h3><h3 id="9-3-异步处理"><a href="#9-3-异步处理" class="headerlink" title="9.3 异步处理"></a>9.3 异步处理</h3><h3 id="9-4-消息分发"><a href="#9-4-消息分发" class="headerlink" title="9.4 消息分发"></a>9.4 消息分发</h3>
                 
               </div>
             
