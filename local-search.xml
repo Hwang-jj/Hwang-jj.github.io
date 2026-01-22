@@ -716,16 +716,10 @@
     
     <categories>
       
-      <category>MessageQueue</category>
+      <category>MQ</category>
       
     </categories>
     
-    
-    <tags>
-      
-      <tag>MessageQueue</tag>
-      
-    </tags>
     
   </entry>
   
@@ -811,16 +805,10 @@
     
     <categories>
       
-      <category>MessageQueue</category>
+      <category>MQ</category>
       
     </categories>
     
-    
-    <tags>
-      
-      <tag>MessageQueue</tag>
-      
-    </tags>
     
   </entry>
   
