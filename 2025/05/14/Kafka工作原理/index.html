@@ -28,8 +28,10 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151012092.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151012093.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601221406419.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601221416264.png">
 <meta property="article:published_time" content="2025-05-14T10:54:23.000Z">
-<meta property="article:modified_time" content="2026-01-22T03:43:05.041Z">
+<meta property="article:modified_time" content="2026-01-22T06:21:34.933Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151012092.png">
@@ -229,7 +231,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.8k 字
+          4.7k 字
         
       </span>
     
@@ -240,7 +242,7 @@
         
         
         
-          32 分钟
+          39 分钟
         
       </span>
     
@@ -392,24 +394,42 @@
 <h3 id="6-3-重试失败后的消息如何再次处理？"><a href="#6-3-重试失败后的消息如何再次处理？" class="headerlink" title="6.3 重试失败后的消息如何再次处理？"></a>6.3 重试失败后的消息如何再次处理？</h3><p><strong>死信队列（Dead Letter Queue，简称 DLQ）</strong> 是消息中间件中的一种特殊队列。它主要用于处理无法被消费者正确处理的消息，通常是因为消息格式错误、处理失败、消费超时等情况导致的消息被”丢弃”或”死亡”的情况。</p>
 <p>当消息进入队列后，消费者会尝试处理它。如果处理失败，或者超过一定的重试次数仍无法被成功处理，消息可以发送到死信队列中，而不是被永久性地丢弃。在死信队列中，可以进一步分析、处理这些无法正常消费的消息，以便定位问题、修复错误，并采取适当的措施。</p>
 <h2 id="7-Kafka高性能原因"><a href="#7-Kafka高性能原因" class="headerlink" title="7. Kafka高性能原因"></a>7. Kafka高性能原因</h2><h3 id="7-1-使用批量消息提升服务端处理能力"><a href="#7-1-使用批量消息提升服务端处理能力" class="headerlink" title="7.1 使用批量消息提升服务端处理能力"></a>7.1 使用批量消息提升服务端处理能力</h3><ul>
-<li>发送端：当我们调用send()方法发送一条消息后，无论我们是同步发送还是异步发送，Kafka并不会立刻把这条消息发送出去，它会先把这条消息存放在内存中，然后<mark>选择合适的时机把缓存的所有消息组成一批，一次性的发给Broker</mark>。</li>
-<li>Broker：整个处理流程中，无论是写入磁盘、从磁盘读出来、还是复制到其他副本，批消息都不会被解开，一直是作为一条“批消息”进行处理的</li>
-<li>消费端：消息同样是以批为单位进行传递的，Consumer从Broker拉到一批消息后，在客户端把批消息解开，再一条一条交给用户代码处理</li>
+<li>发送端：当我们调用send()方法发送一条消息后，无论我们是同步发送还是异步发送，Kafka并不会立刻把这条消息发送出去，它会先把这条消息存放在内存中，然后<mark>选择合适的时机把缓存的所有消息组成一批，一次性的发给Broker</mark>。<b>减少了网络调用次数</b>。</li>
+<li>Broker：整个处理流程中，无论是写入磁盘、从磁盘读出来、还是复制到其他副本，批消息都不会被解开，一直是作为一条“批消息”进行处理的。<b>减少了磁盘IO次数</b>。</li>
+<li>消费端：消息同样是以批为单位进行传递的，Consumer从Broker拉到一批消息后，在客户端把批消息解开，再一条一条交给用户代码处理。<b>减少了网络调用次数</b>。</li>
 </ul>
 <p>构建批消息和解开批消息分别在发送端和消费端的客户端完成，不仅减轻了Broker的压力，还减少了Broker处理请求的次数，提升了总体的处理能力</p>
 <h3 id="7-2-顺序读写提升磁盘IO性能"><a href="#7-2-顺序读写提升磁盘IO性能" class="headerlink" title="7.2 顺序读写提升磁盘IO性能"></a>7.2 顺序读写提升磁盘IO性能</h3><p>每个分区，它把从Producer收到的消息，顺序地写入对应的log文件中，一个文件写完了，就开启一个新的文件继续顺序写下去。消费的时候，也是从某个全局的位置开始，顺序地把消息读出来</p>
-<h3 id="7-3-利用PageCache加速消息读写"><a href="#7-3-利用PageCache加速消息读写" class="headerlink" title="7.3 利用PageCache加速消息读写"></a>7.3 利用PageCache加速消息读写</h3><h3 id="7-4-使用零拷贝技术加速消费流程"><a href="#7-4-使用零拷贝技术加速消费流程" class="headerlink" title="7.4 使用零拷贝技术加速消费流程"></a>7.4 使用零拷贝技术加速消费流程</h3><p>服务端，处理消费的逻辑步骤如下：</p>
+<h3 id="7-3-利用PageCache加速消息读写"><a href="#7-3-利用PageCache加速消息读写" class="headerlink" title="7.3 利用PageCache加速消息读写"></a>7.3 利用PageCache加速消息读写</h3><p>当生产者发送消息时，这些数据并不是立即落盘，而是被写入操作系统提供的页缓存中。这是一块用于缓存磁盘数据的内存区域，可以延迟刷盘，从而显著提升写入性能。</p>
+<p>在消费过程中，如果消费者在<mark>写入后短时间内就开始拉取数据，那么这些数据往往还停留在页缓存中</mark>，不需要再从磁盘读取，这就极大减少了磁盘IO。Kafka的“写后即读”特性与PageCache的缓存策略高度契合，形成了一种天然的局部性优化。</p>
+<h3 id="7-4-使用零拷贝技术加速消费流程"><a href="#7-4-使用零拷贝技术加速消费流程" class="headerlink" title="7.4 使用零拷贝技术加速消费流程"></a>7.4 使用零拷贝技术加速消费流程</h3><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601221406419.png" srcset="/img/loading.gif" lazyload alt="image-20260122140621700" style="zoom: 33%;" />
+
+<h4 id="2次系统调用"><a href="#2次系统调用" class="headerlink" title="2次系统调用"></a>2次系统调用</h4><p>一次是<code>read()</code>，一次是<code>write()</code>，每次系统调用都得先从用户态切换到内核态，等内核完成任务后，再从内核态切换回用户态，所以共发生了<mark>4次用户态与内核态的上下文切换</mark>。<br>上下文切换到成本并不小，一次切换需要耗时几十纳秒到几微秒，虽然时间看上去很短，但是在高并发的场景下，这类时间容易被累积和放大，从而影响系统的性能。</p>
+<h4 id="4次数据拷贝"><a href="#4次数据拷贝" class="headerlink" title="4次数据拷贝"></a>4次数据拷贝</h4><p>还发生了<mark>4次数据拷贝，其中两次是DMA的拷贝，另外两次则是通过CPU拷贝的</mark>，下面说一下这个过程:</p>
 <ul>
-<li>首先，从文件中找到消息数据，读到内存中</li>
-<li>然后，把消息通过网络发送给客户端。</li>
+<li>第一次拷贝：把磁盘上的数据拷到操作系统内核的缓冲区里，很多资料里也将其叫作Read Buffer，这个拷贝的过程是通过DMA搬运的。</li>
+<li>第二次拷贝：把内核缓冲区的数据拷贝到用户的缓冲区里，于是我们应用程序就可以使用这部分数据了，这个拷贝到过程是由CPU完成的。</li>
+<li>第三次拷贝：把刚才拷贝到用户的缓冲区里的数据，再拷到内核的socket的缓冲区里，这个过程依然还是由CPU搬运的。</li>
+<li>第四次拷贝：把内核的socket缓冲区里的数据，拷到网卡的缓冲区里，这个过程又是由DMA这个控制器搬运的。</li>
 </ul>
-<p>这个过程中，数据实际上做了2到3次复制：</p>
+<p>我们回过头看这个数据传输的过程，我们只是搬运一份数据，结果却搬运了4次，过多的数据拷贝无疑会消耗CPU资源，大大降低了系统性能。</p>
+<h4 id="优化思路"><a href="#优化思路" class="headerlink" title="优化思路"></a>优化思路</h4><p>减少系统调用 和 数据拷贝次数</p>
+<ul>
+<li>减少系统调用：一次系统调用会发生2次上下文切换，从用户态切换到内核态，内核执行完成后再从内核态切换回用户态</li>
+<li>减少数据拷贝：上面的第二、三次拷贝是不必要的，因为在数据传输过程中，我们不会在用户态中对数据进行加工，也就没必要把数据搬运到用户态</li>
+</ul>
+<h4 id="零拷贝技术"><a href="#零拷贝技术" class="headerlink" title="零拷贝技术"></a>零拷贝技术</h4><blockquote>
+<p>所谓的<b>零拷贝</b>是指<mark>将数据在内核空间直接从磁盘文件复制到网卡中</mark>，而不需要经由用户态的应用程序之手。这样既可以提高数据读取的性能，也能减少核心态和用户态之间的上下文切换，提高数据传输效率。<br>这种方式的优势非常明显。<mark>系统调用次数从两次降为一次，内核态和用户态的切换从四次降到两次，数据拷过程也由四次减少到两次</mark>。同时，配合DMA(直接内存访问)机制，还可以进一步减轻CPU的负担。</p>
+</blockquote>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601221416264.png" srcset="/img/loading.gif" lazyload alt="image-20260122141626958" style="zoom:33%;" />
+
+<p>具体流程如下:</p>
 <ol>
-<li>从文件复制数据到PageCache中，如果命中PageCache，这一步可以忽略。</li>
-<li>从PageCache复制到应用程序的内存空间中。</li>
-<li>从应用程序的内存空间复制到Socket缓冲区。</li>
+<li><code>sendfile</code>开启流程，可以看到<code>sendfile</code>是代替了<code>read</code>和<code>write</code>，相当于<mark>只有一次系统调用</mark>了</li>
+<li>操作系统将数据从磁盘通过DMA加载到内核空间的缓存区</li>
+<li>操作系统将数据的描述符拷贝到Socket缓冲区中。<mark>Socket缓冲区仅仅会拷贝一个描述符过去，不会拷贝数据</mark>。</li>
+<li>操作系统直接将数据从内核空间的缓存区传输到网卡中，并通过网卡将数据发送给接收方，这也是通过DMA来做的，不过这里的DMA叫SG-DMA，基本上现阶段的网卡都是支持SG-DMA的，所以没有什么特别的，知道它是一种加强的DMA技术就行了，甚至面试时候就说是DMA也是一样的。</li>
 </ol>
-<p>Kafka使用零拷贝技术把上述复制次数减少一次，上面的第2步和第3步的两次复制合并成一次复制。直接从PageCache中将数据复制到Socket缓冲区，这样<mark>不仅减少了一次数据复制，而且由于不用把数据复制到用户内存空间</mark>，DMA控制器就可以直接完成数据复制，不需要CPU参与，速度更快。</p>
 
                 
               </div>
