@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601221406419.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601221416264.png">
 <meta property="article:published_time" content="2025-05-14T10:54:23.000Z">
-<meta property="article:modified_time" content="2026-01-22T07:37:23.008Z">
+<meta property="article:modified_time" content="2026-01-22T09:04:33.485Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151012092.png">
@@ -231,7 +231,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          5.1k 字
+          5.5k 字
         
       </span>
     
@@ -242,7 +242,7 @@
         
         
         
-          43 分钟
+          46 分钟
         
       </span>
     
@@ -434,7 +434,7 @@
 <li>操作系统直接将数据从内核空间的缓存区传输到网卡中，并通过网卡将数据发送给接收方，这也是通过DMA来做的，不过这里的DMA叫SG-DMA，基本上现阶段的网卡都是支持SG-DMA的，所以没有什么特别的，知道它是一种加强的DMA技术就行了，甚至面试时候就说是DMA也是一样的。</li>
 </ol>
 <h3 id="7-5-消息压缩"><a href="#7-5-消息压缩" class="headerlink" title="7.5 消息压缩"></a>7.5 消息压缩</h3><p><mark>Kafka支持在生产端或Broker端对消息进行压缩，以减少网络传输的数据体积</mark>。数据压缩适合带宽资源紧张而CPU资源相对宽裕的场景，能有效提升整体传输效率，是Kafka保持高吞吐的重要机制之一。</p>
-<h2 id="8-Kafka的分层设计机制"><a href="#8-Kafka的分层设计机制" class="headerlink" title="8. Kafka的分层设计机制"></a>8. Kafka的分层设计机制</h2><p>Kafka采用 <code>Topic - Partition - Segment</code> 的分层设计机制：</p>
+<h2 id="8-Kafka的分层设计机制与索引设计"><a href="#8-Kafka的分层设计机制与索引设计" class="headerlink" title="8. Kafka的分层设计机制与索引设计"></a>8. Kafka的分层设计机制与索引设计</h2><h3 id="8-1-分层设计机制"><a href="#8-1-分层设计机制" class="headerlink" title="8.1 分层设计机制"></a>8.1 分层设计机制</h3><p>Kafka采用 <code>Topic - Partition - Segment</code> 的分层设计机制：</p>
 <ul>
 <li><p>Topic作为<mark>业务逻辑隔离</mark>的基本单位，实现数据独立性；</p>
 </li>
@@ -449,6 +449,16 @@
 <p>索引文件加载至内存以优化查询效率，通过该分层结构实现高并发、高吞吐场景下的数据高效管理与扩展。</p>
 </li>
 </ul>
+<h3 id="8-2-索引机制"><a href="#8-2-索引机制" class="headerlink" title="8.2 索引机制"></a>8.2 索引机制</h3><blockquote>
+<p>根据offset定位消息的具体步骤</p>
+</blockquote>
+<h4 id="步骤一-确定消息所在的日志分段"><a href="#步骤一-确定消息所在的日志分段" class="headerlink" title="步骤一:确定消息所在的日志分段"></a>步骤一:确定消息所在的日志分段</h4><p>当你指定一个偏移量offset时，Kafka首先会<mark>根据offset的大小确定消息所在的日志分段segment</mark>。由于segment是按照偏移量顺序排列的，Kafka可以通过比较offset和每个segment的起始偏移量，快速找到包含该offset的日志分段.</p>
+<h4 id="步骤二-使用索引文件加速查找"><a href="#步骤二-使用索引文件加速查找" class="headerlink" title="步骤二:使用索引文件加速查找"></a>步骤二:使用索引文件加速查找</h4><p>在确定了消息所在的日志分段后，Kafka会使用对应的索引文件来加速消息的查找过程。</p>
+<ul>
+<li>偏移量索引文件(.index)：该文件记录了<b>部分消息的偏移量和它们在.log文件中的物理位置</b>。Kafka会在这个索引文件中进行<mark>二分查找</mark>，找到<mark>小于或等于指定偏移量的最大偏移量记录</mark>，从而得到一个<mark>近似</mark>的物理文件位置。</li>
+<li>时间戳索引文件(.timeindex)：如果需要根据时间戳来定位消息，Kafka会先在时间戳索引文件中查找指定时间戳对应的偏移量，然后再使用偏移量索引文件进一步定位消息。</li>
+</ul>
+<h4 id="步骤三-在日志文件中查找消息"><a href="#步骤三-在日志文件中查找消息" class="headerlink" title="步骤三:在日志文件中查找消息"></a>步骤三:在日志文件中查找消息</h4><p>通过索引文件得到近似的物理文件位置后，Kafka会从该位置开始在.log文件中<mark>顺序查找</mark>，直到找到指定偏移量的消息。由于已经通过索引文件缩小了查找范围，这个顺序查找的过程通常非常快。</p>
 <h2 id="9-消息队列常见应用场景"><a href="#9-消息队列常见应用场景" class="headerlink" title="9. 消息队列常见应用场景"></a>9. 消息队列常见应用场景</h2><h3 id="9-1-解耦"><a href="#9-1-解耦" class="headerlink" title="9.1 解耦"></a>9.1 解耦</h3><h3 id="9-2-削峰"><a href="#9-2-削峰" class="headerlink" title="9.2 削峰"></a>9.2 削峰</h3><h3 id="9-3-异步处理"><a href="#9-3-异步处理" class="headerlink" title="9.3 异步处理"></a>9.3 异步处理</h3><h3 id="9-4-消息分发"><a href="#9-4-消息分发" class="headerlink" title="9.4 消息分发"></a>9.4 消息分发</h3>
                 
               </div>
