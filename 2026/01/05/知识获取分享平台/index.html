@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
 <meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
-<meta property="article:modified_time" content="2026-01-24T07:06:52.246Z">
+<meta property="article:modified_time" content="2026-01-24T08:03:01.620Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
@@ -228,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          8.1k 字
+          8.3k 字
         
       </span>
     
@@ -239,7 +239,7 @@
         
         
         
-          68 分钟
+          70 分钟
         
       </span>
     
@@ -491,6 +491,17 @@
 <li>而对于消费者中每一个用户关注事件，通过<mark>Redis分布式锁（10min的setnx）</mark>，来实现一个用户关注事件只被消费一次，保证了幂等性</li>
 </ol>
 <h3 id="3-6-用户关系系统如何实现重建？"><a href="#3-6-用户关系系统如何实现重建？" class="headerlink" title="3.6 用户关系系统如何实现重建？"></a>3.6 用户关系系统如何实现重建？</h3><p>采样校验：查询关注数&#x2F;粉丝数等Redis计数时，使用 Redis 锁限流，每用户<b> 300s 触发一次</b>，去和数据库中的事实表做比较，不一致则重建。</p>
+<h3 id="3-7-Outbox表的结构？Outbox表binlog中哪些信息可以被Canal监控并发送消息？"><a href="#3-7-Outbox表的结构？Outbox表binlog中哪些信息可以被Canal监控并发送消息？" class="headerlink" title="3.7 Outbox表的结构？Outbox表binlog中哪些信息可以被Canal监控并发送消息？"></a>3.7 Outbox表的结构？Outbox表binlog中哪些信息可以被Canal监控并发送消息？</h3><p>Outbox表结构如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> outbox (<br>    id <span class="hljs-type">BIGINT</span> UNSIGNED <span class="hljs-keyword">NOT NULL</span>,<br>    aggregate_type <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">64</span>) <span class="hljs-keyword">NOT NULL</span>,<br>    aggregate_id <span class="hljs-type">BIGINT</span> UNSIGNED <span class="hljs-keyword">NULL</span>,<br>    type <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">64</span>) <span class="hljs-keyword">NOT NULL</span>,<br>    payload JSON <span class="hljs-keyword">NOT NULL</span>,<br>    created_at <span class="hljs-type">TIMESTAMP</span>(<span class="hljs-number">3</span>) <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-built_in">CURRENT_TIMESTAMP</span>(<span class="hljs-number">3</span>),<br>    <span class="hljs-keyword">PRIMARY KEY</span> (id),<br>    KEY ix_outbox_agg (aggregate_type, aggregate_id),<br>    KEY ix_outbox_ct (created_at)<br>) ENGINE<span class="hljs-operator">=</span>InnoDB <span class="hljs-keyword">DEFAULT</span> CHARSET<span class="hljs-operator">=</span>utf8mb4 <span class="hljs-keyword">COLLATE</span><span class="hljs-operator">=</span>utf8mb4_unicode_ci;<br></code></pre></td></tr></table></figure>
+
+<p>其中<code>payload</code>字段为如下Json：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 构造关系事件。</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> type       事件类型</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> fromUserId 触发方用户ID</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> toUserId   目标方用户ID</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> id         关系记录ID，可为空</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">record</span> <span class="hljs-title class_">RelationEvent</span><span class="hljs-params">(</span><br><span class="hljs-params">        String type,</span><br><span class="hljs-params">        Long fromUserId,</span><br><span class="hljs-params">        Long toUserId,</span><br><span class="hljs-params">        Long id)</span> &#123;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Canal通过监控outbox表中，事件类型为<code>INSERT</code>或<code>UPDATE</code>的数据行，并将<code>payload</code>字段发送给kafka，这个字段包含了完整的业务信息。最终发送到kafka的消息结构：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;table&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;outbox&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;INSERT/UPDATE&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>    <span class="hljs-punctuation">&#123;</span><br>      <span class="hljs-attr">&quot;payload&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&#123;type: FollowCreated, fromUserId: 123, toUserId: 456&#125;&quot;</span><br>    <span class="hljs-punctuation">&#125;</span><br>  <span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+
+
 <h2 id="四、点赞系统"><a href="#四、点赞系统" class="headerlink" title="四、点赞系统"></a>四、点赞系统</h2><blockquote>
 <p>采用<b>异步写+写聚合</b>的形式应对高并发写场景。采用<b>分片位图</b>的结构高效实现幂等和判重。读取遇到异常或缺失时，基于位图做按需重建，保证最终一致。</p>
 </blockquote>
