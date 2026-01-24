@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
 <meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
-<meta property="article:modified_time" content="2026-01-24T06:39:41.162Z">
+<meta property="article:modified_time" content="2026-01-24T07:06:52.246Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
@@ -228,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          7.8k 字
+          8.1k 字
         
       </span>
     
@@ -239,7 +239,7 @@
         
         
         
-          65 分钟
+          68 分钟
         
       </span>
     
@@ -317,7 +317,7 @@
 </tr>
 </tbody></table>
 <p>所以本项目实现的是一个<mark>半无状态的</mark>双token机制，兼顾高安全与高性能。</p>
-<h3 id="1-3-token保存在什么地方"><a href="#1-3-token保存在什么地方" class="headerlink" title="1.3 token保存在什么地方"></a>1.3 token保存在什么地方</h3><p>JWT Token 存放在 HTTP 请求头的<code> Authorization</code> 字段中，格式为：</p>
+<h3 id="1-3-token保存在什么地方"><a href="#1-3-token保存在什么地方" class="headerlink" title="1.3 token保存在什么地方"></a>1.3 token保存在什么地方</h3><p>JWT Token 存放在 HTTP 请求头的<code>Authorization</code> 字段中，格式为：</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">Authorization<span class="hljs-punctuation">:</span> Bearer Header.Payload.Signature<br></code></pre></td></tr></table></figure>
 
 <p>客户端在登录成功后，会将服务端返回的 token 保存在：</p>
@@ -552,6 +552,14 @@
 </li>
 </ol>
 <h3 id="4-6-使用位图判断点赞与否不会存在内存浪费的问题吗？"><a href="#4-6-使用位图判断点赞与否不会存在内存浪费的问题吗？" class="headerlink" title="4.6 使用位图判断点赞与否不会存在内存浪费的问题吗？"></a>4.6 使用位图判断点赞与否不会存在内存浪费的问题吗？</h3><p>用户量很小时不会产生稀疏问题，后续可更换为稀疏位图，比如 roaring bitmap</p>
+<h3 id="4-7-一次点赞会访问三次Redis（bitmap-hash-sds），这是不是冗余的？为什么不直接存储在sds里？"><a href="#4-7-一次点赞会访问三次Redis（bitmap-hash-sds），这是不是冗余的？为什么不直接存储在sds里？" class="headerlink" title="4.7 一次点赞会访问三次Redis（bitmap+hash+sds），这是不是冗余的？为什么不直接存储在sds里？"></a>4.7 一次点赞会访问三次Redis（bitmap+hash+sds），这是不是冗余的？为什么不直接存储在sds里？</h3><p>并不冗余。</p>
+<ul>
+<li>第一次访问Redis的bitmap，用于记录该用户是否点赞了该作品，用于实时展示“已点赞”的状态；然后生成一个kafka消息，用于后续点赞数更新</li>
+<li>第二次访问Redis的hash，用于记录当前时间窗口内，该作品点赞数的增量（防止某个作品的总点赞数sds被不停访问更新，特别是对于热门作品，导致redis负载不均衡）</li>
+<li>第三次访问Redis的sds，用于将hash中的增量点赞数刷写到总点赞数中去</li>
+</ul>
+<h3 id="4-8-对于点赞业务，如果消息还没被消费，那么如果在前端页面上刷新一下页面，这个点赞会消失吗？"><a href="#4-8-对于点赞业务，如果消息还没被消费，那么如果在前端页面上刷新一下页面，这个点赞会消失吗？" class="headerlink" title="4.8 对于点赞业务，如果消息还没被消费，那么如果在前端页面上刷新一下页面，这个点赞会消失吗？"></a>4.8 对于点赞业务，如果消息还没被消费，那么如果在前端页面上刷新一下页面，这个点赞会消失吗？</h3><p>不会消失，因为当用户点赞之后，触发作品对应的bitmap更新，将该用户对应的bitmap位设置为1，表示用户“已点赞”，之后才发出消息去更新点赞数，所以即使刷新页面，用户已点赞的状态不会消失</p>
+<p>但是如果此时消息还没被消费，那么点赞数的更新可能会有延迟，但这是在能够接受的范围内的</p>
 <h2 id="五、Feed信息流"><a href="#五、Feed信息流" class="headerlink" title="五、Feed信息流"></a>五、Feed信息流</h2><blockquote>
 <p>采用<b>三级缓存</b>架构且设计了缓存一致性策略，本地 Caffeine + Redis 页面缓存 + Redis 片段缓存。<b>自定义 hotkey 探测机制</b>，基于热点检测按层级延长缓存时长，叠加随机抖动抗雪崩。并设置<b>单飞锁(single-flight)</b>避免同一页并发回源风暴</p>
 </blockquote>
