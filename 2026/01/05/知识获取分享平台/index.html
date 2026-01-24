@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
 <meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
-<meta property="article:modified_time" content="2026-01-07T07:14:00.779Z">
+<meta property="article:modified_time" content="2026-01-24T06:39:41.162Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
@@ -228,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          6.9k 字
+          7.8k 字
         
       </span>
     
@@ -239,7 +239,7 @@
         
         
         
-          58 分钟
+          65 分钟
         
       </span>
     
@@ -317,6 +317,65 @@
 </tr>
 </tbody></table>
 <p>所以本项目实现的是一个<mark>半无状态的</mark>双token机制，兼顾高安全与高性能。</p>
+<h3 id="1-3-token保存在什么地方"><a href="#1-3-token保存在什么地方" class="headerlink" title="1.3 token保存在什么地方"></a>1.3 token保存在什么地方</h3><p>JWT Token 存放在 HTTP 请求头的<code> Authorization</code> 字段中，格式为：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">Authorization<span class="hljs-punctuation">:</span> Bearer Header.Payload.Signature<br></code></pre></td></tr></table></figure>
+
+<p>客户端在登录成功后，会将服务端返回的 token 保存在：</p>
+<ul>
+<li><p>localStorage &#x2F; sessionStorage （本项目中使用此种保存方法）</p>
+<blockquote>
+<p><strong>localStorage</strong> 是一种浏览器提供的客户端存储机制，允许开发者在用户的浏览器中以键值对的形式存储数据。与 sessionStorage 不同，<mark>localStorage 中的数据可以长期保留，直到手动删除。</mark></p>
+</blockquote>
+</li>
+<li><p>Cookie （如果使用 HttpOnly Cookie）</p>
+</li>
+<li><p>内存变量 （如 Redux&#x2F;Vuex 状态）</p>
+</li>
+</ul>
+<p>每次发送请求时，客户端需要手动在请求头中加上这个 token。流程如下：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span> 用户在前端输入账号密码<br>   ↓<br><span class="hljs-bullet">2.</span> 前端发送给后端 (Spring Boot)<br>   ↓<br><span class="hljs-bullet">3.</span> 后端验证成功，生成 JWT Token，返回给前端<br>   ↓<br><span class="hljs-bullet">4.</span> 前端把 Token 存到 localStorage<br>   ↓<br><span class="hljs-bullet">5.</span> 以后每次请求，前端从 localStorage 读取 Token<br>   ↓<br><span class="hljs-bullet">6.</span> 把 Token 放在 HTTP Header 中发给后端<br>   ↓<br><span class="hljs-bullet">7.</span> 后端用 @AuthenticationPrincipal 自动解析 Token<br></code></pre></td></tr></table></figure>
+
+<h3 id="1-4-token过期验证流程"><a href="#1-4-token过期验证流程" class="headerlink" title="1.4 token过期验证流程"></a>1.4 token过期验证流程</h3><h4 id="场景1：token正常"><a href="#场景1：token正常" class="headerlink" title="场景1：token正常"></a>场景1：token正常</h4><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs arcade">前端：<br>  └─ ⚠️ 每 <span class="hljs-number">60</span> 秒检查：<span class="hljs-built_in">Date</span>.<span class="hljs-built_in">now</span>() &lt; expiresAt - <span class="hljs-number">5000</span> → 是 → 不刷新<br>  └─ 发送请求，携带 token<br>      ↓<br>后端：<br>  └─ JwtDecoder 验证：<span class="hljs-built_in">exp</span> &gt; 当前时间 → 通过 ✓<br>  └─ Controller 正常处理<br></code></pre></td></tr></table></figure>
+
+<h4 id="场景2：token快过期（还有几秒）"><a href="#场景2：token快过期（还有几秒）" class="headerlink" title="场景2：token快过期（还有几秒）"></a>场景2：token快过期（还有几秒）</h4><figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs gauss">前端：<br>  └─ ⚠️ 检查：Date.now() &gt;= expiresAt - <span class="hljs-number">5000</span> → 快过期了！<br>  └─ 自动调用 /api/v1/auth/<span class="hljs-built_in">token</span>/refresh<br>      ↓<br>后端：<br>  └─ 验证 refresh <span class="hljs-built_in">token</span>（<span class="hljs-number">7</span>天有效期）<br>  └─ 生成新的 access <span class="hljs-built_in">token</span>（新的<span class="hljs-number">15</span>分钟）<br>  └─ 返回给前端<br>      ↓<br>前端：<br>  └─ 保存新 <span class="hljs-built_in">token</span> 到 localStorage<br>  └─ 后续请求使用新 <span class="hljs-built_in">token</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="场景3：token已过期（前端没刷新成功）"><a href="#场景3：token已过期（前端没刷新成功）" class="headerlink" title="场景3：token已过期（前端没刷新成功）"></a>场景3：token已过期（前端没刷新成功）</h4><figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs gauss">前端：<br>  └─ 发送请求，携带过期 <span class="hljs-built_in">token</span><br>      ↓<br>后端：<br>  └─ JwtDecoder 验证：<span class="hljs-built_in">exp</span> &lt; 当前时间 → 过期！<br>  └─ 抛出 JwtException<br>  └─ Spring Security 返回 <span class="hljs-number">401</span> Unauthorized<br>      ↓<br>前端：<br>  └─ 收到 <span class="hljs-number">401</span> 错误<br>  └─ 可以尝试刷新 <span class="hljs-built_in">token</span>，或跳转到登录页<br></code></pre></td></tr></table></figure>
+
+<h3 id="1-5-token使用什么加密算法？token里包含什么信息？"><a href="#1-5-token使用什么加密算法？token里包含什么信息？" class="headerlink" title="1.5 token使用什么加密算法？token里包含什么信息？"></a>1.5 token使用什么加密算法？token里包含什么信息？</h3><p>本项目中的Jwt采用<code>RSA-256</code>非对称加密算法，原理如下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">密钥类型</th>
+<th align="left">作用</th>
+<th align="left">谁持有</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">私钥 (private.pem)</td>
+<td align="left">签名 Token（加密）<br />生成：header.payload.signature</td>
+<td align="left">只有后端服务器持有</td>
+</tr>
+<tr>
+<td align="left">公钥 (public.pem)</td>
+<td align="left">验证 Token（解密）<br />检查：signature 是否匹配 header + payload</td>
+<td align="left">可以公开，任何人都能验证</td>
+</tr>
+</tbody></table>
+<p>一个完整的Jwt长这样：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-selector-attr">[Header]</span>.<span class="hljs-selector-attr">[Payload]</span>.<span class="hljs-selector-attr">[Signature]</span><br>这三部分用 . 分隔：<br></code></pre></td></tr></table></figure>
+
+<h4 id="Header（头部）-算法信息"><a href="#Header（头部）-算法信息" class="headerlink" title="Header（头部） - 算法信息"></a>Header（头部） - 算法信息</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;alg&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;RS256&quot;</span><span class="hljs-punctuation">,</span>      <span class="hljs-comment">// 使用 RSA-256 算法</span><br>  <span class="hljs-attr">&quot;typ&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;JWT&quot;</span><span class="hljs-punctuation">,</span>        <span class="hljs-comment">// 类型是 JWT</span><br>  <span class="hljs-attr">&quot;kid&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;xxx-key&quot;</span> <span class="hljs-comment">// 密钥 ID（用于密钥轮换）</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="Payload（负载）-实际数据"><a href="#Payload（负载）-实际数据" class="headerlink" title="Payload（负载） - 实际数据"></a>Payload（负载） - 实际数据</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;iss&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;xxx&quot;</span><span class="hljs-punctuation">,</span>           <span class="hljs-comment">// 签发者（issuer）</span><br>  <span class="hljs-attr">&quot;iat&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1706169600</span><span class="hljs-punctuation">,</span>           <span class="hljs-comment">// 签发时间（issued at）</span><br>  <span class="hljs-attr">&quot;exp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1706170500</span><span class="hljs-punctuation">,</span>           <span class="hljs-comment">// 过期时间（expires at）</span><br>  <span class="hljs-attr">&quot;sub&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;123&quot;</span><span class="hljs-punctuation">,</span>                <span class="hljs-comment">// 主题（subject，通常是用户ID）</span><br>  <span class="hljs-attr">&quot;jti&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;uuid-1234&quot;</span><span class="hljs-punctuation">,</span>          <span class="hljs-comment">// JWT ID（唯一标识）</span><br>  <span class="hljs-attr">&quot;token_type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;access&quot;</span><span class="hljs-punctuation">,</span>      <span class="hljs-comment">// Token 类型（access 或 refresh）</span><br>  <span class="hljs-attr">&quot;uid&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">123</span><span class="hljs-punctuation">,</span>                  <span class="hljs-comment">// 用户 ID（自定义声明）</span><br>  <span class="hljs-attr">&quot;nickname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;张三&quot;</span>           <span class="hljs-comment">// 用户昵称（自定义声明）</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="Signature（签名）-防篡改"><a href="#Signature（签名）-防篡改" class="headerlink" title="Signature（签名） - 防篡改"></a>Signature（签名） - 防篡改</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs json">签名 = RSA_SIGN(<br>  Base64Url(header) + <span class="hljs-string">&quot;.&quot;</span> + Base64Url(payload)<span class="hljs-punctuation">,</span><br>  private.pem  <span class="hljs-comment">// 私钥</span><br>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="1-6-Jwt验证完整流程"><a href="#1-6-Jwt验证完整流程" class="headerlink" title="1.6 Jwt验证完整流程"></a>1.6 Jwt验证完整流程</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-number">1.</span> 接收 Token<br>   前端发送：Authorization<span class="hljs-punctuation">:</span> Bearer eyJhbGc...<br>   <br><span class="hljs-number">2.</span> 分解 Token<br>   header.payload.signature<br>   <br><span class="hljs-number">3.</span> ⚠️ 用公钥验证签名【关键步骤】<br>   ┌─────────────────────────────┐<br>   │ 用 public.pem 解密 signature │<br>   │ 得到：hash1                  │<br>   └─────────────────────────────┘<br>   <br>   ┌─────────────────────────────┐<br>   │ 重新计算 header + payload    │<br>   │ 的哈希值：hash2              │<br>   └─────────────────────────────┘<br>   <br>   ┌─────────────────────────────┐<br>   │ 对比：hash1 == hash2 ?       │<br>   │ - 相等 → 签名有效，未被篡改    │<br>   │ - 不等 → 签名无效，拒绝！      │<br>   └─────────────────────────────┘<br><br><span class="hljs-number">4.</span> 验证声明（Claims）<br>   ✅ exp（过期时间）&gt; 当前时间？<br>   ✅ iss（签发者）== <span class="hljs-string">&quot;xxx&quot;</span>？<br>   ✅ Token 格式正确？<br><br><span class="hljs-number">5.</span> 提取用户信息<br>   从 payload 中取出 uid、nickname 等<br>   <br><span class="hljs-number">6.</span> 传递给 Controller<br>   @AuthenticationPrincipal Jwt jwt<br></code></pre></td></tr></table></figure>
+
+
+
+
+
 <h2 id="二、计数系统"><a href="#二、计数系统" class="headerlink" title="二、计数系统"></a>二、计数系统</h2><blockquote>
 <p>计数系统：笔记维度(点赞收藏)与用户维度(关注取关) 以 Redis 作为底层存储系统，采用<mark>定制化 Redis SDS 二进制</mark>紧凑计数，使用 Lua 脚本进行原子更新，并实现了采样一致性校验与自愈重建。</p>
 </blockquote>
