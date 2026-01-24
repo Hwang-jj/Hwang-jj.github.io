@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
 <meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
-<meta property="article:modified_time" content="2026-01-24T08:09:28.369Z">
+<meta property="article:modified_time" content="2026-01-24T09:02:31.774Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
@@ -228,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          8.4k 字
+          8.7k 字
         
       </span>
     
@@ -239,7 +239,7 @@
         
         
         
-          70 分钟
+          73 分钟
         
       </span>
     
@@ -702,7 +702,7 @@
 <li><p>Spring AI 原生支持：Spring AI 框架提供了开箱即用的 Elasticsearch Vector Store 集成</p>
 </li>
 </ul>
-<p>索引维度是1536 维，使用的是阿里云 DashScope 的 text-embedding-v4 模型</p>
+<p>索引维度是1536 维，embedding使用的是阿里云 DashScope 的 text-embedding-v4 模型；回答采用deepseek模型</p>
 <p>采用了<mark>宽召回策略</mark>来提高召回率：</p>
 <ul>
 <li><p>采用 <code>fetchK = max(topK × 3, 20)</code> 的宽召回策略，即召回 3 倍目标数量的候选，再进行后过滤</p>
@@ -717,6 +717,17 @@
 <li>否则先删除所有旧版本向量</li>
 <li>再重新写入新版本向量，并携带新的指纹信息</li>
 </ul>
+<h3 id="6-4-“预索引”是在什么时候实现的？"><a href="#6-4-“预索引”是在什么时候实现的？" class="headerlink" title="6.4 “预索引”是在什么时候实现的？"></a>6.4 “预索引”是在什么时候实现的？</h3><ul>
+<li>发布文章成功后触发一次预索引</li>
+<li>回答时检查文章是否发生变化，若发生变化则生成新索引</li>
+</ul>
+<h3 id="6-5-检索的原理是什么？"><a href="#6-5-检索的原理是什么？" class="headerlink" title="6.5 检索的原理是什么？"></a>6.5 检索的原理是什么？</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 语义检索上下文：</span><br><span class="hljs-comment"> * - 先进行宽召回（fetchK ≥ 3×topK，至少 20）提高召回率</span><br><span class="hljs-comment"> * - 再按 metadata.postId 做服务端过滤，避免跨帖子污染</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">private</span> List&lt;String&gt; <span class="hljs-title function_">searchContexts</span><span class="hljs-params">(String postId, String query, <span class="hljs-type">int</span> topK)</span> &#123;<br>    <span class="hljs-type">int</span> <span class="hljs-variable">fetchK</span> <span class="hljs-operator">=</span> Math.max(topK * <span class="hljs-number">3</span>, <span class="hljs-number">20</span>); <span class="hljs-comment">// 宽召回：扩大初始检索集合</span><br>    List&lt;Document&gt; docs = vectorStore.similaritySearch(<br>            SearchRequest.builder().query(query).topK(fetchK).build() <span class="hljs-comment">// 语义相似检索</span><br>    );<br>    List&lt;String&gt; out = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;(topK);<br>    <span class="hljs-keyword">for</span> (Document d : docs) &#123;<br>        <span class="hljs-type">Object</span> <span class="hljs-variable">pid</span> <span class="hljs-operator">=</span> d.getMetadata().get(<span class="hljs-string">&quot;postId&quot;</span>);<br>        <span class="hljs-keyword">if</span> (pid != <span class="hljs-literal">null</span> &amp;&amp; postId.equals(String.valueOf(pid))) &#123; <span class="hljs-comment">// 仅保留当前帖子对应的切片</span><br>            <span class="hljs-type">String</span> <span class="hljs-variable">txt</span> <span class="hljs-operator">=</span> d.getText();<br>            <span class="hljs-keyword">if</span> (txt != <span class="hljs-literal">null</span> &amp;&amp; !txt.isEmpty()) &#123;<br>                out.add(txt);<br>                <span class="hljs-keyword">if</span> (out.size() &gt;= topK) <span class="hljs-keyword">break</span>; <span class="hljs-comment">// 只取前 topK 个上下文</span><br>            &#125;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> out;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="基于向量距离的-kNN-ANN-搜索"><a href="#基于向量距离的-kNN-ANN-搜索" class="headerlink" title="基于向量距离的 kNN&#x2F;ANN 搜索"></a>基于向量距离的 kNN&#x2F;ANN 搜索</h4><ol>
+<li><b>Embedding（向量化）</b>: 系统首先会调用 Embedding Model，将输入的自然语言 <code>query</code> 转换成一个1536维向量。</li>
+<li><b>Distance Calculation（距离计算）</b>: 拿着这个查询向量，到 <code>vectorStore</code>（向量数据库）中去计算它与库中存储的 Document 向量之间的距离（通常使用<mark>余弦相似度 Cosine 或 欧氏距离 L2</mark>）。</li>
+<li><b>Ranking（排序）</b>: 找出距离最近（相似度最高）的 <code>fetchK</code> 个文档返回。</li>
+</ol>
 
                 
               </div>
