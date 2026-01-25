@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
 <meta property="article:published_time" content="2026-01-05T09:28:39.000Z">
-<meta property="article:modified_time" content="2026-01-24T09:02:31.774Z">
+<meta property="article:modified_time" content="2026-01-25T06:38:33.170Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601061722309.png">
@@ -228,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          8.7k 字
+          8.8k 字
         
       </span>
     
@@ -405,7 +405,7 @@
 <p>我们设计的紧凑计数：</p>
 <figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs nix"><span class="hljs-params">key:</span> userId<br><span class="hljs-params">value:</span> 一个连续的二进制块<br>[<span class="hljs-params">offset0:</span> followCount][<span class="hljs-params">offset1:</span> fanCount][<span class="hljs-params">offset2:</span> workCount][<span class="hljs-params">offset3:</span> likeCount][<span class="hljs-params">offset4:</span> favCount]<br></code></pre></td></tr></table></figure>
 
-<p><mark>没有字段名，只存值，节省空间；寻找对应的数据只需：“起始地址 + 类型偏移”即可</mark>。我们为每一个key分配了20KB的value，每个value分成5段，每段4KB存储对应数值。</p>
+<p><mark>没有字段名，只存值，节省空间；寻找对应的数据只需：“起始地址 + 类型偏移”即可</mark>。我们为每一个key分配了20字节的value，每个value分成5段，每段4字节存储对应数值。</p>
 <h3 id="2-4-采样一致性校验和自愈重建是怎么做的？"><a href="#2-4-采样一致性校验和自愈重建是怎么做的？" class="headerlink" title="2.4 采样一致性校验和自愈重建是怎么做的？"></a>2.4 采样一致性校验和自愈重建是怎么做的？</h3><p>每隔300s，在查询Redis SDS中数量的时候，去对比和数据库中事实表的实际值，如果不一致，就触发重建<mark>（用户关系每隔300s检查是否一致；而点赞系统每次获取数量都判断最终计数结构是否完整，只有结构不完整才会重建）</mark>。</p>
 <p><mark>采样 &#x3D; 不是每次请求都校验，而是按一定频率抽样检查</mark>：</p>
 <ol>
