@@ -26,13 +26,13 @@
 <meta property="og:site_name" content="Kon4tsu Blog">
 <meta property="og:description" content="Caffeine常见面试题一、Caffeine 基础相关Caffeine 的原理、特性是什么？原理采用 W-TinyLFU 淘汰算法，底层通过分段锁减少并发竞争，结合惰性删除、异步加载等机制实现高性能 特性性能高：基于 W-TinyLFU 淘汰算法，命中率 &#x2F; 吞吐量比传统的 LRU、LFU 算法要好 缓存策略比较丰富：支持基于大小、时间、引用类型的过期 &#x2F; 淘汰策略； 加载比">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/D2B5CA33BD970F64A6301FA75AE2EB22.png">
-<meta property="og:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/D2B5CA33BD970F64A6301FA75AE2EB22-20260127141332365.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601271428366.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601271428368.png">
 <meta property="article:published_time" content="2026-01-27T06:00:57.000Z">
-<meta property="article:modified_time" content="2026-01-27T06:27:07.192Z">
+<meta property="article:modified_time" content="2026-01-27T06:28:54.619Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/D2B5CA33BD970F64A6301FA75AE2EB22.png">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601271428366.png">
   
   
   
@@ -291,7 +291,7 @@
 <p>兼容性：API 几乎和 Guava Cache 一致，迁移成本低</p>
 <h3 id="Caffeine-缓存主要存储什么数据？"><a href="#Caffeine-缓存主要存储什么数据？" class="headerlink" title="Caffeine 缓存主要存储什么数据？"></a>Caffeine 缓存主要存储什么数据？</h3><p>热点数据（秒杀商品库存）、高频访问 + 低变更数据（商品基础信息）</p>
 <h3 id="Caffeine-缓存的数据具体是怎么添加的？"><a href="#Caffeine-缓存的数据具体是怎么添加的？" class="headerlink" title="Caffeine 缓存的数据具体是怎么添加的？"></a>Caffeine 缓存的数据具体是怎么添加的？</h3><p>手动添加（cache.put，直接添加缓存项）， 同步加载（cache.get，通过加载器自动加载，未命中时执行加载逻辑），异步加载（也可以根据自己的实际业务作出回答）</p>
-<h2 id="二、Caffeine-与其他组件的区别"><a href="#二、Caffeine-与其他组件的区别" class="headerlink" title="二、Caffeine 与其他组件的区别"></a>二、Caffeine 与其他组件的区别</h2><h3 id="Caffeine-与-HashMap-的区别？"><a href="#Caffeine-与-HashMap-的区别？" class="headerlink" title="Caffeine 与 HashMap 的区别？"></a>Caffeine 与 HashMap 的区别？</h3><p><img src="/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/D2B5CA33BD970F64A6301FA75AE2EB22.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="二、Caffeine-与其他组件的区别"><a href="#二、Caffeine-与其他组件的区别" class="headerlink" title="二、Caffeine 与其他组件的区别"></a>二、Caffeine 与其他组件的区别</h2><h3 id="Caffeine-与-HashMap-的区别？"><a href="#Caffeine-与-HashMap-的区别？" class="headerlink" title="Caffeine 与 HashMap 的区别？"></a>Caffeine 与 HashMap 的区别？</h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601271428366.png" srcset="/img/loading.gif" lazyload alt="img"></p>
 <h3 id="Caffeine-与-Guava-Cache-的区别？"><a href="#Caffeine-与-Guava-Cache-的区别？" class="headerlink" title="Caffeine 与 Guava Cache 的区别？"></a>Caffeine 与 Guava Cache 的区别？</h3><p>区别性能：Caffeine 命中率高，吞吐量大；</p>
 <p>并发：Caffeine 支持异步加载，Guava 仅同步加载；（ Caffeine 并不像 Guava Cache 那样在读写操作时立即加锁，而是使用 RingBuffer（类似 RingBuffer 的环形队列）将写操作、淘汰、更新等操作记录下来，然后异步、批量地执行。）</p>
 <p>算法：Caffeine 用 W-TinyLFU，Guava 用 LRU；</p>
@@ -300,7 +300,7 @@
 <h3 id="Caffeine-解决了-Guava-的哪些问题？"><a href="#Caffeine-解决了-Guava-的哪些问题？" class="headerlink" title="Caffeine 解决了 Guava 的哪些问题？"></a>Caffeine 解决了 Guava 的哪些问题？</h3><p>Guava 的 LRU 易被偶发冷数据冲掉热点，W-TinyLFU 兼顾热点保留与冷数据淘汰；</p>
 <p>Guava 同步加载导致高并发下线程阻塞，Caffeine 异步加载避免此问题；</p>
 <p>Guava 无原生异步加载，需手动封装，Caffeine 内置</p>
-<h3 id="Caffeine-与-Redis-缓存的区别？"><a href="#Caffeine-与-Redis-缓存的区别？" class="headerlink" title="Caffeine 与 Redis 缓存的区别？"></a>Caffeine 与 Redis 缓存的区别？</h3><p><img src="/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/D2B5CA33BD970F64A6301FA75AE2EB22-20260127141332365.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h3 id="Caffeine-与-Redis-缓存的区别？"><a href="#Caffeine-与-Redis-缓存的区别？" class="headerlink" title="Caffeine 与 Redis 缓存的区别？"></a>Caffeine 与 Redis 缓存的区别？</h3><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601271428368.png" srcset="/img/loading.gif" lazyload alt="img"></p>
 <h2 id="三、Caffeine-核心机制"><a href="#三、Caffeine-核心机制" class="headerlink" title="三、Caffeine 核心机制"></a>三、Caffeine 核心机制</h2><h3 id="Caffeine-为什么比-Guava-快？"><a href="#Caffeine-为什么比-Guava-快？" class="headerlink" title="Caffeine 为什么比 Guava 快？"></a>Caffeine 为什么比 Guava 快？</h3><p>算法：W-TinyLFU 算法时间复杂度更低，命中率更高</p>
 <p>并发：Guava通过类似ConcurrentHashMap的分段锁减少竞争；而Caffeine读操作几乎无锁，写入、删除操作交给独立的线程池异步执行</p>
 <p>异步支持：内置异步加载，避免同步阻塞</p>
