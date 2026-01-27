@@ -19,23 +19,24 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Redis本身有事务为什么还要用Lua脚本?Redis有事务（MULTI&#x2F;EXEC），但更青睐Lua脚本，主要因为Lua提供更强大的逻辑灵活性（可依赖前一步结果）、更好的性能（减少网络往返）和更适合实现复杂原子操作，如分布式锁、限流等，而Redis事务在复杂场景下难以处理依赖关系且有执行错误不回滚的限制，因此Lua脚本成为处理复杂业务逻辑的优选方案。  Redis事务（MULTI&amp;#x2">
+    <meta name="description" content="Caffeine常见面试题一、Caffeine 基础相关Caffeine 的原理、特性是什么？原理采用 W-TinyLFU 淘汰算法，底层通过分段锁减少并发竞争，结合惰性删除、异步加载等机制实现高性能 特性性能高：基于 W-TinyLFU 淘汰算法，命中率 &#x2F; 吞吐量比传统的 LRU、LFU 算法要好 缓存策略比较丰富：支持基于大小、时间、引用类型的过期 &#x2F; 淘汰策略； 加载比">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Redis本身有事务为什么还要用Lua脚本?">
-<meta property="og:url" content="http://example.com/2026/01/21/Redis%E6%9C%AC%E8%BA%AB%E6%9C%89%E4%BA%8B%E5%8A%A1%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E8%A6%81%E7%94%A8Lua%E8%84%9A%E6%9C%AC/index.html">
+<meta property="og:title" content="Caffeine常见面试题">
+<meta property="og:url" content="http://example.com/2026/01/27/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="Redis本身有事务为什么还要用Lua脚本?Redis有事务（MULTI&#x2F;EXEC），但更青睐Lua脚本，主要因为Lua提供更强大的逻辑灵活性（可依赖前一步结果）、更好的性能（减少网络往返）和更适合实现复杂原子操作，如分布式锁、限流等，而Redis事务在复杂场景下难以处理依赖关系且有执行错误不回滚的限制，因此Lua脚本成为处理复杂业务逻辑的优选方案。  Redis事务（MULTI&amp;#x2">
+<meta property="og:description" content="Caffeine常见面试题一、Caffeine 基础相关Caffeine 的原理、特性是什么？原理采用 W-TinyLFU 淘汰算法，底层通过分段锁减少并发竞争，结合惰性删除、异步加载等机制实现高性能 特性性能高：基于 W-TinyLFU 淘汰算法，命中率 &#x2F; 吞吐量比传统的 LRU、LFU 算法要好 缓存策略比较丰富：支持基于大小、时间、引用类型的过期 &#x2F; 淘汰策略； 加载比">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601211533698.png">
-<meta property="article:published_time" content="2026-01-21T07:24:51.000Z">
-<meta property="article:modified_time" content="2026-01-21T07:34:02.710Z">
+<meta property="og:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/D2B5CA33BD970F64A6301FA75AE2EB22.png">
+<meta property="og:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/D2B5CA33BD970F64A6301FA75AE2EB22-20260127141332365.png">
+<meta property="article:published_time" content="2026-01-27T06:00:57.000Z">
+<meta property="article:modified_time" content="2026-01-27T06:27:07.192Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601211533698.png">
+<meta name="twitter:image" content="http://example.com/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/D2B5CA33BD970F64A6301FA75AE2EB22.png">
   
   
   
-  <title>Redis本身有事务为什么还要用Lua脚本? - Kon4tsu Blog</title>
+  <title>Caffeine常见面试题 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -205,7 +206,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Redis本身有事务为什么还要用Lua脚本?"></span>
+            <span id="subtitle" data-typed-text="Caffeine常见面试题"></span>
           
         </div>
 
@@ -216,8 +217,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-01-21 15:24" pubdate>
-          2026年1月21日 下午
+        <time datetime="2026-01-27 14:00" pubdate>
+          2026年1月27日 下午
         </time>
       </span>
     
@@ -228,7 +229,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          502 字
+          1.6k 字
         
       </span>
     
@@ -239,7 +240,7 @@
         
         
         
-          5 分钟
+          14 分钟
         
       </span>
     
@@ -276,25 +277,73 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Redis本身有事务为什么还要用Lua脚本?</h1>
+            <h1 id="seo-header">Caffeine常见面试题</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="Redis本身有事务为什么还要用Lua脚本"><a href="#Redis本身有事务为什么还要用Lua脚本" class="headerlink" title="Redis本身有事务为什么还要用Lua脚本?"></a>Redis本身有事务为什么还要用Lua脚本?</h1><p>Redis有事务（MULTI&#x2F;EXEC），但更青睐Lua脚本，主要因为Lua提供<b>更强大的逻辑灵活性</b>（可依赖前一步结果）、<b>更好的性能</b>（减少网络往返）和更适合实现<b>复杂原子操作</b>，如分布式锁、限流等，而Redis事务在复杂场景下难以处理依赖关系且有执行错误不回滚的限制，因此Lua脚本成为处理复杂业务逻辑的优选方案。 </p>
-<h2 id="Redis事务（MULTI-EXEC）的局限"><a href="#Redis事务（MULTI-EXEC）的局限" class="headerlink" title="Redis事务（MULTI&#x2F;EXEC）的局限"></a>Redis事务（MULTI&#x2F;EXEC）的局限</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601211533698.png" srcset="/img/loading.gif" lazyload alt="Redis事务(MULTI&#x2F;EXEC)执行流程"></p>
+                <h1 id="Caffeine常见面试题"><a href="#Caffeine常见面试题" class="headerlink" title="Caffeine常见面试题"></a>Caffeine常见面试题</h1><h2 id="一、Caffeine-基础相关"><a href="#一、Caffeine-基础相关" class="headerlink" title="一、Caffeine 基础相关"></a>一、Caffeine 基础相关</h2><h3 id="Caffeine-的原理、特性是什么？"><a href="#Caffeine-的原理、特性是什么？" class="headerlink" title="Caffeine 的原理、特性是什么？"></a>Caffeine 的原理、特性是什么？</h3><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>采用 W-TinyLFU 淘汰算法，底层通过分段锁减少并发竞争，结合惰性删除、异步加载等机制实现高性能</p>
+<h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><p>性能高：基于 W-TinyLFU 淘汰算法，命中率 &#x2F; 吞吐量比传统的 LRU、LFU 算法要好</p>
+<p>缓存策略比较丰富：支持基于大小、时间、引用类型的过期 &#x2F; 淘汰策略；</p>
+<p>加载比较灵活：支持手动加载、自动加载、异步加载</p>
+<p>高并发性能：无锁设计，分段锁机制</p>
+<p>事件监听：支持缓存淘汰、过期、移除的事件监听，便于问题排查</p>
+<p>兼容性：API 几乎和 Guava Cache 一致，迁移成本低</p>
+<h3 id="Caffeine-缓存主要存储什么数据？"><a href="#Caffeine-缓存主要存储什么数据？" class="headerlink" title="Caffeine 缓存主要存储什么数据？"></a>Caffeine 缓存主要存储什么数据？</h3><p>热点数据（秒杀商品库存）、高频访问 + 低变更数据（商品基础信息）</p>
+<h3 id="Caffeine-缓存的数据具体是怎么添加的？"><a href="#Caffeine-缓存的数据具体是怎么添加的？" class="headerlink" title="Caffeine 缓存的数据具体是怎么添加的？"></a>Caffeine 缓存的数据具体是怎么添加的？</h3><p>手动添加（cache.put，直接添加缓存项）， 同步加载（cache.get，通过加载器自动加载，未命中时执行加载逻辑），异步加载（也可以根据自己的实际业务作出回答）</p>
+<h2 id="二、Caffeine-与其他组件的区别"><a href="#二、Caffeine-与其他组件的区别" class="headerlink" title="二、Caffeine 与其他组件的区别"></a>二、Caffeine 与其他组件的区别</h2><h3 id="Caffeine-与-HashMap-的区别？"><a href="#Caffeine-与-HashMap-的区别？" class="headerlink" title="Caffeine 与 HashMap 的区别？"></a>Caffeine 与 HashMap 的区别？</h3><p><img src="/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/D2B5CA33BD970F64A6301FA75AE2EB22.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h3 id="Caffeine-与-Guava-Cache-的区别？"><a href="#Caffeine-与-Guava-Cache-的区别？" class="headerlink" title="Caffeine 与 Guava Cache 的区别？"></a>Caffeine 与 Guava Cache 的区别？</h3><p>区别性能：Caffeine 命中率高，吞吐量大；</p>
+<p>并发：Caffeine 支持异步加载，Guava 仅同步加载；（ Caffeine 并不像 Guava Cache 那样在读写操作时立即加锁，而是使用 RingBuffer（类似 RingBuffer 的环形队列）将写操作、淘汰、更新等操作记录下来，然后异步、批量地执行。）</p>
+<p>算法：Caffeine 用 W-TinyLFU，Guava 用 LRU；</p>
+<p>功能：Caffeine 支持异步刷新，Guava 同步刷新易阻塞。</p>
+<p>兼容性好：API 兼容 Guava，迁移成本低解决的问题</p>
+<h3 id="Caffeine-解决了-Guava-的哪些问题？"><a href="#Caffeine-解决了-Guava-的哪些问题？" class="headerlink" title="Caffeine 解决了 Guava 的哪些问题？"></a>Caffeine 解决了 Guava 的哪些问题？</h3><p>Guava 的 LRU 易被偶发冷数据冲掉热点，W-TinyLFU 兼顾热点保留与冷数据淘汰；</p>
+<p>Guava 同步加载导致高并发下线程阻塞，Caffeine 异步加载避免此问题；</p>
+<p>Guava 无原生异步加载，需手动封装，Caffeine 内置</p>
+<h3 id="Caffeine-与-Redis-缓存的区别？"><a href="#Caffeine-与-Redis-缓存的区别？" class="headerlink" title="Caffeine 与 Redis 缓存的区别？"></a>Caffeine 与 Redis 缓存的区别？</h3><p><img src="/Users/jjhwang/hexo/Hwang-jj.github.io/source/_posts/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/D2B5CA33BD970F64A6301FA75AE2EB22-20260127141332365.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="三、Caffeine-核心机制"><a href="#三、Caffeine-核心机制" class="headerlink" title="三、Caffeine 核心机制"></a>三、Caffeine 核心机制</h2><h3 id="Caffeine-为什么比-Guava-快？"><a href="#Caffeine-为什么比-Guava-快？" class="headerlink" title="Caffeine 为什么比 Guava 快？"></a>Caffeine 为什么比 Guava 快？</h3><p>算法：W-TinyLFU 算法时间复杂度更低，命中率更高</p>
+<p>并发：Guava通过类似ConcurrentHashMap的分段锁减少竞争；而Caffeine读操作几乎无锁，写入、删除操作交给独立的线程池异步执行</p>
+<p>异步支持：内置异步加载，避免同步阻塞</p>
+<p>惰性操作：过期数据惰性清理，避免后台线程开销</p>
+<h3 id="Caffeine-本地缓存的失效（淘汰）算法是什么？"><a href="#Caffeine-本地缓存的失效（淘汰）算法是什么？" class="headerlink" title="Caffeine 本地缓存的失效（淘汰）算法是什么？"></a>Caffeine 本地缓存的失效（淘汰）算法是什么？</h3><p>W-TinyLFU解决传统 LRU&#x2F;LFU 缺陷</p>
+<p>LRU：缓存 “突发流量的临时数据”，挤占常用数据</p>
+<p>LFU：缓存 “历史高频但当前无用” 的数据；</p>
 <ul>
-<li><b>不支持依赖</b>： 事务中的命令排队执行，但<b>无法在事务内获取前一个命令的结果</b>，对后续命令的依赖处理很弱。</li>
-<li><b>不回滚</b>： 执行过程中命令出错（如类型错误）不会回滚，会继续执行其他命令，与传统数据库事务不同。</li>
-<li><b>网络开销</b>： 每个命令都需要一次网络往返，累积起来开销较大。</li>
+<li>对新数据不友好计数最小草图（Count-Min Sketch）用 “近似统计” 替代 “精确统计”解决 LFU 的 “频率统计内存开销大” 问题；</li>
+<li>频率衰减解决 LFU “历史高频数据占坑” 问题</li>
+<li>单独开辟一个 “窗口缓存”，专门接纳新数据，给新数据一个 “观察期”，避免刚进来就被淘汰，解决 LFU 的 “新数据歧视” 问题</li>
 </ul>
-<h2 id="Lua脚本的优势"><a href="#Lua脚本的优势" class="headerlink" title="Lua脚本的优势"></a>Lua脚本的优势</h2><ul>
-<li><b>原子性与隔离性</b>： Redis将Lua脚本视为一个整体，在服务器端<b>一次性、原子性地执行</b>，期间不会被其他命令打断，保证了执行过程中的数据一致性。</li>
-<li><b>强大的逻辑处理</b>： 可以在脚本内编写条件判断、循环，<b>支持命令结果的链式调用</b>，实现复杂业务逻辑（如分布式锁、计数器）。</li>
-<li><b>性能更优</b>： 脚本将多个命令打包成<b>一次远程调用</b>，大幅减少网络延迟和通信开销。</li>
-<li><b>功能互补</b>： Lua脚本能做事务能做的，还能做事务做不到的，是事务功能的<b>强大补充</b>。</li>
+<h3 id="多线程请求数据时，Caffeine-缓存未命中的内部处理逻辑是什么？（例：多线程同时请求同一数据）"><a href="#多线程请求数据时，Caffeine-缓存未命中的内部处理逻辑是什么？（例：多线程同时请求同一数据）" class="headerlink" title="多线程请求数据时，Caffeine 缓存未命中的内部处理逻辑是什么？（例：多线程同时请求同一数据）"></a>多线程请求数据时，Caffeine 缓存未命中的内部处理逻辑是什么？（例：多线程同时请求同一数据）</h3><p>核心是 请求合并（避免缓存击穿）第一个线程请求未命中时，标记 key 为 “加载中”，执行加载逻辑；</p>
+<p>后续线程请求同一 key 时，不重复加载，等待第一个线程完成；</p>
+<p>加载完成后，结果放入缓存，所有等待线程获取结果；</p>
+<p>加载异常时，所有线程抛出异常，缓存不存储异常结果。</p>
+<h3 id="给-Caffeine-预留固定内存（如-128M），并发量高导致数据存不下时如何处理？"><a href="#给-Caffeine-预留固定内存（如-128M），并发量高导致数据存不下时如何处理？" class="headerlink" title="给 Caffeine 预留固定内存（如 128M），并发量高导致数据存不下时如何处理？"></a>给 Caffeine 预留固定内存（如 128M），并发量高导致数据存不下时如何处理？</h3><p>临时调整缓存配置（缩短过期时间+提高淘汰优先级+临时扩容）通过配置中心关闭非核心场景的 Caffeine 缓存，非核心热点 key 直接走 Redis若 JVM 堆内存剩余较多，临时提高 Caffeine 内存上限（比如，128 ——&gt; 256）</p>
+<h2 id="四、Caffeine-的优缺点与选型"><a href="#四、Caffeine-的优缺点与选型" class="headerlink" title="四、Caffeine 的优缺点与选型"></a>四、Caffeine 的优缺点与选型</h2><h3 id="用-Caffeine-缓存有什么缺点？"><a href="#用-Caffeine-缓存有什么缺点？" class="headerlink" title="用 Caffeine 缓存有什么缺点？"></a>用 Caffeine 缓存有什么缺点？</h3><p>仅支持本地缓存，无法解决分布式场景下的数据共享问题</p>
+<p>JVM 重启丢失，可能引发数据库瞬时压力仅能存热点数据，无法存储大规模数据一致性难保证，更新需手动失效，易遗漏</p>
+<h2 id="五、缓存一致性问题"><a href="#五、缓存一致性问题" class="headerlink" title="五、缓存一致性问题"></a>五、缓存一致性问题</h2><h3 id="Redis-和-Caffeine-的缓存一致性如何保证？"><a href="#Redis-和-Caffeine-的缓存一致性如何保证？" class="headerlink" title="Redis 和 Caffeine 的缓存一致性如何保证？"></a>Redis 和 Caffeine 的缓存一致性如何保证？</h3><p>最终一致性写流程：更新数据库 → 更新 Redis → 删 Caffeine；</p>
+<p>读流程：查 Caffeine → 查 Redis → 查数据库（查库后更新 Redis 和 Caffeine）；</p>
+<p>兜底：Redis 设置短过期（30 分钟），Canal 监听 binlog 异步刷新缓存，MQ 广播缓存失效事件（集群场景）</p>
+<h3 id="本地缓存的一致性如何保证？"><a href="#本地缓存的一致性如何保证？" class="headerlink" title="本地缓存的一致性如何保证？"></a>本地缓存的一致性如何保证？</h3><p>采用双写策略：先更新数据库，再更新 Redis 和 Caffeine</p>
+<p>通过消息队列或发布-订阅机制同步更新设置较短的过期时间，保证数据最终一致性</p>
+<h3 id="本地缓存失败了怎么办？"><a href="#本地缓存失败了怎么办？" class="headerlink" title="本地缓存失败了怎么办？"></a>本地缓存失败了怎么办？</h3><p>降级策略：本地缓存失败时直接读Redis</p>
+<p>监控告警：缓存命中率低于阈值时告警</p>
+<h2 id="六、多级缓存架构"><a href="#六、多级缓存架构" class="headerlink" title="六、多级缓存架构"></a>六、多级缓存架构</h2><h3 id="Redis-缓存和本地缓存（Caffeine-Guava）如何取舍？"><a href="#Redis-缓存和本地缓存（Caffeine-Guava）如何取舍？" class="headerlink" title="Redis 缓存和本地缓存（Caffeine&#x2F;Guava）如何取舍？"></a>Redis 缓存和本地缓存（Caffeine&#x2F;Guava）如何取舍？</h3><p>选 Caffeine：访问频率高、数据量小、单节点使用的热点数据；</p>
+<p>选 Redis：数据需共享、容量大、需持久化 &#x2F; 分布式支持的场景</p>
+<h3 id="采用-Redis-Caffeine-两级缓存是出于什么考虑？"><a href="#采用-Redis-Caffeine-两级缓存是出于什么考虑？" class="headerlink" title="采用 Redis+Caffeine 两级缓存是出于什么考虑？"></a>采用 Redis+Caffeine 两级缓存是出于什么考虑？</h3><p>性能：本地缓存减少网络延迟稳定性：即使 Redis 故障，Caffeine 仍可提供服务</p>
+<p>数据库保护：大幅减少数据库查询压力</p>
+<p>缓存压力：分流热点请求，降低 Redis 负载</p>
+<h3 id="多级缓存主要解决了什么问题？"><a href="#多级缓存主要解决了什么问题？" class="headerlink" title="多级缓存主要解决了什么问题？"></a>多级缓存主要解决了什么问题？</h3><ul>
+<li>性能瓶颈：应对突发流量，保护下游存储</li>
+<li>数据库的读压力过大</li>
+<li>网络延迟导致的响应时间长</li>
+<li>单级故障不影响全局</li>
 </ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>事务适用于简单的命令批处理，而 Lua脚本则用于处理需要<b>复杂逻辑、依赖和高性能的场景</b>，如分布式锁、限流、队列操作等，它们共同构成了Redis的原子性操作方案，满足不同业务需求。</p>
+<h2 id="七、缓存命中率问题"><a href="#七、缓存命中率问题" class="headerlink" title="七、缓存命中率问题"></a>七、缓存命中率问题</h2><h3 id="若-Caffeine-本地缓存命中率不高，会产生什么问题？"><a href="#若-Caffeine-本地缓存命中率不高，会产生什么问题？" class="headerlink" title="若 Caffeine 本地缓存命中率不高，会产生什么问题？"></a>若 Caffeine 本地缓存命中率不高，会产生什么问题？</h3><h4 id="如何解决？"><a href="#如何解决？" class="headerlink" title="如何解决？"></a>如何解决？</h4><p>问题性能下降：请求穿透到 Redis &#x2F; 数据库，接口响应变慢资源浪费：占用 JVM 内存但无缓存效果</p>
+<h4 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h4><ul>
+<li>优化配置：调整过期时间，增加缓存大小</li>
+<li>缓存预热：系统启动时加载热点数据到缓存</li>
+<li>监控与告警：实时监控缓存命中率，设置告警阈值</li>
+</ul>
 
                 
               </div>
@@ -313,7 +362,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  <a href="/categories/%E6%9D%82/" class="category-chain-item">杂</a>
   
   
 
@@ -333,8 +382,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Redis本身有事务为什么还要用Lua脚本?</div>
-      <div>http://example.com/2026/01/21/Redis本身有事务为什么还要用Lua脚本/</div>
+      <div>Caffeine常见面试题</div>
+      <div>http://example.com/2026/01/27/Caffeine常见面试题/</div>
     </div>
     <div class="license-meta">
       
@@ -346,7 +395,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年1月21日</div>
+          <div>2026年1月27日</div>
         </div>
       
       
@@ -378,18 +427,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/01/27/Caffeine%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98/" title="Caffeine常见面试题">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Caffeine常见面试题</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/01/21/MySQL-MVCC/" title="MySQL-MVCC">
-                        <span class="hidden-mobile">MySQL-MVCC</span>
+                      <a href="/2026/01/21/Redis%E6%9C%AC%E8%BA%AB%E6%9C%89%E4%BA%8B%E5%8A%A1%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E8%A6%81%E7%94%A8Lua%E8%84%9A%E6%9C%AC/" title="Redis本身有事务为什么还要用Lua脚本?">
+                        <span class="hidden-mobile">Redis本身有事务为什么还要用Lua脚本?</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
