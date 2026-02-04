@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602041625600.png">
 <meta property="article:published_time" content="2026-02-04T08:24:14.000Z">
-<meta property="article:modified_time" content="2026-02-04T08:36:19.045Z">
+<meta property="article:modified_time" content="2026-02-04T08:41:01.198Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602041625600.png">
@@ -228,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          735 字
+          932 字
         
       </span>
     
@@ -239,7 +239,7 @@
         
         
         
-          7 分钟
+          8 分钟
         
       </span>
     
@@ -297,8 +297,17 @@
 <h3 id="触发式搬迁"><a href="#触发式搬迁" class="headerlink" title="触发式搬迁"></a>触发式搬迁</h3><p>每当客户端对该字典执行 <b>添加、删除、查找或更新</b> 操作时，Redis 除了执行指定操作外，还会顺带将 <code>ht[0]</code> 在 <code>rehashidx</code> 索引上的所有键值对搬迁到 <code>ht[1]</code>。</p>
 <h3 id="定时同步"><a href="#定时同步" class="headerlink" title="定时同步"></a>定时同步</h3><p>即便没有客户端访问，Redis 也会利用 <b>定时任务</b>，在系统空闲时主动搬迁一部分数据，确保 rehash 最终能完成。</p>
 <h2 id="3-rehash的触发条件"><a href="#3-rehash的触发条件" class="headerlink" title="3. rehash的触发条件"></a>3. rehash的触发条件</h2><p>在 Redis 中，rehash 的触发主要取决于<strong>负载因子（Load Factor）</strong>。负载因子的计算公式非常简单：</p>
-<p>$$\text{Load Factor} &#x3D; \frac{\text{ht[0].used}}{\text{ht[0].size}}$$</p>
-<p>即：已保存节点的数量与哈希表大小的比值。</p>
+<p>$$\text{Load Factor} &#x3D; \frac{\text{ht[0].used}}{\text{ht[0].size}}$$，即：<mark>已保存节点的数量与哈希表大小的比值</mark>。</p>
+<h3 id="3-1-扩容（Expand）的触发条件"><a href="#3-1-扩容（Expand）的触发条件" class="headerlink" title="3.1 扩容（Expand）的触发条件"></a>3.1 扩容（Expand）的触发条件</h3><p>Redis 会根据当前是否在执行后台指令，采取不同的扩容阈值：</p>
+<ul>
+<li><b>常规状态</b>：当负载因子 <strong>$\ge 1$</strong> 时，Redis 可能会触发扩容。</li>
+<li><b>强制状态</b>：当负载因子 <strong>$&gt; 5$</strong> 时，无论是否有后台进程，Redis 都会立即开始扩容。</li>
+</ul>
+<h3 id="3-2-为什么有两个标准？"><a href="#3-2-为什么有两个标准？" class="headerlink" title="3.2 为什么有两个标准？"></a>3.2 为什么有两个标准？</h3><p>这涉及到 Redis 的 <strong>Copy-On-Write (COW)</strong> 机制。当 Redis 正在执行 <code>BGSAVE</code>（生成 RDB 快照）或 <code>BGREWRITEAOF</code>（AOF 重写）时，会创建子进程。</p>
+<ul>
+<li>为了尽可能减少父子进程间的内存页写入，Redis 会提高扩容门槛（从 1 提升到 5）。</li>
+<li>这样可以避免在子进程工作期间发生大规模的内存地址变动，从而节省系统内存并提高效率。</li>
+</ul>
 <h2 id="4-rehash-的详细步骤"><a href="#4-rehash-的详细步骤" class="headerlink" title="4. rehash 的详细步骤"></a>4. rehash 的详细步骤</h2><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602041625600.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom: 50%;" />
 
 <ol>
@@ -461,6 +470,12 @@
 
 
 
+  
+
+
+
+
+  
   
 
 
@@ -654,6 +669,49 @@
   });
 </script>
 
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script  src="/js/local-search.js" ></script>
 
