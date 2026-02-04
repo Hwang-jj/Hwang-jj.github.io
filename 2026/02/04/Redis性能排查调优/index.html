@@ -27,7 +27,7 @@
 <meta property="og:description" content="Redis性能排查调优 Redis执行命令变慢的原因  1. 网络问题2. 业务问题 设置慢日志阈值，开启慢日志slowLog  2.1 命令复杂度过高 经常使用 O(N) 以上复杂度的命令，例如 SORT、SUNION、ZUNIONSTORE 聚合类命令 使用 O(N) 复杂度的命令，但 N 的值非常大  解决方法：  尽量不使用 O(N) 以上复杂度过高的命令，对于数据的聚合操作，放在客户端做">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-02-04T06:35:33.000Z">
-<meta property="article:modified_time" content="2026-02-04T07:39:51.532Z">
+<meta property="article:modified_time" content="2026-02-04T08:07:13.620Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          709 字
+          827 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          6 分钟
+          7 分钟
         
       </span>
     
@@ -303,7 +303,8 @@
 <h2 id="3-运维问题"><a href="#3-运维问题" class="headerlink" title="3. 运维问题"></a>3. 运维问题</h2><h3 id="3-1-RDB、AOF日志"><a href="#3-1-RDB、AOF日志" class="headerlink" title="3.1 RDB、AOF日志"></a>3.1 RDB、AOF日志</h3><p>rdb、aof持久化时都需要主进程fork一个子进程去执行，这个fork的过程中主进程需要拷贝自己的内存页表给子进程,如果实例很大,拷贝的过程也会很长时间耗时</p>
 <h3 id="3-2-使用Swap虚拟内存"><a href="#3-2-使用Swap虚拟内存" class="headerlink" title="3.2 使用Swap虚拟内存"></a>3.2 使用Swap虚拟内存</h3><p>Redis遵循 key-value模型。同时key和value通常都存储在内存中。然而有时这并不是一个最好的选择，所以在设计过程中我们要求key必须存储在内存中（为了保证快速查找），而value在很少使用时，可以从内存被交换出至磁盘上。 实际应用中，如果内存中有一个10万条记录的key值数据集，而只有10%被经常使用，那么开启虚拟内存的Redis将把与较少使用的key相对应的value转移至磁盘上。当客户端请求获取这些value时，他们被将从swap 文件中读回，并载入到内存中。从磁盘中读取速度肯定会慢很多。</p>
 <p>预留更多的空间,避免使用 swap</p>
-<h3 id="3-3-内存碎片"><a href="#3-3-内存碎片" class="headerlink" title="3.3 内存碎片"></a>3.3 内存碎片</h3><p>Redis 的数据都存储在内存中，当我们的应用程序频繁修改 Redis 中的数据时，就有可能会导致 Redis 产生内存碎片。内存碎片会降低 Redis 的内存使用率。</p>
+<h3 id="3-3-内存碎片"><a href="#3-3-内存碎片" class="headerlink" title="3.3 内存碎片"></a>3.3 内存碎片</h3><p>Redis 的数据都存储在内存中，当我们的应用程序频繁修改 Redis 中的数据时，就有可能会导致 Redis 产生内存碎片（比如当一个key过期后，其占用的内存空间会被释放，如果这份释放的空间无法被新数据填满，就会出现内存碎片）。</p>
+<p>碎片化的内存空间无法得到有效利用，即使总的剩余内存充足，但由于碎片的存在，可能导致新数据无法找到足够大的连续空闲空间进行分配，从而引发“内存不足”的假象，迫使 Redis 进行不必要的数据淘汰或触发 swap。</p>
 <p>Redis4.0之后可以开启内存碎片自动整理，但是由于碎片整理工作也是在主线程中执行的，所以碎片整理也可能会导致redis性能下降</p>
 
                 
