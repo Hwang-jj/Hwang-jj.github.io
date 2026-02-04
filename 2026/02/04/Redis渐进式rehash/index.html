@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602041625600.png">
 <meta property="article:published_time" content="2026-02-04T08:24:14.000Z">
-<meta property="article:modified_time" content="2026-02-04T08:55:18.674Z">
+<meta property="article:modified_time" content="2026-02-04T10:48:57.647Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602041625600.png">
@@ -282,7 +282,7 @@
               <div class="markdown-body">
                 
                 <h1 id="Redis渐进式rehash"><a href="#Redis渐进式rehash" class="headerlink" title="Redis渐进式rehash"></a>Redis渐进式rehash</h1><blockquote>
-<p><b>渐进式 rehash</b> 是 Redis 为了避免在扩容或收缩哈希表（Dict）时导致服务器“卡死”而设计的一种高明策略。</p>
+<p><b>渐进式 rehash</b> 是 Redis 为了避免在扩容或收缩<b>哈希表（Dict）</b>时导致服务器“卡死”而设计的一种高明策略。</p>
 <p>如果 Redis 像传统方式那样一次性完成百万级键值的搬迁，会导致主线程长时间阻塞，对于追求高并发、低延迟的 Redis 来说，这显然是不可接受的。</p>
 </blockquote>
 <h2 id="1-核心数据结构"><a href="#1-核心数据结构" class="headerlink" title="1. 核心数据结构"></a>1. 核心数据结构</h2><p>在 Redis 的字典结构中，实际上维护了两个哈希表：</p>
