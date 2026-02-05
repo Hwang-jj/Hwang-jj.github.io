@@ -43,7 +43,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051710044.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051720565.png">
 <meta property="article:published_time" content="2025-05-15T03:48:12.000Z">
-<meta property="article:modified_time" content="2026-02-05T11:46:42.938Z">
+<meta property="article:modified_time" content="2026-02-05T11:50:10.666Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642009.png">
@@ -547,6 +547,7 @@
 <li><p><code>RAW</code>编码：基于<code>SDS</code>实现，存储上限为 512MB，需要分配<b>两次</b>内存空间（分别为 <code>RedisObject</code> 和 SDS 分配空间）</p>
 </li>
 <li><p><code>embstr</code>编码：如果存储的<b>字符串长度小于 44 字节</b>，则会采用 embstr 编码，此时 RedisObject 的头信息与 <code>SDS</code> 是一段连续空间，只分配<b>一次</b>内存空间（但它是<b>只读</b>的，任何修改都会导致它升级为 <code>raw</code>，因为原地修改<code>embstr</code>成本很高）</p>
+<p><a target="_blank" rel="noopener" href="https://hwang-jj.github.io/2026/02/05/Redis%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84embstr%E7%BC%96%E7%A0%81%E5%92%8Craw%E7%BC%96%E7%A0%81%E4%B9%8B%E9%97%B4%E7%9A%84%E7%95%8C%E9%99%90%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF44%E5%AD%97%E8%8A%82/">Redis字符串的embstr编码和raw编码之间的界限为什么是44字节</a></p>
 </li>
 </ul>
 <h3 id="4-2-List（LinkedList-ZipList-QuickList-listpack）"><a href="#4-2-List（LinkedList-ZipList-QuickList-listpack）" class="headerlink" title="4.2 List（LinkedList &#x2F; ZipList &#x2F; QuickList &#x2F; listpack）"></a>4.2 List（<code>LinkedList</code> &#x2F; <code>ZipList</code> &#x2F; <code>QuickList</code> &#x2F; <code>listpack</code>）</h3><p>哪一个数据结构能满足<code>LPUSH</code> <code>RPUSH</code> <code>LRANGE</code> <code>LPOP</code> <code>RPOP</code>等操作？</p>
