@@ -231,6 +231,60 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/05/15/Redis%E6%8C%81%E4%B9%85%E5%8C%96/" target="_self">
+          Redis持久化
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/05/15/Redis%E6%8C%81%E4%B9%85%E5%8C%96/" target="_self">
+        <div>
+          Redis持久化1. AOF日志1.1 AOF日志在Redis执行完一条命令后，将该命令记录到AOF日志中 为什么是在执行完命令之后记录日志呢？  避免额外的检查开销，AOF 记录日志不会对命令进行语法检查； 在命令执行完之后再记录，不会阻塞当前的命令执行。  这样也带来了风险：  如果刚执行完命令 Redis 就宕机会导致对应的修改丢失； 可能会阻塞后续其他命令的执行（AOF 记录日志是在 Re
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-05-15 17:15" pubdate>
+              2025-05-15
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/05/15/Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" target="_self">
           Redis数据结构
         </a>
@@ -694,73 +748,6 @@
 
           </div>
         
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/02/15/%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE/" target="_self">
-          点评项目
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/15/%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE/" target="_self">
-        <div>
-          点评项目短信登录功能基于Session实现登录 Session原理 Session会为每一次会话分配一个Session对象 同一个浏览器发起的多次请求，同属于一次会话（Session） 首次使用到Session时，服务器会自动创建Session，并创建Cookie存储SessionId发送回客户端  Session在项目中的使用 保存验证码到session：session.setAttribute
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-02-15 19:00" pubdate>
-              2025-02-15
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E9%A1%B9%E7%9B%AE/" class="category-chain-item">项目</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Java/">#Java</a>
-            
-              <a href="/tags/Redis/">#Redis</a>
-            
-              <a href="/tags/%E7%BC%93%E5%AD%98/">#缓存</a>
-            
-              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">#分布式锁</a>
-            
-          </div>
         
       </div>
     </article>

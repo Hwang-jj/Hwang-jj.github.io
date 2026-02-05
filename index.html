@@ -231,6 +231,60 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/02/05/Redis%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84embstr%E7%BC%96%E7%A0%81%E5%92%8Craw%E7%BC%96%E7%A0%81%E4%B9%8B%E9%97%B4%E7%9A%84%E7%95%8C%E9%99%90%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF44%E5%AD%97%E8%8A%82/" target="_self">
+          Redis字符串的embstr编码和raw编码之间的界限为什么是44字节
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/02/05/Redis%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84embstr%E7%BC%96%E7%A0%81%E5%92%8Craw%E7%BC%96%E7%A0%81%E4%B9%8B%E9%97%B4%E7%9A%84%E7%95%8C%E9%99%90%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF44%E5%AD%97%E8%8A%82/" target="_self">
+        <div>
+          Redis字符串的embstr编码和raw编码之间的界限为什么是44字节 引用：https://juejin.cn/post/7278858311595900987  核心结论：44 字节是为了让整个 RedisObject 对象（包含 SDS Header 和字符串内容）刚好填满 64 字节的内存块 1. Redis字符串编码类型Redis 字符串内部内部编码有三种：  int：存储 8 个字节
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-02-05 19:10" pubdate>
+              2026-02-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/02/05/Redis-SDS%E7%9A%845%E7%A7%8D%E7%B1%BB%E5%9E%8B/" target="_self">
           Redis SDS的5种类型
         </a>
@@ -239,7 +293,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/02/05/Redis-SDS%E7%9A%845%E7%A7%8D%E7%B1%BB%E5%9E%8B/" target="_self">
         <div>
-          Redis SDS的5种类型1. 结构概览与区别为了极致地节省内存，Redis 开发者并没有使用一种通用的结构，而是根据字符串的长度，定义了五种不同的 Header 结构。这五种类型的核心区别在于：用于保存字符串长度（len）和分配空间（alloc）的变量类型不同。    类型 len 变量类型 alloc 变量类型 flags占用 最大容纳长度 **Header 自身占用 **    sdshd
+          Redis SDS的5种类型1. 结构概览与区别为了极致地节省内存，Redis 开发者并没有使用一种通用的结构，而是根据字符串的长度，定义了五种不同的 Header 结构。这五种类型的核心区别在于：用于保存字符串长度（len）和分配空间（alloc）的变量类型不同。    类型 len变量类型 alloc变量类型 flags占用 最大容纳长度 Header自身占用    sdshdr5 无 (由
         </div>
       </a>
 
@@ -680,60 +734,6 @@
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
             <time datetime="2026-01-19 15:33" pubdate>
-              2026-01-19
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/JUC/" class="category-chain-item">JUC</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/19/%E4%B8%BA%E4%BB%80%E4%B9%88HashMap%E7%9A%84%E9%94%AE%E5%80%BC%E5%8F%AF%E4%BB%A5%E4%B8%BAnull%EF%BC%8C%E8%80%8CConcurrentHashMap%E4%B8%8D%E8%A1%8C%EF%BC%9F/" target="_self">
-          为什么HashMap的键值可以为null，而ConcurrentHashMap不行？
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/19/%E4%B8%BA%E4%BB%80%E4%B9%88HashMap%E7%9A%84%E9%94%AE%E5%80%BC%E5%8F%AF%E4%BB%A5%E4%B8%BAnull%EF%BC%8C%E8%80%8CConcurrentHashMap%E4%B8%8D%E8%A1%8C%EF%BC%9F/" target="_self">
-        <div>
-          为什么HashMap的键值可以为null，而ConcurrentHashMap不行？根本原因：二义性问题，无法判断get(key)返回的Null值到底是因为不存在这个key，还是因为这个key对应的value就是Null 1. HashMapHashMap允许一个Null key和多个Null value，为什么HashMap没有二义性问题？ 因为HashMap是为单线程设计的，在单线程的情况下，
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-19 14:39" pubdate>
               2026-01-19
             </time>
           </div>
