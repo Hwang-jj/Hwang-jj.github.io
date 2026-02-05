@@ -27,7 +27,7 @@
 <meta property="og:description" content="Redis SDS的5种类型1. 结构概览与区别为了极致地节省内存，Redis 开发者并没有使用一种通用的结构，而是根据字符串的长度，定义了五种不同的 Header 结构。这五种类型的核心区别在于：用于保存字符串长度（len）和分配空间（alloc）的变量类型不同。    类型 len 变量类型 alloc 变量类型 flags占用 最大容纳长度 **Header 自身占用 **    sdshd">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-02-05T10:40:43.000Z">
-<meta property="article:modified_time" content="2026-02-05T10:57:23.210Z">
+<meta property="article:modified_time" content="2026-02-05T11:06:57.643Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          671 字
+          699 字
         
       </span>
     
@@ -333,10 +333,10 @@
 </tr>
 </tbody></table>
 <p>⚠️：<b>Header</b>表示元数据信息，即为 <code>flag</code> + <code>len</code> + <code>alloc</code> （<code>sdshd5</code>没有 <code>len</code> 和  <code>alloc</code>）</p>
-<h2 id="2-sdshdr5：特殊的“超短”结构"><a href="#2-sdshdr5：特殊的“超短”结构" class="headerlink" title="2. sdshdr5：特殊的“超短”结构"></a>2. sdshdr5：特殊的“超短”结构</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr5</span> &#123;</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 1字节：高 5 位存储长度，低 3 位存储类型标识 */</span><br>    <span class="hljs-type">char</span> buf[];<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h2 id="2-sdshdr5：特殊的“超短”结构"><a href="#2-sdshdr5：特殊的“超短”结构" class="headerlink" title="2. sdshdr5：特殊的“超短”结构"></a>2. sdshdr5：特殊的“超短”结构</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr5</span> &#123;</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 1字节：高 5 位存储长度，低 3 位存储类型标识 */</span><br>    <span class="hljs-type">char</span> buf[];<br>&#125;;<br><br><span class="hljs-comment">// flags: xxxxx000 ===&gt; SDS_TYPE_5(xxxxx存储buf长度)</span><br></code></pre></td></tr></table></figure>
 
 <p>由于没有 <code>alloc</code> 字段，它无法记录剩余可用空间，因此不适合频繁修改的字符串。在 Redis 中，这种类型通常只用于只读的短键名。</p>
-<h2 id="3-sdshdr8-16-32-64：标准结构"><a href="#3-sdshdr8-16-32-64：标准结构" class="headerlink" title="3. sdshdr8&#x2F;16&#x2F;32&#x2F;64：标准结构"></a>3. sdshdr8&#x2F;16&#x2F;32&#x2F;64：标准结构</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr8</span> &#123;</span><br>    <span class="hljs-type">uint8_t</span> len;    <span class="hljs-comment">/* 已使用的长度 */</span><br>    <span class="hljs-type">uint8_t</span> alloc;  <span class="hljs-comment">/* 已分配的总长度（不含头和结束符） */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 低3位表示类型，高5位未使用 */</span><br>    <span class="hljs-type">char</span> buf[];     <span class="hljs-comment">/* 字符数组 */</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<h2 id="3-sdshdr8-16-32-64：标准结构"><a href="#3-sdshdr8-16-32-64：标准结构" class="headerlink" title="3. sdshdr8&#x2F;16&#x2F;32&#x2F;64：标准结构"></a>3. sdshdr8&#x2F;16&#x2F;32&#x2F;64：标准结构</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr8</span> &#123;</span><br>    <span class="hljs-type">uint8_t</span> len;    <span class="hljs-comment">/* 已使用的长度 */</span><br>    <span class="hljs-type">uint8_t</span> alloc;  <span class="hljs-comment">/* 已分配的总长度（不含头和结束符） */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 低3位表示类型，高5位未使用 */</span><br>    <span class="hljs-type">char</span> buf[];     <span class="hljs-comment">/* 字符数组 */</span><br>&#125;;<br><br><span class="hljs-comment">// flags: 1 = 00000001 ===&gt; SDS_TYPE_8</span><br><span class="hljs-comment">// flags: 2 = 00000010 ===&gt; SDS_TYPE_16</span><br><span class="hljs-comment">// flags: 3 = 00000011 ===&gt; SDS_TYPE_32</span><br><span class="hljs-comment">// flags: 4 = 00000100 ===&gt; SDS_TYPE_64</span><br></code></pre></td></tr></table></figure>
 
 <p><code>__attribute__ ((__packed__))</code>：这是 C 语言的一个特性，告诉编译器<b>取消结构体对齐</b>。这样 Header 就会紧凑排列，不会在变量之间插入填充字节，进一步压榨内存空间。</p>
 <h2 id="4-为什么要分这么多类？"><a href="#4-为什么要分这么多类？" class="headerlink" title="4. 为什么要分这么多类？"></a>4. 为什么要分这么多类？</h2><p>Redis 作为内存数据库，<b>内存利用率</b>是生命线。</p>
