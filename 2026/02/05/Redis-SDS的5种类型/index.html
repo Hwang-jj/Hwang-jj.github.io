@@ -19,23 +19,21 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Redis渐进式rehash 渐进式 rehash 是 Redis 为了避免在扩容或收缩哈希表（Dict）时导致服务器“卡死”而设计的一种高明策略。 如果 Redis 像传统方式那样一次性完成百万级键值的搬迁，会导致主线程长时间阻塞，对于追求高并发、低延迟的 Redis 来说，这显然是不可接受的。  1. 核心数据结构在 Redis 的字典结构中，实际上维护了两个哈希表：  ht[0]：平时使用的">
+    <meta name="description" content="Redis SDS的5种类型1. 结构概览与区别为了极致地节省内存，Redis 开发者并没有使用一种通用的结构，而是根据字符串的长度，定义了五种不同的 Header 结构。这五种类型的核心区别在于：用于保存字符串长度（len）和分配空间（alloc）的变量类型不同。    类型 len 变量类型 alloc 变量类型 flags占用 最大容纳长度 **Header 自身占用 **    sdshd">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Redis渐进式rehash">
-<meta property="og:url" content="http://example.com/2026/02/04/Redis%E6%B8%90%E8%BF%9B%E5%BC%8Frehash/index.html">
+<meta property="og:title" content="Redis SDS的5种类型">
+<meta property="og:url" content="http://example.com/2026/02/05/Redis-SDS%E7%9A%845%E7%A7%8D%E7%B1%BB%E5%9E%8B/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="Redis渐进式rehash 渐进式 rehash 是 Redis 为了避免在扩容或收缩哈希表（Dict）时导致服务器“卡死”而设计的一种高明策略。 如果 Redis 像传统方式那样一次性完成百万级键值的搬迁，会导致主线程长时间阻塞，对于追求高并发、低延迟的 Redis 来说，这显然是不可接受的。  1. 核心数据结构在 Redis 的字典结构中，实际上维护了两个哈希表：  ht[0]：平时使用的">
+<meta property="og:description" content="Redis SDS的5种类型1. 结构概览与区别为了极致地节省内存，Redis 开发者并没有使用一种通用的结构，而是根据字符串的长度，定义了五种不同的 Header 结构。这五种类型的核心区别在于：用于保存字符串长度（len）和分配空间（alloc）的变量类型不同。    类型 len 变量类型 alloc 变量类型 flags占用 最大容纳长度 **Header 自身占用 **    sdshd">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602041625600.png">
-<meta property="article:published_time" content="2026-02-04T08:24:14.000Z">
-<meta property="article:modified_time" content="2026-02-04T10:48:57.647Z">
+<meta property="article:published_time" content="2026-02-05T10:40:43.000Z">
+<meta property="article:modified_time" content="2026-02-05T10:57:23.210Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602041625600.png">
   
   
   
-  <title>Redis渐进式rehash - Kon4tsu Blog</title>
+  <title>Redis SDS的5种类型 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -205,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Redis渐进式rehash"></span>
+            <span id="subtitle" data-typed-text="Redis SDS的5种类型"></span>
           
         </div>
 
@@ -216,8 +214,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-02-04 16:24" pubdate>
-          2026年2月4日 下午
+        <time datetime="2026-02-05 18:40" pubdate>
+          2026年2月5日 晚上
         </time>
       </span>
     
@@ -228,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          671 字
         
       </span>
     
@@ -239,7 +237,7 @@
         
         
         
-          10 分钟
+          6 分钟
         
       </span>
     
@@ -276,77 +274,79 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Redis渐进式rehash</h1>
+            <h1 id="seo-header">Redis SDS的5种类型</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="Redis渐进式rehash"><a href="#Redis渐进式rehash" class="headerlink" title="Redis渐进式rehash"></a>Redis渐进式rehash</h1><blockquote>
-<p><b>渐进式 rehash</b> 是 Redis 为了避免在扩容或收缩<b>哈希表（Dict）</b>时导致服务器“卡死”而设计的一种高明策略。</p>
-<p>如果 Redis 像传统方式那样一次性完成百万级键值的搬迁，会导致主线程长时间阻塞，对于追求高并发、低延迟的 Redis 来说，这显然是不可接受的。</p>
-</blockquote>
-<h2 id="1-核心数据结构"><a href="#1-核心数据结构" class="headerlink" title="1. 核心数据结构"></a>1. 核心数据结构</h2><p>在 Redis 的字典结构中，实际上维护了两个哈希表：</p>
-<ul>
-<li><b>ht[0]</b>：平时使用的哈希表。</li>
-<li><b>ht[1]</b>：只在 rehash 期间使用的哈希表（通常大小是 ht[0] 的两倍）。</li>
-</ul>
-<h2 id="2-搬迁过程：化整为零"><a href="#2-搬迁过程：化整为零" class="headerlink" title="2. 搬迁过程：化整为零"></a>2. 搬迁过程：化整为零</h2><blockquote>
-<p><b>核心思想</b>：将巨大的计算成本，<mark>平摊到了每一次请求和后台空闲时间</mark>中。这避免了集中式处理带来的长耗时，保证了 Redis 的 响应时间 始终保持在极低水平。</p>
-</blockquote>
-<p>Redis 不会一次性把 <code>ht[0]</code> 的所有数据搬到 <code>ht[1]</code>，而是采取了“分而治之”的办法：</p>
-<h3 id="触发式搬迁"><a href="#触发式搬迁" class="headerlink" title="触发式搬迁"></a>触发式搬迁</h3><p>每当客户端对该字典执行 <b>添加、删除、查找或更新</b> 操作时，Redis 除了执行指定操作外，还会顺带将 <code>ht[0]</code> 在 <code>rehashidx</code> 索引上的所有键值对搬迁到 <code>ht[1]</code>。</p>
-<h3 id="定时同步"><a href="#定时同步" class="headerlink" title="定时同步"></a>定时同步</h3><p>即便没有客户端访问，Redis 也会利用 <b>定时任务</b>，在系统空闲时主动搬迁一部分数据，确保 rehash 最终能完成。</p>
-<h2 id="3-rehash的触发条件"><a href="#3-rehash的触发条件" class="headerlink" title="3. rehash的触发条件"></a>3. rehash的触发条件</h2><p>在 Redis 中，rehash 的触发主要取决于<strong>负载因子（Load Factor）</strong>。负载因子的计算公式非常简单：</p>
-<p>$$\text{Load Factor} &#x3D; \frac{\text{ht[0].used}}{\text{ht[0].size}}$$</p>
-<p>即：<mark>已保存节点的数量与哈希表大小的比值</mark></p>
-<h3 id="3-1-扩容（Expand）的触发条件"><a href="#3-1-扩容（Expand）的触发条件" class="headerlink" title="3.1 扩容（Expand）的触发条件"></a>3.1 扩容（Expand）的触发条件</h3><p>Redis 会根据当前是否在执行后台指令，采取不同的扩容阈值：</p>
-<ul>
-<li><b>常规状态</b>：当负载因子 <strong>$\ge 1$</strong> 时，Redis <b>可能</b>会触发扩容</li>
-<li><b>强制状态</b>：当负载因子 <strong>$&gt; 5$</strong> 时，无论是否有后台进程，Redis 都会立即开始扩容<mark>（因为出现hash冲突时使用拉链法解决，所以实际保存的节点数可能会超过哈希表大小）</mark></li>
-</ul>
-<h3 id="3-2-为什么有两个标准？"><a href="#3-2-为什么有两个标准？" class="headerlink" title="3.2 为什么有两个标准？"></a>3.2 为什么有两个标准？</h3><p>这涉及到 Redis 的 <strong>Copy-On-Write (COW)</strong> 机制。当 Redis 正在执行 <code>BGSAVE</code>（生成 RDB 快照）或 <code>BGREWRITEAOF</code>（AOF 重写）时，会创建子进程。</p>
-<ul>
-<li>为了尽可能减少父子进程间的内存页写入，Redis 会提高扩容门槛（从 1 提升到 5）。</li>
-<li>这样可以避免在子进程工作期间发生大规模的内存地址变动，从而节省系统内存并提高效率。</li>
-</ul>
-<h3 id="3-3-收缩（Shrink）的触发条件"><a href="#3-3-收缩（Shrink）的触发条件" class="headerlink" title="3.3 收缩（Shrink）的触发条件"></a>3.3 收缩（Shrink）的触发条件</h3><p>当数据库中的键值对大量减少时，为了不浪费内存，Redis 会对哈希表进行收缩。</p>
-<ul>
-<li><b>触发条件</b>：当负载因子 <strong>$&lt; 0.1$</strong> 时（即已用空间不足 10%），Redis 会自动开始收缩操作。</li>
-</ul>
-<h3 id="3-4-rehash-的空间分配规则"><a href="#3-4-rehash-的空间分配规则" class="headerlink" title="3.4 rehash 的空间分配规则"></a>3.4 rehash 的空间分配规则</h3><p>无论是扩容还是收缩，新哈希表 <code>ht[1]</code> 的大小都是有讲究的：</p>
-<ul>
-<li><b>如果是扩容</b>：<code>ht[1]</code> 的大小为第一个大于等于 <code>ht[0].used * 2</code> 的 $2^n$。<ul>
-<li>例如：当前用了 100 个空间，扩容大小就是 $2^8 &#x3D; 256$</li>
-</ul>
-</li>
-<li><b>如果是收缩</b>：<code>ht[1]</code> 的大小为第一个大于等于 <code>ht[0].used</code> 的 $2^n$。<ul>
-<li>例如：当前只剩 10 个键，收缩大小就是 $2^4 &#x3D; 16$</li>
-</ul>
-</li>
-</ul>
-<h2 id="4-rehash-的详细步骤"><a href="#4-rehash-的详细步骤" class="headerlink" title="4. rehash 的详细步骤"></a>4. rehash 的详细步骤</h2><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602041625600.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom: 50%;" />
+                <h1 id="Redis-SDS的5种类型"><a href="#Redis-SDS的5种类型" class="headerlink" title="Redis SDS的5种类型"></a>Redis SDS的5种类型</h1><h2 id="1-结构概览与区别"><a href="#1-结构概览与区别" class="headerlink" title="1. 结构概览与区别"></a>1. 结构概览与区别</h2><p>为了极致地节省内存，Redis 开发者并没有使用一种通用的结构，而是根据字符串的长度，定义了五种不同的 Header 结构。这五种类型的核心区别在于：<b>用于保存字符串长度（len）和分配空间（alloc）的变量类型不同</b>。</p>
+<table>
+<thead>
+<tr>
+<th><strong>类型</strong></th>
+<th><strong>len 变量类型</strong></th>
+<th><strong>alloc 变量类型</strong></th>
+<th>flags占用</th>
+<th><strong>最大容纳长度</strong></th>
+<th>**Header 自身占用 **</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>sdshdr5</strong></td>
+<td>无 (由 <code>flags</code> 位域存储)</td>
+<td>无</td>
+<td>1字节</td>
+<td>31 字节</td>
+<td>1字节</td>
+</tr>
+<tr>
+<td><strong>sdshdr8</strong></td>
+<td><code>uint8_t</code> (1字节)</td>
+<td><code>uint8_t</code>（1字节）</td>
+<td>1字节</td>
+<td>255 字节</td>
+<td>3字节</td>
+</tr>
+<tr>
+<td><strong>sdshdr16</strong></td>
+<td><code>uint16_t</code> (2字节)</td>
+<td><code>uint16_t</code>（2字节）</td>
+<td>1字节</td>
+<td>64 KB</td>
+<td>5字节</td>
+</tr>
+<tr>
+<td><strong>sdshdr32</strong></td>
+<td><code>uint32_t</code> (4字节)</td>
+<td><code>uint32_t</code>（4字节）</td>
+<td>1字节</td>
+<td>4 GB</td>
+<td>9字节</td>
+</tr>
+<tr>
+<td><strong>sdshdr64</strong></td>
+<td><code>uint64_t</code> (8字节)</td>
+<td><code>uint64_t</code>（8字节）</td>
+<td>1字节</td>
+<td>$2^{64}-1$ 字节</td>
+<td>17字节</td>
+</tr>
+</tbody></table>
+<p>⚠️：<b>Header</b>表示元数据信息，即为 <code>flag</code> + <code>len</code> + <code>alloc</code> （<code>sdshd5</code>没有 <code>len</code> 和  <code>alloc</code>）</p>
+<h2 id="2-sdshdr5：特殊的“超短”结构"><a href="#2-sdshdr5：特殊的“超短”结构" class="headerlink" title="2. sdshdr5：特殊的“超短”结构"></a>2. sdshdr5：特殊的“超短”结构</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr5</span> &#123;</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 1字节：高 5 位存储长度，低 3 位存储类型标识 */</span><br>    <span class="hljs-type">char</span> buf[];<br>&#125;;<br></code></pre></td></tr></table></figure>
 
-<p>⚠️：图中<code>ht[1]</code>大小应为16，即首个大于2 * 6 &#x3D; 12 的2次幂</p>
+<p>由于没有 <code>alloc</code> 字段，它无法记录剩余可用空间，因此不适合频繁修改的字符串。在 Redis 中，这种类型通常只用于只读的短键名。</p>
+<h2 id="3-sdshdr8-16-32-64：标准结构"><a href="#3-sdshdr8-16-32-64：标准结构" class="headerlink" title="3. sdshdr8&#x2F;16&#x2F;32&#x2F;64：标准结构"></a>3. sdshdr8&#x2F;16&#x2F;32&#x2F;64：标准结构</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr8</span> &#123;</span><br>    <span class="hljs-type">uint8_t</span> len;    <span class="hljs-comment">/* 已使用的长度 */</span><br>    <span class="hljs-type">uint8_t</span> alloc;  <span class="hljs-comment">/* 已分配的总长度（不含头和结束符） */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 低3位表示类型，高5位未使用 */</span><br>    <span class="hljs-type">char</span> buf[];     <span class="hljs-comment">/* 字符数组 */</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p><code>__attribute__ ((__packed__))</code>：这是 C 语言的一个特性，告诉编译器<b>取消结构体对齐</b>。这样 Header 就会紧凑排列，不会在变量之间插入填充字节，进一步压榨内存空间。</p>
+<h2 id="4-为什么要分这么多类？"><a href="#4-为什么要分这么多类？" class="headerlink" title="4. 为什么要分这么多类？"></a>4. 为什么要分这么多类？</h2><p>Redis 作为内存数据库，<b>内存利用率</b>是生命线。</p>
 <ol>
-<li><b>分配空间</b>：为 <code>ht[1]</code> 分配空间：<ul>
-<li>如果是<b>扩容</b>，大小通常是第一个大于等于 <code>ht[0].used * 2</code> 的 $2^n$<mark>（首个大于已使用空间两倍的2次幂）</mark>；</li>
-<li>如果是<b>收缩</b>，则是第一个大于等于 <code>ht[0].used</code> 的 $2^n$<mark>（首个大于已使用空间的2次幂）</mark></li>
-</ul>
+<li><p><b>内存节省</b>：如果你只需要存储一个长度为 10 的字符串，用 <code>sdshdr8</code> 只需要 3 字节的 Header；如果强制用 <code>sdshdr64</code>，光 Header 就要 17 字节。在拥有数亿个 Key 的环境下，这种差距会被放大到 GB 级别</p>
 </li>
-<li><b>设置索引</b>：将变量 <code>rehashidx</code> 设置为 <b>0</b>，代表 rehash 正式开始。</li>
-<li><b>分步搬迁</b>：<ul>
-<li>每次操作字典，将 <code>ht[0]</code> 中 <code>rehashidx</code> 索引位置上的桶（Bucket）移动到 <code>ht[1]</code>。</li>
-<li>搬迁完成后，<code>rehashidx</code> <strong>自增 1</strong>。</li>
-</ul>
+<li><p><b>动态升级</b>：当一个字符串因为追加（Append）操作而增长时，Redis 会检测当前 Header 是否还能容纳新长度。如果不够，<mark>Redis 会自动将其升级为更高阶的 SDS 类型</mark></p>
+<p>注意⚠️：<b>升级是单向的</b>。 为了<mark>减少频繁内存重分配带来的开销</mark>，Redis 官方实现中，<mark>SDS 结构通常不会在字符串变小时自动“降级”</mark>。即使你把一个巨大的字符串截断得很短，它依然会保留之前的 Header 类型和已分配的内存，直到该 Key 被删除或重写。如果未来又要拼接这个字符串，这些多出来的空间就能派上用场。</p>
 </li>
-<li><b>完成收尾</b>：当 <code>ht[0]</code> 的所有数据都迁移到 <code>ht[1]</code> 后，将 <code>rehashidx</code> 设为 <b>-1</b>。释放 <code>ht[0]</code>，将 <code>ht[1]</code> 设置为新的 <code>ht[0]</code>，并创建一个空的 <code>ht[1]</code> 为下次做准备。</li>
 </ol>
-<h2 id="5-rehash-期间的特殊行为"><a href="#5-rehash-期间的特殊行为" class="headerlink" title="5. rehash 期间的特殊行为"></a>5. rehash 期间的特殊行为</h2><p>在搬迁过程中，字典处于一个“过渡状态”，其行为如下：</p>
-<ul>
-<li><b>查找操作</b>：程序会先在 <code>ht[0]</code> 找，如果没找到，再去 <code>ht[1]</code> 找。</li>
-<li><b>添加操作</b>：所有新键值对一律直接插入 <code>ht[1]</code>。这样可以保证 <code>ht[0]</code> 的数据只减不增，直到变空。</li>
-<li><b>删除&#x2F;更新</b>：同样会在两个表上进行，确保数据一致性。</li>
-</ul>
 
                 
               </div>
@@ -385,8 +385,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Redis渐进式rehash</div>
-      <div>http://example.com/2026/02/04/Redis渐进式rehash/</div>
+      <div>Redis SDS的5种类型</div>
+      <div>http://example.com/2026/02/05/Redis-SDS的5种类型/</div>
     </div>
     <div class="license-meta">
       
@@ -398,7 +398,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年2月4日</div>
+          <div>2026年2月5日</div>
         </div>
       
       
@@ -430,18 +430,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/02/05/Redis-SDS%E7%9A%845%E7%A7%8D%E7%B1%BB%E5%9E%8B/" title="Redis SDS的5种类型">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Redis SDS的5种类型</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/02/04/Redis%E6%80%A7%E8%83%BD%E6%8E%92%E6%9F%A5%E8%B0%83%E4%BC%98/" title="Redis性能排查调优">
-                        <span class="hidden-mobile">Redis性能排查调优</span>
+                      <a href="/2026/02/04/Redis%E6%B8%90%E8%BF%9B%E5%BC%8Frehash/" title="Redis渐进式rehash">
+                        <span class="hidden-mobile">Redis渐进式rehash</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
