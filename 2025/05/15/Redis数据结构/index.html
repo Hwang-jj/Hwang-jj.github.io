@@ -41,8 +41,9 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051458552.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051539628.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051710044.png">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051720565.png">
 <meta property="article:published_time" content="2025-05-15T03:48:12.000Z">
-<meta property="article:modified_time" content="2026-02-05T09:10:50.892Z">
+<meta property="article:modified_time" content="2026-02-05T09:24:54.716Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505151642009.png">
@@ -242,7 +243,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4.2k 字
+          4.3k 字
         
       </span>
     
@@ -253,7 +254,7 @@
         
         
         
-          35 分钟
+          37 分钟
         
       </span>
     
@@ -523,6 +524,13 @@
 </ul>
 <img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051710044.png" srcset="/img/loading.gif" lazyload alt="SkipList数据结构" style="zoom:50%;" />
 
+<h4 id="SkipList查询过程"><a href="#SkipList查询过程" class="headerlink" title="SkipList查询过程"></a>SkipList查询过程</h4><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051720565.png" srcset="/img/loading.gif" lazyload alt="SkipList查询过程"></p>
+<p>查找「元素:abcd，权重:4」的节点时:</p>
+<ul>
+<li>从<code>SkipList</code>头节点最高层L2开始，指向「元素:abc，权重:3」节点，因其权重小于目标权重，访问下一个节点，却发现下一个节点为空</li>
+<li>跳到「元素:abc，权重:3」节点的下一层level[1]，其<code>forward</code>指针指向「元素:abcde，权重:4」节点，虽权重相<br>同，但该节点SDS类型数据大于目标数据，继续跳到下一层level[0]</li>
+<li>在level[0]层，「元素:abc，权重:3」节点的<code>forward</code>指针指向「元素:abcd，权重:4」节点，找到目标节点，查询<br>结束</li>
+</ul>
 <p><b><code>SkipList</code>的特点</b>：</p>
 <ul>
 <li>跳跃表是一个双向链表，每个节点都包含 score 和 ele 值</li>
