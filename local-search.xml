@@ -654,7 +654,7 @@
     <link href="/2025/05/16/JVM-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/"/>
     <url>/2025/05/16/JVM-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/</url>
     
-    <content type="html"><![CDATA[<h1 id="JVM——执行引擎"><a href="#JVM——执行引擎" class="headerlink" title="JVM——执行引擎"></a>JVM——执行引擎</h1><h2 id="为什么说JAVA是“半编译半解释型”语言？"><a href="#为什么说JAVA是“半编译半解释型”语言？" class="headerlink" title="为什么说JAVA是“半编译半解释型”语言？"></a>为什么说JAVA是“半编译半解释型”语言？</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161056353.jpg" alt="IMG_4078"></p><h2 id="JVM的编译器"><a href="#JVM的编译器" class="headerlink" title="JVM的编译器"></a>JVM的编译器</h2><ul><li>Client Compiler（C1）：注重启动速度、局部优化</li><li>Server Compiler（C2）：注重全局优化</li></ul><h2 id="JVM的分层编译"><a href="#JVM的分层编译" class="headerlink" title="JVM的分层编译"></a>JVM的分层编译</h2><ul><li>层级0：解释器</li><li>层级1：C1编译器+轻量级优化</li><li>层级2：C1编译器+完整优化</li><li>层级3：C1编译器+分析数据收集</li><li>层级4：C2编译器</li></ul>]]></content>
+    <content type="html"><![CDATA[<h1 id="JVM——执行引擎"><a href="#JVM——执行引擎" class="headerlink" title="JVM——执行引擎"></a>JVM——执行引擎</h1><h2 id="为什么说JAVA是“半编译半解释型”语言？"><a href="#为什么说JAVA是“半编译半解释型”语言？" class="headerlink" title="为什么说JAVA是“半编译半解释型”语言？"></a>为什么说JAVA是“半编译半解释型”语言？</h2><p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161056353.jpg" alt="IMG_4078"></p><p>事实上，这里的“半编译”应该指的是<b>JIT编译</b></p><h2 id="JVM的编译器"><a href="#JVM的编译器" class="headerlink" title="JVM的编译器"></a>JVM的编译器</h2><ul><li>Client Compiler（C1）：注重启动速度、局部优化</li><li>Server Compiler（C2）：注重全局优化</li></ul><h2 id="JVM的分层编译"><a href="#JVM的分层编译" class="headerlink" title="JVM的分层编译"></a>JVM的分层编译</h2><ul><li>层级0：解释器</li><li>层级1：C1编译器+轻量级优化</li><li>层级2：C1编译器+完整优化</li><li>层级3：C1编译器+分析数据收集</li><li>层级4：C2编译器</li></ul>]]></content>
     
     
     <categories>
