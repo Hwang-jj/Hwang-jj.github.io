@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231033855.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202601191616846.png">
 <meta property="article:published_time" content="2025-05-23T01:20:55.000Z">
-<meta property="article:modified_time" content="2026-01-19T08:19:13.474Z">
+<meta property="article:modified_time" content="2026-03-09T07:30:01.002Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505231033854.webp">
@@ -230,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.1k 字
+          2.2k 字
         
       </span>
     
@@ -241,7 +241,7 @@
         
         
         
-          18 分钟
+          19 分钟
         
       </span>
     
@@ -307,6 +307,9 @@
 <h3 id="2-4-轻量级锁"><a href="#2-4-轻量级锁" class="headerlink" title="2.4 轻量级锁"></a>2.4 轻量级锁</h3><p>当一个线程持有偏向锁时且仍处于活动状态时，另外一个线程来竞争锁，这时偏向锁就会升级为轻量级锁。</p>
 <p>轻量级锁的竞争方式是一种比较轻量级的竞争方式，<mark>当某个线程没有获取到锁，它并不是立刻被阻塞，而是采取CAS+自旋的方式来竞争锁资源</mark>。在竞争较少的情况下，轻量级锁通过<strong>减少线程阻塞和唤醒操作</strong>，可以提高性能。</p>
 <p>轻量级锁的目的在于它<mark>认为系统当前的竞争环境不是很激烈，如果采取阻塞和唤醒线程的方式，则会过多地消耗系统资源</mark>。如果某个线程没有获取到轻量级锁，则采取<strong>自旋</strong>的方式来判断锁资源是否已被释放。这种方式减少了上下文的切换。</p>
+<blockquote>
+<p>⚠️synchronized的轻量级锁是不会自旋的，cas失败直接膨胀成重量级锁，重量级锁竞争失败会自旋一会再阻塞</p>
+</blockquote>
 <h3 id="2-5-重量级锁"><a href="#2-5-重量级锁" class="headerlink" title="2.5 重量级锁"></a>2.5 重量级锁</h3><p>短时间的自旋性能是不错的，但轻量级锁自旋是要有限度的，不能一直在那里空转，这样也是很消耗CPU资源的，所以如果锁竞争环境比较严重，当自旋次数达到某个阈值（默认 10 次，可自动调整）后 或者 等待轻量级锁的线程很多时，就停止自旋，此时锁升级为重量级锁。当其膨胀为重量级锁后，其他线程就不再是等待了，而是<strong>阻塞等待</strong>。重量级锁依赖对象内部的监视器（<code>monitor</code>）实现，而 <code>monitor</code> 依赖的是操作系统的 <code>mutex</code>原语。</p>
 <h3 id="2-6-为什么JDK18中废止了偏向锁"><a href="#2-6-为什么JDK18中废止了偏向锁" class="headerlink" title="2.6 为什么JDK18中废止了偏向锁"></a>2.6 为什么JDK18中废止了偏向锁</h3><ul>
 <li>性能收益不明显<ul>
