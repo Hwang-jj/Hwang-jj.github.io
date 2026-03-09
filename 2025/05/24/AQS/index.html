@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505241523499.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505241523500.png">
 <meta property="article:published_time" content="2025-05-24T06:00:28.000Z">
-<meta property="article:modified_time" content="2025-12-03T06:38:08.215Z">
+<meta property="article:modified_time" content="2026-03-09T07:45:26.405Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505241523493.png">
@@ -246,7 +246,7 @@
         
         
         
-          19 分钟
+          20 分钟
         
       </span>
     
@@ -369,6 +369,7 @@
 <li>没有竞争到锁的线程会加入到队列中，线程阻塞等待的前提是：<mark>当前线程所在的节点的前置节点是正常状态（waitStatus &#x3D; SIGNAL）</mark>。这是为了避免队列中出现异常线程，导致无法唤醒后续线程的情况出现。所以线程阻塞等待之前需要判断它的前置节点状态是否正常，如果使用单向链表，那就只能从头遍历，效率很低</li>
 <li>处于队列中<mark>阻塞等待的线程允许被外部线程通过<code>interrupt()</code>方法去触发唤醒的</mark>，这时节点的状态waitStatus需要修改为<strong>CANCELLED</strong>，标记为CANCELLED的线程就<mark>不需要参与锁的竞争了，但它仍会处于队列中，为了方便移除它，可以选用双向链表</mark></li>
 <li>线程在加入到队列之后，会尝试通过CAS+自旋去获取锁，但我们知道，只有队列中的第一个线程能优先得到锁，后面的线程去尝试获取锁只会浪费资源，于是<mark>在线程尝试CAS+自旋获取锁之前，会判断这个线程的前置节点是不是队列的头节点</mark>，如果是，说明这个线程是队列中的第一个线程，则可以尝试CAS+自旋获取锁；否则直接阻塞等待即可。所以，这个判断前置节点是否是头节点的操作，使用双向链表效率会更高</li>
+<li>由于AQS采用自旋+阻塞，阻塞之后需要前面的线程释放锁之后去唤醒当前线程</li>
 </ul>
 <h2 id="7-AQS唤醒节点时，为什么是从队列后面往前去找的？"><a href="#7-AQS唤醒节点时，为什么是从队列后面往前去找的？" class="headerlink" title="7. AQS唤醒节点时，为什么是从队列后面往前去找的？"></a>7. AQS唤醒节点时，为什么是从队列后面往前去找的？</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// AQS：这里的入参 node 为队列的头节点（虚拟头节点）</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">unparkSuccessor</span><span class="hljs-params">(Node node)</span> &#123;<br>    <span class="hljs-type">int</span> <span class="hljs-variable">ws</span> <span class="hljs-operator">=</span> node.waitStatus;<br>    <span class="hljs-comment">// 1、将头节点的状态进行清除，为后续的唤醒做准备。</span><br>    <span class="hljs-keyword">if</span> (ws &lt; <span class="hljs-number">0</span>)<br>        compareAndSetWaitStatus(node, ws, <span class="hljs-number">0</span>);<br><br>    <span class="hljs-type">Node</span> <span class="hljs-variable">s</span> <span class="hljs-operator">=</span> node.next;<br>    <span class="hljs-comment">// 2、如果后继节点异常，则需要从 tail 向前遍历，找到正常状态的节点进行唤醒。</span><br>    <span class="hljs-keyword">if</span> (s == <span class="hljs-literal">null</span> || s.waitStatus &gt; <span class="hljs-number">0</span>) &#123;<br>        s = <span class="hljs-literal">null</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">Node</span> <span class="hljs-variable">t</span> <span class="hljs-operator">=</span> tail; t != <span class="hljs-literal">null</span> &amp;&amp; t != node; t = t.prev)<br>            <span class="hljs-keyword">if</span> (t.waitStatus &lt;= <span class="hljs-number">0</span>)<br>                s = t;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (s != <span class="hljs-literal">null</span>)<br>        <span class="hljs-comment">// 3、唤醒后继节点</span><br>        LockSupport.unpark(s.thread);<br>&#125;<br></code></pre></td></tr></table></figure>
 
