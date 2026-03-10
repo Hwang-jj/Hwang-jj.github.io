@@ -19,23 +19,23 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Redis字符串的embstr编码和raw编码之间的界限为什么是44字节 引用：https:&#x2F;&#x2F;juejin.cn&#x2F;post&#x2F;7278858311595900987  核心结论：44 字节是为了让整个 RedisObject 对象（包含 SDS Header 和字符串内容）刚好填满 64 字节的内存块 1. Redis字符串编码类型Redis 字符串内部内部编码有三种：  int：存储 8 个字节">
+    <meta name="description" content="Spring是如何解决循环依赖的 循环依赖在Spring中主要有三种情况：  构造器注入时产生的循环依赖问题 多例模式下通过setter方法注入产生的循环依赖问题 单例模式下通过setter方法注入产生的循环依赖问题   1. Spring的三级缓存产生循环依赖的三种情况里，只有单例模式下通过setter方法注入产生的循环依赖问题被Spring解决了，其他两种情况下都会抛出异常。 Spring 创">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Redis字符串的embstr编码和raw编码之间的界限为什么是44字节">
-<meta property="og:url" content="http://example.com/2026/02/05/Redis%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84embstr%E7%BC%96%E7%A0%81%E5%92%8Craw%E7%BC%96%E7%A0%81%E4%B9%8B%E9%97%B4%E7%9A%84%E7%95%8C%E9%99%90%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF44%E5%AD%97%E8%8A%82/index.html">
+<meta property="og:title" content="Spring是如何解决循环依赖的">
+<meta property="og:url" content="http://example.com/2026/03/10/Spring%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E7%9A%84/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="Redis字符串的embstr编码和raw编码之间的界限为什么是44字节 引用：https:&#x2F;&#x2F;juejin.cn&#x2F;post&#x2F;7278858311595900987  核心结论：44 字节是为了让整个 RedisObject 对象（包含 SDS Header 和字符串内容）刚好填满 64 字节的内存块 1. Redis字符串编码类型Redis 字符串内部内部编码有三种：  int：存储 8 个字节">
+<meta property="og:description" content="Spring是如何解决循环依赖的 循环依赖在Spring中主要有三种情况：  构造器注入时产生的循环依赖问题 多例模式下通过setter方法注入产生的循环依赖问题 单例模式下通过setter方法注入产生的循环依赖问题   1. Spring的三级缓存产生循环依赖的三种情况里，只有单例模式下通过setter方法注入产生的循环依赖问题被Spring解决了，其他两种情况下都会抛出异常。 Spring 创">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051944004.png">
-<meta property="article:published_time" content="2026-02-05T11:10:47.000Z">
-<meta property="article:modified_time" content="2026-02-05T12:12:22.146Z">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603101854753.png">
+<meta property="article:published_time" content="2026-03-10T10:30:45.000Z">
+<meta property="article:modified_time" content="2026-03-10T10:58:02.709Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051944004.png">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603101854753.png">
   
   
   
-  <title>Redis字符串的embstr编码和raw编码之间的界限为什么是44字节 - Kon4tsu Blog</title>
+  <title>Spring是如何解决循环依赖的 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -205,7 +205,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Redis字符串的embstr编码和raw编码之间的界限为什么是44字节"></span>
+            <span id="subtitle" data-typed-text="Spring是如何解决循环依赖的"></span>
           
         </div>
 
@@ -216,8 +216,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-02-05 19:10" pubdate>
-          2026年2月5日 晚上
+        <time datetime="2026-03-10 18:30" pubdate>
+          2026年3月10日 晚上
         </time>
       </span>
     
@@ -228,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          674 字
+          1.7k 字
         
       </span>
     
@@ -239,7 +239,7 @@
         
         
         
-          6 分钟
+          15 分钟
         
       </span>
     
@@ -276,45 +276,73 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Redis字符串的embstr编码和raw编码之间的界限为什么是44字节</h1>
+            <h1 id="seo-header">Spring是如何解决循环依赖的</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="Redis字符串的embstr编码和raw编码之间的界限为什么是44字节"><a href="#Redis字符串的embstr编码和raw编码之间的界限为什么是44字节" class="headerlink" title="Redis字符串的embstr编码和raw编码之间的界限为什么是44字节"></a>Redis字符串的embstr编码和raw编码之间的界限为什么是44字节</h1><blockquote>
-<p>引用：<a target="_blank" rel="noopener" href="https://juejin.cn/post/7278858311595900987">https://juejin.cn/post/7278858311595900987</a></p>
-</blockquote>
-<p><mark>核心结论：44 字节是为了让整个 <code>RedisObject</code> 对象（包含 SDS Header 和字符串内容）刚好填满 64 字节的内存块</mark></p>
-<h2 id="1-Redis字符串编码类型"><a href="#1-Redis字符串编码类型" class="headerlink" title="1. Redis字符串编码类型"></a>1. Redis字符串编码类型</h2><p>Redis 字符串内部内部编码有三种：</p>
-<ol>
-<li><code>int</code>：存储 8 个字节的长整型</li>
-<li><code>embstr</code>：代表 <code>embstr</code> 格式的 SDS，存储小于 44 个字节的字符串（3.2 版本之前是 39 个字节），只分配一次内存空间（因为 <code>RedisObject</code> 和 SDS 是连续的，但它是<b>只读</b>的，任何修改都会导致它升级为 <code>raw</code>，因为原地修改<code>embstr</code>成本很高）</li>
-<li><code>raw</code>：存储大于 44 个字节的字符串（3.2 版本之前是 39 个字节），需要分配两次内存空间（分别为 <code>RedisObject</code> 和 SDS 分配空间）</li>
-</ol>
-<h2 id="2-embstr结构"><a href="#2-embstr结构" class="headerlink" title="2. embstr结构"></a>2. embstr结构</h2><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202602051944004.png" srcset="/img/loading.gif" lazyload alt="embstr结构" style="zoom:50%;" />
-
-<p><code>embstr</code>分配的是连续的一块内存，包含<code>redisObjec</code>和<code>sds</code>，<code>redisObject</code>占用了16个字节</p>
-<h3 id="2-1-Redis3-2之前的embstr"><a href="#2-1-Redis3-2之前的embstr" class="headerlink" title="2.1 Redis3.2之前的embstr"></a>2.1 Redis3.2之前的embstr</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sdshdr</span> &#123;</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> len;		<span class="hljs-comment">// buf 中已占用空间的长度，4字节</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> <span class="hljs-built_in">free</span>;	<span class="hljs-comment">// buf 中剩余可用空间的长度，4字节</span><br>    <span class="hljs-type">char</span> buf[];	<span class="hljs-comment">// 数据空间</span><br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<p>当存储<b>39字节</b>时，<code>embstr</code>大小为：16(<code>redisObject</code>) + 4(<code>len</code>) + 4(<code>free</code>) + 39(<code>buf</code>) + 1(<code>\0</code>) &#x3D; 64字节</p>
-<p>也就是说只要是存储的内容小于39个字节的，分配的空间都是64个字节。超过64个字节就为<code>raw</code></p>
-<h3 id="2-2-Redis3-2之后的embstr"><a href="#2-2-Redis3-2之后的embstr" class="headerlink" title="2.2 Redis3.2之后的embstr"></a>2.2 Redis3.2之后的embstr</h3><p>sds使用了<code>uint8_t</code>代替<code>uint</code>，占用的内存空间更小了</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr8</span> &#123;</span><br>    <span class="hljs-type">uint8_t</span> len; <span class="hljs-comment">// 1字节</span><br>    <span class="hljs-type">uint8_t</span> alloc; <span class="hljs-comment">// 1字节</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">// 1字节</span><br>    <span class="hljs-type">char</span> buf[];<br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<p>当存储<b>44字节</b>时，<code>embstr</code>大小为：16(<code>redisObject</code>) + 1(<code>len</code>) + 1(<code>alloc</code>) + 1(<code>flags</code>) + 44(<code>buf</code>) + 1(<code>\0</code>) &#x3D; 64字节</p>
-<p>同理也是超过64字节就为<code>raw</code></p>
-<h3 id="2-3-特殊情况：sdshdr5"><a href="#2-3-特殊情况：sdshdr5" class="headerlink" title="2.3 特殊情况：sdshdr5"></a>2.3 特殊情况：sdshdr5</h3><p>由于 sdshdr5 的结构和 sdshdr8&#x2F;16&#x2F;32&#x2F;64 不同，它不直接用来做<code>embstr</code></p>
-<p>Redis 字符串的物理表现总结为三级：</p>
-<ol>
-<li><b>极小静态（sdshdr5）</b>：主要在内存极度受限或冷数据加载时由系统内部使用（通常 &lt; 32 字节）</li>
-<li><b>小动态（embstr + sdshdr8）</b>：<b>0 到 44 字节</b>。这是最常见的形态，连续内存，一次分配，性能最高</li>
-<li><b>大动态（raw + sdshdr8&#x2F;16&#x2F;32&#x2F;64）</b>：<b>大于 44 字节</b>。两次分配，内存不连续，适合存储大数据或频繁修改的数据</li>
-</ol>
-<h2 id="3-为什么是64字节？"><a href="#3-为什么是64字节？" class="headerlink" title="3. 为什么是64字节？"></a>3. 为什么是64字节？</h2><p>在 Linux 中，主流的内存分配器（如 jemalloc）是以 $2^n$ 次方来划分内存池的。而 CPU 的 <b>Cache Line（缓存行）</b> 大小通常也是 <b>64 字节</b></p>
+                <h1 id="Spring是如何解决循环依赖的"><a href="#Spring是如何解决循环依赖的" class="headerlink" title="Spring是如何解决循环依赖的"></a>Spring是如何解决循环依赖的</h1><blockquote>
+<p>循环依赖在Spring中主要有三种情况：</p>
 <ul>
-<li>如果一个对象超过了 64 字节，它可能就需要跨缓存行存储，或者被分配到 128 字节的内存块中，这会造成内存碎片和性能下降。</li>
-<li>因此，Redis 希望尽可能将小的字符串控制在 64 字节以内。</li>
+<li>构造器注入时产生的循环依赖问题</li>
+<li>多例模式下通过setter方法注入产生的循环依赖问题</li>
+<li>单例模式下通过setter方法注入产生的循环依赖问题</li>
 </ul>
+</blockquote>
+<h2 id="1-Spring的三级缓存"><a href="#1-Spring的三级缓存" class="headerlink" title="1. Spring的三级缓存"></a>1. Spring的三级缓存</h2><p>产生循环依赖的三种情况里，<mark>只有单例模式下通过setter方法注入产生的循环依赖问题被Spring解决了</mark>，其他两种情况下都会抛出异常。</p>
+<p>Spring 创建一个 Bean 流程通常分为三个大步：</p>
+<ol>
+<li><b>实例化 (Instantiation)</b>：调用构造函数，在堆内存中开辟空间，此时对象已产生（但属性是空的）。</li>
+<li><b>属性填充 (Population)</b>：注入依赖（Setter 注入或字段注入在此阶段）。</li>
+<li><b>初始化 (Initialization)</b>：执行 <code>init-method</code> 或 <code>@PostConstruct</code>。</li>
+</ol>
+<p>Spring维护了三个重要的缓存：</p>
+<ul>
+<li><b>一级缓存singletonObjects</b>：存放完全初始化好的，可用的Bean实例</li>
+<li><b>二级缓存earlySingletonObjects</b>：存放的是<mark>需要提前暴露的Bean对象的原始引用 或 代理对应引用</mark>，此时的Bean已经实例化，但属性尚未填充，初始化方法尚未执行</li>
+<li><b>三级缓存singletonFactories</b>：存放的是Bean的ObjectFactory工厂对象，这是解决循环依赖问题和AOP代理协同工作的关键。当对象实例化后，Spring会创建一个对应对象的ObjectFactory，并放进三级缓存里</li>
+</ul>
+<p>假设存在两个相互依赖的单例Bean:BeanA和BeanB。当Spring容器启动时，它会按照以下流程处理：</p>
+<ol>
+<li><h3 id="创建BeanA的实例并提前暴露工厂："><a href="#创建BeanA的实例并提前暴露工厂：" class="headerlink" title="创建BeanA的实例并提前暴露工厂："></a>创建BeanA的实例并提前暴露工厂：</h3><p>Spring会首先调用BeanA的构造函数进行实例化，此时得到一个原始对象（尚未填充属性）。</p>
+<p>紧接着，Spring会将一个特殊的ObjectFactory工厂对象放入第三级缓存中。<mark>这个工厂的使命是，当其他的Bean需要引用BeanA时，它能动态返回当前这个半成品BeanA（可能是原始对象，也可能是为应对AOP而提前生成的代理对象）</mark>。</p>
+<p>此时BeanA的状态是“已实例化但并未初始化”。</p>
+</li>
+<li><h3 id="填充BeanA的属性时触发BeanB的创建："><a href="#填充BeanA的属性时触发BeanB的创建：" class="headerlink" title="填充BeanA的属性时触发BeanB的创建："></a>填充BeanA的属性时触发BeanB的创建：</h3><p>Spring开始为BeanA注入属性，发现它依赖于BeanB。</p>
+<p>于是容器转向创建BeanB，同样先调用其构造函数实例化，并将BeanB对应的ObjectFactory工厂存入三级缓存</p>
+<p>至此，三级缓存中同时存在BeanA和BeanB的工厂，它们都代表尚未完成初始化的半成品。</p>
+</li>
+<li><h3 id="BeanB属性注入时发现循环依赖："><a href="#BeanB属性注入时发现循环依赖：" class="headerlink" title="BeanB属性注入时发现循环依赖："></a>BeanB属性注入时发现循环依赖：</h3><p>当Spring尝试填充BeanB的属性时，检测到它需要注入BeanA。</p>
+<p>此时容器启动依赖查找:</p>
+<ul>
+<li>在一级缓存（存放完整Bean）中未找到BeanA</li>
+<li>在二级缓存（存放已暴露的早期引用）中同样未命中</li>
+<li>最终在三级缓存中定位到BeanA的工厂</li>
+</ul>
+<p>Spring立即调用该工厂的getObject()方法。这个方法会执行关键决策：<mark>若BeanA需要AOP代理，则动态生成代理对象(即使BeanA还未初始化)。若无需代理，则直接返回原始对象</mark>。</p>
+<p>得到的这个早期引用（可能是代理）被放入<b>二级缓存</b>，同时从三级缓存清理工厂条目。</p>
+<p>最后，Spring将这个早期引用注入到BeanB的属性中。</p>
+</li>
+<li><h3 id="完成BeanB的生命周期："><a href="#完成BeanB的生命周期：" class="headerlink" title="完成BeanB的生命周期："></a>完成BeanB的生命周期：</h3><p>BeanB获得所有依赖后，Spring执行其初始化方法，将其转换为可用的Bean。</p>
+<p>随后，BeanB被提升至一级缓存，二级和三级缓存中关于BeanB的临时条目均被清除。</p>
+<p>此时，BeanB已准备就绪，可被其他对象使用。</p>
+</li>
+<li><h3 id="回溯完成BeanA的创建："><a href="#回溯完成BeanA的创建：" class="headerlink" title="回溯完成BeanA的创建："></a>回溯完成BeanA的创建：</h3><p>随着BeanB创建完成，流程回溯到最初中断的BeanA属性注入环节。Spring将已完备的BeanB实例注入BeanA，接着执行BeanA的初始化方法。</p>
+<p>这里有个精妙细节：若之前BeanA生成过早期代理，Spring会直接复用二级缓存中的代理对象作为最终Bean，而非重复创建。</p>
+<p>最终，完全初始化的BeanA（可能是原始对象或代理）入驻一级缓存，其早期引用从二级缓存移除。</p>
+</li>
+</ol>
+<p>至此循环闭环完成，两个Bean均可用。</p>
+<h2 id="2-为什么Spring的三级缓存策略仅适用于setter注入的方式，对于构造器注入无效？"><a href="#2-为什么Spring的三级缓存策略仅适用于setter注入的方式，对于构造器注入无效？" class="headerlink" title="2. 为什么Spring的三级缓存策略仅适用于setter注入的方式，对于构造器注入无效？"></a>2. 为什么Spring的三级缓存策略仅适用于setter注入的方式，对于构造器注入无效？</h2><h3 id="Setter-注入的逻辑"><a href="#Setter-注入的逻辑" class="headerlink" title="Setter 注入的逻辑"></a>Setter 注入的逻辑</h3><p>在 Setter 注入中，Spring 会先执行第一步（实例化）。<mark>一旦第一步完成，这个“半成品”对象的引用就已经产生了</mark>。Spring 此时会将这个对象的 ObjectFactory 放入三级缓存。 如果此时发生了循环依赖，另一个 Bean 可以直接从缓存中拿到这个“半成品”的引用，从而完成注入。</p>
+<h3 id="构造器注入的逻辑"><a href="#构造器注入的逻辑" class="headerlink" title="构造器注入的逻辑"></a>构造器注入的逻辑</h3><p>在构造器注入中，<mark>实例化和属性填充是同时发生的</mark>。 <mark>Spring 必须先拿到构造函数所需的所有参数，才能调用构造函数</mark>。如果 A 的构造函数需要 B，Spring 就会去创建 B；如果 B 的构造函数又需要 A，Spring 又要去创建 A。 关键点在于： 此时 A 还没有完成实例化，内存中甚至还没有 A 的引用。既然连对象都没创建出来，Spring 就没办法把 A 放入三级缓存。</p>
+<h3 id="如果非要用构造器注入处理循环依赖怎么办？"><a href="#如果非要用构造器注入处理循环依赖怎么办？" class="headerlink" title="如果非要用构造器注入处理循环依赖怎么办？"></a>如果非要用构造器注入处理循环依赖怎么办？</h3><p>@Lazy注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-title function_">A</span><span class="hljs-params">(<span class="hljs-meta">@Lazy</span> B b)</span> &#123;<br>    <span class="hljs-built_in">this</span>.b = b;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>原理：当加上 <code>@Lazy</code> 时，Spring 不会立即去寻找真正的 B，而是给 A 注入一个 <b>B 的代理对象 </b>。 因为代理对象是可以立即生成的，A 的构造函数就能顺利完成执行，A 成功实例化。等到 A 真正调用 <code>b.method()</code> 时，代理对象才会去容器里找真正的 B。<mark>这相当于人为地把“依赖解析”推迟到了“使用时”，从而打破了死循环</mark>。</p>
+<h2 id="3-为什么Spring用三级缓存而不是二级缓存解决循环依赖问题？"><a href="#3-为什么Spring用三级缓存而不是二级缓存解决循环依赖问题？" class="headerlink" title="3. 为什么Spring用三级缓存而不是二级缓存解决循环依赖问题？"></a>3. 为什么Spring用三级缓存而不是二级缓存解决循环依赖问题？</h2><p>Spring用三级缓存解决循环依赖问题，<mark>核心是为了正确处理AOP代理的Bean</mark></p>
+<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603101854753.png" srcset="/img/loading.gif" lazyload alt="image-20260310185453818"></p>
+<p>三级缓存中的ObjecFactory就是解决这个问题的关键。它不是直接缓存对象，而是存了一个能生产对象的工厂</p>
+<p>当发生循环依赖时，调用这个工厂的getObject()方法，这时Spring会智能判断：如果这个Bean最终需要代理，就提前生成代理对象并存入二级缓存，如果不需要代理，就返回原始对象。这样一来，<mark>B注入的就是A的最终形态(可能是代理对象)，后续A初始化完成后也不再会创建新代理，保证了对象全局唯一</mark></p>
 
                 
               </div>
@@ -333,7 +361,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
   
   
 
@@ -353,8 +381,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Redis字符串的embstr编码和raw编码之间的界限为什么是44字节</div>
-      <div>http://example.com/2026/02/05/Redis字符串的embstr编码和raw编码之间的界限为什么是44字节/</div>
+      <div>Spring是如何解决循环依赖的</div>
+      <div>http://example.com/2026/03/10/Spring是如何解决循环依赖的/</div>
     </div>
     <div class="license-meta">
       
@@ -366,7 +394,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年2月5日</div>
+          <div>2026年3月10日</div>
         </div>
       
       
@@ -398,18 +426,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/03/10/Spring%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E7%9A%84/" title="Spring是如何解决循环依赖的">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Spring是如何解决循环依赖的</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/02/05/Redis-SDS%E7%9A%845%E7%A7%8D%E7%B1%BB%E5%9E%8B/" title="Redis SDS的5种类型">
-                        <span class="hidden-mobile">Redis SDS的5种类型</span>
+                      <a href="/2026/02/05/Redis%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84embstr%E7%BC%96%E7%A0%81%E5%92%8Craw%E7%BC%96%E7%A0%81%E4%B9%8B%E9%97%B4%E7%9A%84%E7%95%8C%E9%99%90%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF44%E5%AD%97%E8%8A%82/" title="Redis字符串的embstr编码和raw编码之间的界限为什么是44字节">
+                        <span class="hidden-mobile">Redis字符串的embstr编码和raw编码之间的界限为什么是44字节</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -461,12 +483,6 @@
 
 
 
-  
-
-
-
-
-  
   
 
 
@@ -660,49 +676,6 @@
   });
 </script>
 
-
-  
-      <script>
-        if (!window.MathJax) {
-          window.MathJax = {
-            tex    : {
-              inlineMath: { '[+]': [['$', '$']] }
-            },
-            loader : {
-              load: ['ui/lazy']
-            },
-            options: {
-              renderActions: {
-                insertedScript: [200, () => {
-                  document.querySelectorAll('mjx-container').forEach(node => {
-                    let target = node.parentNode;
-                    if (target.nodeName.toLowerCase() === 'li') {
-                      target.parentNode.classList.add('has-jax');
-                    }
-                  });
-                }, '', false]
-              }
-            }
-          };
-        } else {
-          MathJax.startup.document.state(0);
-          MathJax.texReset();
-          MathJax.typeset();
-          MathJax.typesetPromise();
-        }
-
-        Fluid.events.registerRefreshCallback(function() {
-          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
-            MathJax.startup.document.state(0);
-            MathJax.texReset();
-            MathJax.typeset();
-            MathJax.typesetPromise();
-          }
-        });
-      </script>
-    
-
-  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script  src="/js/local-search.js" ></script>
 
