@@ -29,7 +29,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161005824.png">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161005498.png">
 <meta property="article:published_time" content="2025-05-16T01:53:12.000Z">
-<meta property="article:modified_time" content="2026-03-10T06:37:37.628Z">
+<meta property="article:modified_time" content="2026-03-10T07:00:53.622Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202505161005824.png">
@@ -229,7 +229,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          1.3k 字
         
       </span>
     
@@ -240,7 +240,7 @@
         
         
         
-          10 分钟
+          12 分钟
         
       </span>
     
@@ -346,6 +346,13 @@
 <h3 id="3-初始化0值"><a href="#3-初始化0值" class="headerlink" title="3. 初始化0值"></a>3. 初始化0值</h3><h3 id="4-进行必要设置"><a href="#4-进行必要设置" class="headerlink" title="4. 进行必要设置"></a>4. 进行必要设置</h3><p>初始化0值完成后，虚拟机要对对象进行必要的设置，例如这个对象是哪个类的实例，如何才能找到类的元数据信息，对象的hash码，对象的GC分代年龄等信息。这些信息存放在对象头中。</p>
 <p>另外，根据虚拟机的状态不同，是否启用偏向锁等，对象头会有不同的设置方式。</p>
 <h3 id="5-执行init方法"><a href="#5-执行init方法" class="headerlink" title="5. 执行init方法"></a>5. 执行init方法</h3><p>即执行对象的构造函数</p>
+<h2 id="4-类卸载"><a href="#4-类卸载" class="headerlink" title="4. 类卸载"></a>4. 类卸载</h2><p>卸载类需要满足三个条件：</p>
+<ul>
+<li>该类对应的所有实例对象都已被GC，即堆中不存在该类的实例对象</li>
+<li>该类对应的class对象没有在其他任何地方被引用，无法在任何地方通过反射访问该类的方法</li>
+<li>该类的类加载器实例已被GC</li>
+</ul>
+<p>所以，<mark>在JVM生命周期内，由JVM自带的类加载器加载的类是不会被卸载的</mark>，因为自带的类加载器不会被GC。只有由我们自定义的类加载器所加载的类会被卸载</p>
 
                 
               </div>
