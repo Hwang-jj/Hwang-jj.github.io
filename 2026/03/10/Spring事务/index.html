@@ -19,23 +19,21 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Spring是如何解决循环依赖的 循环依赖在Spring中主要有三种情况：  构造器注入时产生的循环依赖问题 多例模式下通过setter方法注入产生的循环依赖问题 单例模式下通过setter方法注入产生的循环依赖问题   1. Spring的三级缓存产生循环依赖的三种情况里，只有单例模式下通过setter方法注入产生的循环依赖问题被Spring解决了，其他两种情况下都会抛出异常。 Spring 创">
+    <meta name="description" content="Spring事务1. Spring事务失效场景访问权限问题 Spring 使用动态代理或字节码增强来实现 AOP。当调用一个被 @Transactional 注解标记的方法时，代理对象会拦截调用，并在方法执行前后添加事务管理逻辑。然而，private 方法无法被代理对象拦截，因为它们对外部不可见。  Spring要求被代理的事务方法必须是public的。如果将事务方法定义为private、defa">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spring是如何解决循环依赖的">
-<meta property="og:url" content="http://example.com/2026/03/10/Spring%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E7%9A%84/index.html">
+<meta property="og:title" content="Spring事务">
+<meta property="og:url" content="http://example.com/2026/03/10/Spring%E4%BA%8B%E5%8A%A1/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="Spring是如何解决循环依赖的 循环依赖在Spring中主要有三种情况：  构造器注入时产生的循环依赖问题 多例模式下通过setter方法注入产生的循环依赖问题 单例模式下通过setter方法注入产生的循环依赖问题   1. Spring的三级缓存产生循环依赖的三种情况里，只有单例模式下通过setter方法注入产生的循环依赖问题被Spring解决了，其他两种情况下都会抛出异常。 Spring 创">
+<meta property="og:description" content="Spring事务1. Spring事务失效场景访问权限问题 Spring 使用动态代理或字节码增强来实现 AOP。当调用一个被 @Transactional 注解标记的方法时，代理对象会拦截调用，并在方法执行前后添加事务管理逻辑。然而，private 方法无法被代理对象拦截，因为它们对外部不可见。  Spring要求被代理的事务方法必须是public的。如果将事务方法定义为private、defa">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603101854753.png">
-<meta property="article:published_time" content="2026-03-10T10:30:45.000Z">
-<meta property="article:modified_time" content="2026-03-10T10:58:02.709Z">
+<meta property="article:published_time" content="2026-03-10T11:13:16.000Z">
+<meta property="article:modified_time" content="2026-03-10T11:20:12.324Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603101854753.png">
   
   
   
-  <title>Spring是如何解决循环依赖的 - Kon4tsu Blog</title>
+  <title>Spring事务 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -205,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Spring是如何解决循环依赖的"></span>
+            <span id="subtitle" data-typed-text="Spring事务"></span>
           
         </div>
 
@@ -216,7 +214,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-03-10 18:30" pubdate>
+        <time datetime="2026-03-10 19:13" pubdate>
           2026年3月10日 晚上
         </time>
       </span>
@@ -228,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.7k 字
+          806 字
         
       </span>
     
@@ -239,7 +237,7 @@
         
         
         
-          15 分钟
+          7 分钟
         
       </span>
     
@@ -276,73 +274,23 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Spring是如何解决循环依赖的</h1>
+            <h1 id="seo-header">Spring事务</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="Spring是如何解决循环依赖的"><a href="#Spring是如何解决循环依赖的" class="headerlink" title="Spring是如何解决循环依赖的"></a>Spring是如何解决循环依赖的</h1><blockquote>
-<p>循环依赖在Spring中主要有三种情况：</p>
-<ul>
-<li>构造器注入时产生的循环依赖问题</li>
-<li>多例模式下通过setter方法注入产生的循环依赖问题</li>
-<li>单例模式下通过setter方法注入产生的循环依赖问题</li>
-</ul>
+                <h1 id="Spring事务"><a href="#Spring事务" class="headerlink" title="Spring事务"></a>Spring事务</h1><h2 id="1-Spring事务失效场景"><a href="#1-Spring事务失效场景" class="headerlink" title="1. Spring事务失效场景"></a>1. Spring事务失效场景</h2><h3 id="访问权限问题"><a href="#访问权限问题" class="headerlink" title="访问权限问题"></a>访问权限问题</h3><blockquote>
+<p>Spring 使用动态代理或字节码增强来实现 AOP。当调用一个被 <em>@Transactional</em> 注解标记的方法时，代理对象会拦截调用，并在方法执行前后添加事务管理逻辑。然而，<mark>private 方法无法被代理对象拦截</mark>，因为它们对外部不可见。</p>
 </blockquote>
-<h2 id="1-Spring的三级缓存"><a href="#1-Spring的三级缓存" class="headerlink" title="1. Spring的三级缓存"></a>1. Spring的三级缓存</h2><p>产生循环依赖的三种情况里，<mark>只有单例模式下通过setter方法注入产生的循环依赖问题被Spring解决了</mark>，其他两种情况下都会抛出异常。</p>
-<p>Spring 创建一个 Bean 流程通常分为三个大步：</p>
-<ol>
-<li><b>实例化 (Instantiation)</b>：调用构造函数，在堆内存中开辟空间，此时对象已产生（但属性是空的）。</li>
-<li><b>属性填充 (Population)</b>：注入依赖（Setter 注入或字段注入在此阶段）。</li>
-<li><b>初始化 (Initialization)</b>：执行 <code>init-method</code> 或 <code>@PostConstruct</code>。</li>
-</ol>
-<p>Spring维护了三个重要的缓存：</p>
-<ul>
-<li><b>一级缓存singletonObjects</b>：存放完全初始化好的，可用的Bean实例</li>
-<li><b>二级缓存earlySingletonObjects</b>：存放的是<mark>需要提前暴露的Bean对象的原始引用 或 代理对应引用</mark>，此时的Bean已经实例化，但属性尚未填充，初始化方法尚未执行</li>
-<li><b>三级缓存singletonFactories</b>：存放的是Bean的ObjectFactory工厂对象，这是解决循环依赖问题和AOP代理协同工作的关键。当对象实例化后，Spring会创建一个对应对象的ObjectFactory，并放进三级缓存里</li>
-</ul>
-<p>假设存在两个相互依赖的单例Bean:BeanA和BeanB。当Spring容器启动时，它会按照以下流程处理：</p>
-<ol>
-<li><h3 id="创建BeanA的实例并提前暴露工厂："><a href="#创建BeanA的实例并提前暴露工厂：" class="headerlink" title="创建BeanA的实例并提前暴露工厂："></a>创建BeanA的实例并提前暴露工厂：</h3><p>Spring会首先调用BeanA的构造函数进行实例化，此时得到一个原始对象（尚未填充属性）。</p>
-<p>紧接着，Spring会将一个特殊的ObjectFactory工厂对象放入第三级缓存中。<mark>这个工厂的使命是，当其他的Bean需要引用BeanA时，它能动态返回当前这个半成品BeanA（可能是原始对象，也可能是为应对AOP而提前生成的代理对象）</mark>。</p>
-<p>此时BeanA的状态是“已实例化但并未初始化”。</p>
-</li>
-<li><h3 id="填充BeanA的属性时触发BeanB的创建："><a href="#填充BeanA的属性时触发BeanB的创建：" class="headerlink" title="填充BeanA的属性时触发BeanB的创建："></a>填充BeanA的属性时触发BeanB的创建：</h3><p>Spring开始为BeanA注入属性，发现它依赖于BeanB。</p>
-<p>于是容器转向创建BeanB，同样先调用其构造函数实例化，并将BeanB对应的ObjectFactory工厂存入三级缓存</p>
-<p>至此，三级缓存中同时存在BeanA和BeanB的工厂，它们都代表尚未完成初始化的半成品。</p>
-</li>
-<li><h3 id="BeanB属性注入时发现循环依赖："><a href="#BeanB属性注入时发现循环依赖：" class="headerlink" title="BeanB属性注入时发现循环依赖："></a>BeanB属性注入时发现循环依赖：</h3><p>当Spring尝试填充BeanB的属性时，检测到它需要注入BeanA。</p>
-<p>此时容器启动依赖查找:</p>
-<ul>
-<li>在一级缓存（存放完整Bean）中未找到BeanA</li>
-<li>在二级缓存（存放已暴露的早期引用）中同样未命中</li>
-<li>最终在三级缓存中定位到BeanA的工厂</li>
-</ul>
-<p>Spring立即调用该工厂的getObject()方法。这个方法会执行关键决策：<mark>若BeanA需要AOP代理，则动态生成代理对象(即使BeanA还未初始化)。若无需代理，则直接返回原始对象</mark>。</p>
-<p>得到的这个早期引用（可能是代理）被放入<b>二级缓存</b>，同时从三级缓存清理工厂条目。</p>
-<p>最后，Spring将这个早期引用注入到BeanB的属性中。</p>
-</li>
-<li><h3 id="完成BeanB的生命周期："><a href="#完成BeanB的生命周期：" class="headerlink" title="完成BeanB的生命周期："></a>完成BeanB的生命周期：</h3><p>BeanB获得所有依赖后，Spring执行其初始化方法，将其转换为可用的Bean。</p>
-<p>随后，BeanB被提升至一级缓存，二级和三级缓存中关于BeanB的临时条目均被清除。</p>
-<p>此时，BeanB已准备就绪，可被其他对象使用。</p>
-</li>
-<li><h3 id="回溯完成BeanA的创建："><a href="#回溯完成BeanA的创建：" class="headerlink" title="回溯完成BeanA的创建："></a>回溯完成BeanA的创建：</h3><p>随着BeanB创建完成，流程回溯到最初中断的BeanA属性注入环节。Spring将已完备的BeanB实例注入BeanA，接着执行BeanA的初始化方法。</p>
-<p>这里有个精妙细节：若之前BeanA生成过早期代理，Spring会直接复用二级缓存中的代理对象作为最终Bean，而非重复创建。</p>
-<p>最终，完全初始化的BeanA（可能是原始对象或代理）入驻一级缓存，其早期引用从二级缓存移除。</p>
-</li>
-</ol>
-<p>至此循环闭环完成，两个Bean均可用。</p>
-<h2 id="2-为什么Spring的三级缓存策略仅适用于setter注入的方式，对于构造器注入无效？"><a href="#2-为什么Spring的三级缓存策略仅适用于setter注入的方式，对于构造器注入无效？" class="headerlink" title="2. 为什么Spring的三级缓存策略仅适用于setter注入的方式，对于构造器注入无效？"></a>2. 为什么Spring的三级缓存策略仅适用于setter注入的方式，对于构造器注入无效？</h2><h3 id="Setter-注入的逻辑"><a href="#Setter-注入的逻辑" class="headerlink" title="Setter 注入的逻辑"></a>Setter 注入的逻辑</h3><p>在 Setter 注入中，Spring 会先执行第一步（实例化）。<mark>一旦第一步完成，这个“半成品”对象的引用就已经产生了</mark>。Spring 此时会将这个对象的 ObjectFactory 放入三级缓存。 如果此时发生了循环依赖，另一个 Bean 可以直接从缓存中拿到这个“半成品”的引用，从而完成注入。</p>
-<h3 id="构造器注入的逻辑"><a href="#构造器注入的逻辑" class="headerlink" title="构造器注入的逻辑"></a>构造器注入的逻辑</h3><p>在构造器注入中，<mark>实例化和属性填充是同时发生的</mark>。 <mark>Spring 必须先拿到构造函数所需的所有参数，才能调用构造函数</mark>。如果 A 的构造函数需要 B，Spring 就会去创建 B；如果 B 的构造函数又需要 A，Spring 又要去创建 A。 关键点在于： 此时 A 还没有完成实例化，内存中甚至还没有 A 的引用。既然连对象都没创建出来，Spring 就没办法把 A 放入三级缓存。</p>
-<h3 id="如果非要用构造器注入处理循环依赖怎么办？"><a href="#如果非要用构造器注入处理循环依赖怎么办？" class="headerlink" title="如果非要用构造器注入处理循环依赖怎么办？"></a>如果非要用构造器注入处理循环依赖怎么办？</h3><p>@Lazy注解</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-title function_">A</span><span class="hljs-params">(<span class="hljs-meta">@Lazy</span> B b)</span> &#123;<br>    <span class="hljs-built_in">this</span>.b = b;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>原理：当加上 <code>@Lazy</code> 时，Spring 不会立即去寻找真正的 B，而是给 A 注入一个 <b>B 的代理对象 </b>。 因为代理对象是可以立即生成的，A 的构造函数就能顺利完成执行，A 成功实例化。等到 A 真正调用 <code>b.method()</code> 时，代理对象才会去容器里找真正的 B。<mark>这相当于人为地把“依赖解析”推迟到了“使用时”，从而打破了死循环</mark>。</p>
-<h2 id="3-为什么Spring用三级缓存而不是二级缓存解决循环依赖问题？"><a href="#3-为什么Spring用三级缓存而不是二级缓存解决循环依赖问题？" class="headerlink" title="3. 为什么Spring用三级缓存而不是二级缓存解决循环依赖问题？"></a>3. 为什么Spring用三级缓存而不是二级缓存解决循环依赖问题？</h2><p>Spring用三级缓存解决循环依赖问题，<mark>核心是为了正确处理AOP代理的Bean</mark></p>
-<p><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603101854753.png" srcset="/img/loading.gif" lazyload alt="image-20260310185453818"></p>
-<p>三级缓存中的ObjecFactory就是解决这个问题的关键。它不是直接缓存对象，而是存了一个能生产对象的工厂</p>
-<p>当发生循环依赖时，调用这个工厂的getObject()方法，这时Spring会智能判断：如果这个Bean最终需要代理，就提前生成代理对象并存入二级缓存，如果不需要代理，就返回原始对象。这样一来，<mark>B注入的就是A的最终形态(可能是代理对象)，后续A初始化完成后也不再会创建新代理，保证了对象全局唯一</mark></p>
+<p>Spring要求被代理的事务方法必须是public的。如果将事务方法定义为private、default或protected，Spring将不会提供事务支持。例如，如果一个方法被标记为@Transactional但被定义为private，那么事务将不会生效。</p>
+<h3 id="方法用static、final修饰"><a href="#方法用static、final修饰" class="headerlink" title="方法用static、final修饰"></a>方法用static、final修饰</h3><p>如果一个事务方法被final修饰，那么在其<mark>代理类中无法重写该方法</mark>，从而无法添加事务功能。同样，如果方法是static的，也无法通过动态代理变成事务方法。</p>
+<h3 id="方法内部调用"><a href="#方法内部调用" class="headerlink" title="方法内部调用"></a>方法内部调用</h3><p>在同一个类中，一个方法直接调用另一个事务方法时，被调用的方法不会产生事务（<mark>方法内部直接调用相当于使用<b>this</b>调用另一个事物方法，而这个this指的是未被代理的对象，自然无法产生事务</mark>）。这是因为Spring AOP生成的代理对象不会介入这种内部调用。要解决这个问题，可以通过在Service类中注入自己，或使用AopContext.currentProxy()获取代理对象。</p>
+<h3 id="未被Spring管理的类"><a href="#未被Spring管理的类" class="headerlink" title="未被Spring管理的类"></a>未被Spring管理的类</h3><p>使用Spring事务的前提是对象必须被Spring管理。如果忘记在类上添加@Service或其他相关注解，那么该类的事务方法不会生效。</p>
+<h3 id="多线程调用"><a href="#多线程调用" class="headerlink" title="多线程调用"></a>多线程调用</h3><p>在多线程环境中使用Spring事务时，每个线程都会有自己的数据库连接，因此它们不会共享同一个事务。如果<mark>在一个线程中的事务方法中启动了另一个线程来执行另一个事务方法</mark>，那么这两个方法将不会在同一个事务中。</p>
+<h3 id="表不支持事务"><a href="#表不支持事务" class="headerlink" title="表不支持事务"></a>表不支持事务</h3><p>在MySQL中，MyISAM存储引擎不支持事务。如果操作的表使用了MyISAM引擎，那么事务将不会生效。在MySQL 5之后，推荐使用支持事务的InnoDB存储引擎。</p>
+<h3 id="未开启事务"><a href="#未开启事务" class="headerlink" title="未开启事务"></a>未开启事务</h3><p>在Spring项目中，必须确保已经开启了事务管理功能。在Spring Boot项目中，通常通过配置spring.datasource相关参数来自动开启事务。而在传统的Spring项目中，需要在applicationContext.xml*文件中手动配置事务管理器。</p>
+<h3 id="错误的传播特性"><a href="#错误的传播特性" class="headerlink" title="错误的传播特性"></a>错误的传播特性</h3><p>Spring支持多种事务传播特性，如果手动设置了错误的传播特性，比如将传播特性设置为 Propagation.NEVER，那么事务将不会生效。只有REQUIRED、REQUIRES_NEW 和 NESTED 这三种传播特性会创建新事务。</p>
+<h3 id="异常处理不当"><a href="#异常处理不当" class="headerlink" title="异常处理不当"></a>异常处理不当</h3><p>如果在事务方法中手动捕获了异常并没有重新抛出，或者抛出的异常类型不正确，Spring事务也不会回滚。<mark>Spring事务默认只会回滚RuntimeException和Error，对于普通的Exception，它不会回滚</mark>。可以通过设置@Transactional注解的<b>rollbackFor参数</b>来指定回滚的异常类型。</p>
 
                 
               </div>
@@ -381,8 +329,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Spring是如何解决循环依赖的</div>
-      <div>http://example.com/2026/03/10/Spring是如何解决循环依赖的/</div>
+      <div>Spring事务</div>
+      <div>http://example.com/2026/03/10/Spring事务/</div>
     </div>
     <div class="license-meta">
       
@@ -426,18 +374,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/03/10/Spring%E4%BA%8B%E5%8A%A1/" title="Spring事务">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Spring事务</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/02/05/Redis%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84embstr%E7%BC%96%E7%A0%81%E5%92%8Craw%E7%BC%96%E7%A0%81%E4%B9%8B%E9%97%B4%E7%9A%84%E7%95%8C%E9%99%90%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF44%E5%AD%97%E8%8A%82/" title="Redis字符串的embstr编码和raw编码之间的界限为什么是44字节">
-                        <span class="hidden-mobile">Redis字符串的embstr编码和raw编码之间的界限为什么是44字节</span>
+                      <a href="/2026/03/10/Spring%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E7%9A%84/" title="Spring是如何解决循环依赖的">
+                        <span class="hidden-mobile">Spring是如何解决循环依赖的</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
