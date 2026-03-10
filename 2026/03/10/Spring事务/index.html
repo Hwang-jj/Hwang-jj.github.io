@@ -27,7 +27,7 @@
 <meta property="og:description" content="Spring事务1. Spring事务失效场景访问权限问题 Spring 使用动态代理或字节码增强来实现 AOP。当调用一个被 @Transactional 注解标记的方法时，代理对象会拦截调用，并在方法执行前后添加事务管理逻辑。然而，private 方法无法被代理对象拦截，因为它们对外部不可见。  Spring要求被代理的事务方法必须是public的。如果将事务方法定义为private、defa">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-10T11:13:16.000Z">
-<meta property="article:modified_time" content="2026-03-10T11:20:12.324Z">
+<meta property="article:modified_time" content="2026-03-10T11:24:38.216Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          806 字
+          904 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          7 分钟
+          8 分钟
         
       </span>
     
@@ -284,12 +284,13 @@
 </blockquote>
 <p>Spring要求被代理的事务方法必须是public的。如果将事务方法定义为private、default或protected，Spring将不会提供事务支持。例如，如果一个方法被标记为@Transactional但被定义为private，那么事务将不会生效。</p>
 <h3 id="方法用static、final修饰"><a href="#方法用static、final修饰" class="headerlink" title="方法用static、final修饰"></a>方法用static、final修饰</h3><p>如果一个事务方法被final修饰，那么在其<mark>代理类中无法重写该方法</mark>，从而无法添加事务功能。同样，如果方法是static的，也无法通过动态代理变成事务方法。</p>
-<h3 id="方法内部调用"><a href="#方法内部调用" class="headerlink" title="方法内部调用"></a>方法内部调用</h3><p>在同一个类中，一个方法直接调用另一个事务方法时，被调用的方法不会产生事务（<mark>方法内部直接调用相当于使用<b>this</b>调用另一个事物方法，而这个this指的是未被代理的对象，自然无法产生事务</mark>）。这是因为Spring AOP生成的代理对象不会介入这种内部调用。要解决这个问题，可以通过在Service类中注入自己，或使用AopContext.currentProxy()获取代理对象。</p>
+<h3 id="方法内部调用"><a href="#方法内部调用" class="headerlink" title="方法内部调用"></a>方法内部调用</h3><p>在同一个类中，一个方法直接调用另一个事务方法时，被调用的方法不会产生事务（<mark>方法内部直接调用相当于使用 this 调用另一个事务方法，而这个 this 指的是未被代理的对象，自然无法产生事务</mark>）。这是因为Spring AOP生成的代理对象不会介入这种内部调用。要解决这个问题，可以通过在Service类中注入自己，或使用AopContext.currentProxy()获取代理对象。</p>
 <h3 id="未被Spring管理的类"><a href="#未被Spring管理的类" class="headerlink" title="未被Spring管理的类"></a>未被Spring管理的类</h3><p>使用Spring事务的前提是对象必须被Spring管理。如果忘记在类上添加@Service或其他相关注解，那么该类的事务方法不会生效。</p>
 <h3 id="多线程调用"><a href="#多线程调用" class="headerlink" title="多线程调用"></a>多线程调用</h3><p>在多线程环境中使用Spring事务时，每个线程都会有自己的数据库连接，因此它们不会共享同一个事务。如果<mark>在一个线程中的事务方法中启动了另一个线程来执行另一个事务方法</mark>，那么这两个方法将不会在同一个事务中。</p>
+<h3 id="多数据源的事务管理"><a href="#多数据源的事务管理" class="headerlink" title="多数据源的事务管理"></a>多数据源的事务管理</h3><p>如果使用多数据源时，<mark>不同数据源对应不同事务管理器，Spring默认无法将它们合并到同一事务中</mark>，即使传播行为为REQUIRED也会开启独立事务</p>
 <h3 id="表不支持事务"><a href="#表不支持事务" class="headerlink" title="表不支持事务"></a>表不支持事务</h3><p>在MySQL中，MyISAM存储引擎不支持事务。如果操作的表使用了MyISAM引擎，那么事务将不会生效。在MySQL 5之后，推荐使用支持事务的InnoDB存储引擎。</p>
 <h3 id="未开启事务"><a href="#未开启事务" class="headerlink" title="未开启事务"></a>未开启事务</h3><p>在Spring项目中，必须确保已经开启了事务管理功能。在Spring Boot项目中，通常通过配置spring.datasource相关参数来自动开启事务。而在传统的Spring项目中，需要在applicationContext.xml*文件中手动配置事务管理器。</p>
-<h3 id="错误的传播特性"><a href="#错误的传播特性" class="headerlink" title="错误的传播特性"></a>错误的传播特性</h3><p>Spring支持多种事务传播特性，如果手动设置了错误的传播特性，比如将传播特性设置为 Propagation.NEVER，那么事务将不会生效。只有REQUIRED、REQUIRES_NEW 和 NESTED 这三种传播特性会创建新事务。</p>
+<h3 id="错误的传播特性"><a href="#错误的传播特性" class="headerlink" title="错误的传播特性"></a>错误的传播特性</h3><p>如果多个事务之间存在事务嵌套，且事务传播属性配置不正确，可能会导致事务失效。Spring支持多种事务传播特性，如果手动设置了错误的传播特性，比如将传播特性设置为 Propagation.NEVER，那么事务将不会生效。只有REQUIRED、REQUIRES_NEW 和 NESTED 这三种传播特性会创建新事务。</p>
 <h3 id="异常处理不当"><a href="#异常处理不当" class="headerlink" title="异常处理不当"></a>异常处理不当</h3><p>如果在事务方法中手动捕获了异常并没有重新抛出，或者抛出的异常类型不正确，Spring事务也不会回滚。<mark>Spring事务默认只会回滚RuntimeException和Error，对于普通的Exception，它不会回滚</mark>。可以通过设置@Transactional注解的<b>rollbackFor参数</b>来指定回滚的异常类型。</p>
 
                 
