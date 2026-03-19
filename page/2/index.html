@@ -231,6 +231,60 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/01/20/MySQL%E6%B7%B1%E5%88%86%E9%A1%B5%E9%97%AE%E9%A2%98/" target="_self">
+          MySQL深分页问题
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/20/MySQL%E6%B7%B1%E5%88%86%E9%A1%B5%E9%97%AE%E9%A2%98/" target="_self">
+        <div>
+          MySQL深分页问题1. 什么是深分页问题深分页的性能瓶颈源于MySQL处理LIMIT的机制。当执行： 1SELECT * FROM tabLe LIMIT 1000000, 20  MySQL需要先定位到第1000000条记录，然后再取出接下来的20条记录。这个过程需要跳过前面的100万条记录，即使有索引，这种跳跃操作的成本也是非常高的。随着偏移量的增加，查询时间会线性增长，这就是深分页问题的根
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-20 14:56" pubdate>
+              2026-01-20
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/MySQL/" class="category-chain-item">MySQL</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/01/20/MySQL%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96%E6%89%8B%E6%AE%B5/" target="_self">
           MySQL索引优化手段
         </a>
@@ -696,60 +750,6 @@
       <span class="category-chain">
         
   <a href="/categories/MySQL/" class="category-chain-item">MySQL</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/12/08/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F%E7%9A%84double-check%E4%B8%8Evolatile/" target="_self">
-          单例模式的double check与volatile
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/08/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F%E7%9A%84double-check%E4%B8%8Evolatile/" target="_self">
-        <div>
-          单例模式为什么需要使用单例模式节省内存、节省计算。 12345678910111213141516171819public class Singleton &#123;    private static volatile Singleton singleton;    private Singleton() &#123;    &#125;      public static Singleto
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-12-08 11:13" pubdate>
-              2025-12-08
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/JUC/" class="category-chain-item">JUC</a>
   
   
 
