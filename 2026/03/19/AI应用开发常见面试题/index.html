@@ -27,7 +27,7 @@
 <meta property="og:description" content="AI应用开发常见面试题 来源：https:&#x2F;&#x2F;github.com&#x2F;datawhalechina   1. LLM 八股1.1 请详细解释一下 Transformer 模型中的自注意力机制是如何工作的？它为什么比 RNN 更适合处理长序列？ 参考答案：自注意力（Self-Attention）机制是Transformer模型的核心，它使得模型能够动态地衡量输入序列中不同单词之间的重要性，并据此生成每">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-19T02:34:17.000Z">
-<meta property="article:modified_time" content="2026-03-19T02:36:29.565Z">
+<meta property="article:modified_time" content="2026-03-19T02:38:54.515Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -3298,6 +3298,12 @@ $$\text{Objective}( \pi_{\text{RL}} ) = \mathbb{E} [ \text{Reward} ] - \beta \cd
 
 
 
+  
+  
+
+
+
+
 
 
 
@@ -3486,6 +3492,49 @@ $$\text{Objective}( \pi_{\text{RL}} ) = \mathbb{E} [ \text{Reward} ] - \beta \cd
   });
 </script>
 
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script  src="/js/local-search.js" ></script>
 
