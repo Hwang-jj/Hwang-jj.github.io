@@ -27,7 +27,7 @@
 <meta property="og:description" content="RAG1. Indexing索引构建1.1 文档分块chunking将一个大文档切成小段，每段包含一个相对独立的语义。分块的关键参数：  块大小chunk size：太小会导致语义不完整，太大会导致检索不精准 重叠overlap：防止语义信息在切块边界被硬生生地切断  如何选择合适的chunk size？ 根据embedding模型的能力：embedding会有其最大输入token的限制，切块大小">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-21T02:44:37.000Z">
-<meta property="article:modified_time" content="2026-03-21T06:55:17.751Z">
+<meta property="article:modified_time" content="2026-03-21T07:32:18.026Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -423,6 +423,8 @@
 </ul>
 <h4 id="优化索引结构"><a href="#优化索引结构" class="headerlink" title="优化索引结构"></a>优化索引结构</h4><ul>
 <li><p><b>小块引用大块</b>：在索引时，将文档切成小的、用于检索的“摘要块”，但<mark>每个小块都保留对它所属的、更大的“父块”的引用</mark>。检索时，用query匹配小块以获得高精度，但最终送给LLM的是包含更丰富上下文的父块，<mark>兼顾了小块检索的精确性和大块上下文的完整性</mark></p>
+</li>
+<li><p><b>层级检索</b>：将文档组织成树状，叶节点为原始文档块，中间节点为多个文档块的摘要，根结点为整个文档集的总摘要。RAPTOR即为层级检索的经典实现</p>
 </li>
 <li><p><b>图索引</b>：用LLM提取文档中的实体和关系，构建一个<b>知识图谱</b>。检索时先在图谱中进行结构化查询，找到相关的实体和子图，再结合向量检索进行补充。对于需要多跳推理、理解实体关系的query非常有效</p>
 <blockquote>
