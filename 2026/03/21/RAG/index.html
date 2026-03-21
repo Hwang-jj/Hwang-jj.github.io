@@ -27,7 +27,7 @@
 <meta property="og:description" content="RAG1. Indexing索引构建1.1 文档分块chunking将一个大文档切成小段，每段包含一个相对独立的语义。分块的关键参数：  块大小chunk size：太小会导致语义不完整，太大会导致检索不精准 重叠overlap：防止语义信息在切块边界被硬生生地切断  如何选择合适的chunk size？ 根据embedding模型的能力：embedding会有其最大输入token的限制，切块大小">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-21T02:44:37.000Z">
-<meta property="article:modified_time" content="2026-03-21T05:53:26.120Z">
+<meta property="article:modified_time" content="2026-03-21T06:21:44.364Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.2k 字
+          2.6k 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          19 分钟
+          22 分钟
         
       </span>
     
@@ -392,7 +392,13 @@
 <li>用户查询，根据需要对用户查询进行优化</li>
 <li>向量检索，将用户查询也向量化，然后在向量数据库中搜索，找到最相关的几个chunk</li>
 </ul>
-<h3 id="2-1-检索策略"><a href="#2-1-检索策略" class="headerlink" title="2.1 检索策略"></a>2.1 检索策略</h3><p>基础的向量检索虽然有效，但在处理复杂查询和多样化文档时会遇到瓶颈。为了提升检索质量，可采用以下几种方式：</p>
+<h3 id="2-1-检索策略"><a href="#2-1-检索策略" class="headerlink" title="2.1 检索策略"></a>2.1 检索策略</h3><p>基础的向量检索虽然有效，但在处理复杂查询和多样化文档时会遇到瓶颈。检索策略主要可以分为<b>多路召回</b>和<b>重排序Re-ranking</b>两大策略，其中多路召回指的是在 RAG 系统的检索阶段，不依赖单一的查询或检索策略，而是同时使用<b>两种或更多不同的方法、模型或查询方式</b>从知识库中获取相关文档片段，常见的多路召回策略有：</p>
+<ul>
+<li>基于<b>不同查询表示</b>的多路召回：如多查询检索、HyDE</li>
+<li>基于<b>不同索引类型</b>的多路召回：如混合搜索Hybrid Search</li>
+<li>基于<b>不同粒度</b>的多路召回：如小块引用大块</li>
+</ul>
+<p>为了提升检索质量，可采用以下几种方式：</p>
 <h4 id="增强检索器"><a href="#增强检索器" class="headerlink" title="增强检索器"></a>增强检索器</h4><ul>
 <li><b>混合搜索Hybrid Search</b>：将稀疏索引和密集索引相结合。<ul>
 <li>稀疏索引（如BM25）：基于关键词匹配，对于包含特定术语、缩写、ID的查询非常有效</li>
@@ -423,6 +429,15 @@
 </blockquote>
 </li>
 </ul>
+<h3 id="2-2-多路召回结果的融合与排序"><a href="#2-2-多路召回结果的融合与排序" class="headerlink" title="2.2 多路召回结果的融合与排序"></a>2.2 多路召回结果的融合与排序</h3><p>多路召回生成了多个结果集，关键在于如何有效地将它们合并并排序，以便将最有价值的信息送入 LLM</p>
+<h4 id="排序融合方法（Reciprocal-Rank-Fusion-RRF）"><a href="#排序融合方法（Reciprocal-Rank-Fusion-RRF）" class="headerlink" title="排序融合方法（Reciprocal Rank Fusion, RRF）"></a>排序融合方法（Reciprocal Rank Fusion, RRF）</h4><p>RRF 是一种常用的无参数排序融合方法。它基于文档在不同召回列表中的排名，通过以下公式计算其融合得分：</p>
+<p>$$RRF_{score}(d) &#x3D; \sum \frac{1}{k + rank_r(d)}$$</p>
+<p>其中：</p>
+<ul>
+<li>$rank_r(d)$：文档d在第r个检索结果列表中的排名位置</li>
+<li>$k$：一个平滑常数，用于控制排名靠后的文档对总分的贡献。60为广泛应用的经验值</li>
+</ul>
+<p>如果一个文档在多个召回列表中都获得了较高的排名，其 RRF 得分将非常高</p>
 
                 
               </div>
@@ -563,6 +578,12 @@
 
 
 
+  
+
+
+
+
+  
   
 
 
@@ -756,6 +777,49 @@
   });
 </script>
 
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script  src="/js/local-search.js" ></script>
 
