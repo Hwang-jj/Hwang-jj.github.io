@@ -27,7 +27,7 @@
 <meta property="og:description" content="RAG1. Indexing索引构建1.1 文档分块chunking将一个大文档切成小段，每段包含一个相对独立的语义。分块的关键参数：  块大小chunk size：太小会导致语义不完整，太大会导致检索不精准 重叠overlap：防止语义信息在切块边界被硬生生地切断  如何选择合适的chunk size？ 根据embedding模型的能力：embedding会有其最大输入token的限制，切块大小">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-21T02:44:37.000Z">
-<meta property="article:modified_time" content="2026-03-21T06:21:44.364Z">
+<meta property="article:modified_time" content="2026-03-21T06:30:10.285Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.6k 字
+          2.8k 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          22 分钟
+          24 分钟
         
       </span>
     
@@ -418,7 +418,8 @@
 <li><b>query改写</b>：对于用户的原始query，可能会偏向于口语化，直接用来检索效果可能不好，可以先使用LLM将query改写为逻辑清晰明确的提问，再用于检索。（如用户在首次查询时提到了一样东西，后续query都指代为 “它”，如果直接使用原始query可能会有指代不明确的情况，这时候可以对query进行改写）</li>
 <li><b>多查询检索</b>：让LLM针对原始query，从不同角度生成多个不同的查询，然后对所有查询的检索结果进行合并</li>
 <li><b>HyDE</b>：让LLM先针对问题生成一个“假设性”的答案，然后用这个假设性答案的embedding去检索，因为<mark>答案的文本和目标文档的文本在形式上更相似</mark></li>
-<li><b>子问题查询</b>：对于复杂问题，先将其分解为多个简单的子问题，分别检索，再进行合并</li>
+<li><b>子问题查询Decomposition</b>：对于复杂问题，先将其分解为多个简单的子问题，分别检索，再进行合并</li>
+<li><b>Step Back问答回退</b>：不直接回答具体问题，而是先生成一个更抽象、更通用的”回退问题”，从更高层次理解用户意图，用这个抽象问题去检索，获得更广泛的信息；结合回退问题的答案和原问题，生成更准确的回答</li>
 </ul>
 <h4 id="优化索引结构"><a href="#优化索引结构" class="headerlink" title="优化索引结构"></a>优化索引结构</h4><ul>
 <li><p><b>小块引用大块</b>：在索引时，将文档切成小的、用于检索的“摘要块”，但<mark>每个小块都保留对它所属的、更大的“父块”的引用</mark>。检索时，用query匹配小块以获得高精度，但最终送给LLM的是包含更丰富上下文的父块，<mark>兼顾了小块检索的精确性和大块上下文的完整性</mark></p>
@@ -438,6 +439,36 @@
 <li>$k$：一个平滑常数，用于控制排名靠后的文档对总分的贡献。60为广泛应用的经验值</li>
 </ul>
 <p>如果一个文档在多个召回列表中都获得了较高的排名，其 RRF 得分将非常高</p>
+<h2 id="3-Generation生成"><a href="#3-Generation生成" class="headerlink" title="3. Generation生成"></a>3. Generation生成</h2><p>把检索到的文档和用户问题组合成一个完整的Prompt，发给LLM，调用LLM生成答案后，可能还需要对答案进行一些后处理，如：引用标注、安全过滤、格式美化等。生成效果评估参考：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>评估内容</th>
+<th>评估方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Faithfulness</td>
+<td>答案是否忠实于检索文档</td>
+<td>LLM评判 &#x2F; 人工标注</td>
+</tr>
+<tr>
+<td>Relevance</td>
+<td>答案是否回答了问题</td>
+<td>LLM评判 &#x2F; 相似度计算</td>
+</tr>
+<tr>
+<td>Coherence</td>
+<td>答案是否流畅连贯</td>
+<td>语言模型困惑度</td>
+</tr>
+<tr>
+<td>Groundedness</td>
+<td>答案是否有依据</td>
+<td>检查是否有引用</td>
+</tr>
+</tbody></table>
 
                 
               </div>
