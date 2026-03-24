@@ -231,6 +231,60 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/12/12/MVCC%E5%AF%BC%E8%87%B4%E7%B4%A2%E5%BC%95%E8%A6%86%E7%9B%96%E5%A4%B1%E6%95%88%E5%9C%BA%E6%99%AF/" target="_self">
+          MVCC导致索引覆盖失效场景
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/12/MVCC%E5%AF%BC%E8%87%B4%E7%B4%A2%E5%BC%95%E8%A6%86%E7%9B%96%E5%A4%B1%E6%95%88%E5%9C%BA%E6%99%AF/" target="_self">
+        <div>
+          MVCC导致索引覆盖失效场景MVCC（多版本并发控制）确实会导致索引覆盖失效，从而触发回表。 很多开发者认为只要 SQL 的字段都在联合索引里，就一定能走“索引覆盖（Using index）”，但在高并发写场景下，这并不绝对。 其根本原因在于 MySQL InnoDB 存储引擎的二级索引（Secondary Index）结构设计。  核心原因：二级索引“不完整”在 InnoDB 中，MVCC 的实
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-12-12 14:11" pubdate>
+              2025-12-12
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/MySQL/" class="category-chain-item">MySQL</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/12/11/MySQL%E6%97%A5%E5%BF%97/" target="_self">
           MySQL日志
         </a>
@@ -696,60 +750,6 @@
       <span class="category-chain">
         
   <a href="/categories/JUC/" class="category-chain-item">JUC</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/05/21/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E6%AD%BB%E9%94%81/" target="_self">
-          操作系统-死锁
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/05/21/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E6%AD%BB%E9%94%81/" target="_self">
-        <div>
-          操作系统-死锁1. 死锁的概念死锁只有满足以下四个条件时才会产生：  互斥条件：每个资源要么已经分配给了一个进程，要么就是可用的 持有并等待条件：已经得到了某个资源的进程可以再请求新的资源 不可剥夺条件：已经分配给一个进程的资源不能强制性地被抢占，它只能被占有它的进程显式地释放 环路等待条件：有两个或者两个以上的进程组成一条环路，该环路中的每个进程都在等待下一个进程所占有的资源  2. 死锁检测与
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-05-21 15:19" pubdate>
-              2025-05-21
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
   
   
 

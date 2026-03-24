@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>BM25算法原理</title>
+    <link href="/2026/03/24/BM25%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86/"/>
+    <url>/2026/03/24/BM25%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86/</url>
+    
+    <content type="html"><![CDATA[<h1 id="BM25算法原理"><a href="#BM25算法原理" class="headerlink" title="BM25算法原理"></a>BM25算法原理</h1><p>BM25（Best Matching 25）是信息检索领域用来计算查询（Query）与文档（Document）之间相关性的核心算法。BM25 是在经典的 TF-IDF 基础上改进而来的，它主要解决了 TF-IDF 中的两个痛点：<b>词频饱和度</b>和<b>文档长度归一化</b></p><h2 id="1-TF-IDF"><a href="#1-TF-IDF" class="headerlink" title="1. TF-IDF"></a>1. TF-IDF</h2><h3 id="1-1-TF-IDF-的两个核心组件"><a href="#1-1-TF-IDF-的两个核心组件" class="headerlink" title="1.1 TF-IDF 的两个核心组件"></a>1.1 TF-IDF 的两个核心组件</h3><p>TF-IDF 是由两部分相乘得来的：</p><h4 id="TF-Term-Frequency-——-词频"><a href="#TF-Term-Frequency-——-词频" class="headerlink" title="TF (Term Frequency) —— 词频"></a><strong>TF (Term Frequency) —— 词频</strong></h4><ul><li><p><strong>含义</strong>：某个词在当前文档中出现的频率。</p></li><li><p><strong>逻辑</strong>：一个词在文档中出现次数越多，说明它越能代表这篇文档的主题。</p></li><li><p><strong>公式</strong>：</p><p>$$TF(t, d) &#x3D; \frac{\text{词 } t \text{ 在文档 } d \text{ 中出现的次数}}{\text{文档 } d \text{ 的总词数}}$$</p></li></ul><h4 id="IDF-Inverse-Document-Frequency-——-逆文档频率"><a href="#IDF-Inverse-Document-Frequency-——-逆文档频率" class="headerlink" title="IDF (Inverse Document Frequency) —— 逆文档频率"></a><strong>IDF (Inverse Document Frequency) —— 逆文档频率</strong></h4><ul><li><p><strong>含义</strong>：衡量一个词有多“稀有”。</p></li><li><p><strong>逻辑</strong>：如果一个词在语料库中的所有文档里都频繁出现（比如“的”、“是”、“我们”），那么它对于区分文档就没有什么贡献。相反，如果一个词只在极少数文档中出现，它的辨识度就极高。</p></li><li><p><strong>公式</strong>：</p><p>$$IDF(t) &#x3D; \log\left(\frac{\text{语料库中的文档总数}}{\text{包含词 } t \text{ 的文档数} + 1}\right)$$</p><p><em>注：分母加 1 是为了防止除以零（平滑处理）。</em></p></li></ul><hr><h3 id="1-2-最终计算公式"><a href="#1-2-最终计算公式" class="headerlink" title="1.2 最终计算公式"></a>1.2 最终计算公式</h3><p>$$TF\text{-}IDF &#x3D; TF \times IDF$$</p><ul><li><strong>高 TF-IDF 值</strong>：表示该词在当前文档中出现次数多，且在其他文档中出现次数少。这通常是一个非常好的<strong>关键词</strong>。</li><li><strong>低 TF-IDF 值</strong>：<ul><li>如果 TF 低：词没怎么出现。</li><li>如果 IDF 低：词太常见了（如停用词），不具备代表性。</li></ul></li></ul><hr><h3 id="1-3-一个直观的例子"><a href="#1-3-一个直观的例子" class="headerlink" title="1.3 一个直观的例子"></a>1.3 一个直观的例子</h3><p>假设你有一个包含 10,000 篇文章的图书馆：</p><ol><li><strong>场景 A</strong>：词语“<strong>原子能</strong>”在某篇 1,000 字的文章中出现了 10 次。<ul><li>它的 TF 适中。</li><li>由于“原子能”这个词很专业，全馆只有 10 篇文章提到它，它的 IDF 就会非常高。</li><li><strong>结果</strong>：TF-IDF 很高，判定为该文的关键词。</li></ul></li><li><strong>场景 B</strong>：词语“<strong>今天</strong>”在同一篇文章中也出现了 10 次。<ul><li>它的 TF 和“原子能”一样。</li><li>但全馆 10,000 篇文章几乎每篇都有“今天”，它的 IDF 接近 0。</li><li><strong>结果</strong>：TF-IDF 很低，判定为无意义的通用词。</li></ul></li></ol><hr><h3 id="1-4-TF-IDF-的局限性（为什么后来有了-BM25？）"><a href="#1-4-TF-IDF-的局限性（为什么后来有了-BM25？）" class="headerlink" title="1.4 TF-IDF 的局限性（为什么后来有了 BM25？）"></a>1.4 TF-IDF 的局限性（为什么后来有了 BM25？）</h3><p>虽然 TF-IDF 很经典，但它有两个明显的短板，这正是 <strong>BM25</strong> 改进的地方：</p><ol><li><strong>词频线性增长问题</strong>：在 TF-IDF 中，一个词出现 100 次的权重是出现 1 次的 100 倍。但在实际检索中，出现 20 次和出现 100 次的相关性差别其实没那么大。</li><li><strong>忽视文档长度</strong>：TF-IDF 对长文章有天然的“偏爱”，因为长文章更容易堆砌关键词。BM25 引入了长度归一化来解决这个问题。</li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>AI</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>近似最近邻ANN算法技术总结</title>
     <link href="/2026/03/24/%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BBANN%E7%AE%97%E6%B3%95%E6%8A%80%E6%9C%AF%E6%80%BB%E7%BB%93/"/>
     <url>/2026/03/24/%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BBANN%E7%AE%97%E6%B3%95%E6%8A%80%E6%9C%AF%E6%80%BB%E7%BB%93/</url>
