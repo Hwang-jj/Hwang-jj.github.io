@@ -231,6 +231,60 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/01/21/Redis%E6%9C%AC%E8%BA%AB%E6%9C%89%E4%BA%8B%E5%8A%A1%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E8%A6%81%E7%94%A8Lua%E8%84%9A%E6%9C%AC/" target="_self">
+          Redis本身有事务为什么还要用Lua脚本?
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/21/Redis%E6%9C%AC%E8%BA%AB%E6%9C%89%E4%BA%8B%E5%8A%A1%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E8%A6%81%E7%94%A8Lua%E8%84%9A%E6%9C%AC/" target="_self">
+        <div>
+          Redis本身有事务为什么还要用Lua脚本?Redis有事务（MULTI&#x2F;EXEC），但更青睐Lua脚本，主要因为Lua提供更强大的逻辑灵活性（可依赖前一步结果）、更好的性能（减少网络往返）和更适合实现复杂原子操作，如分布式锁、限流等，而Redis事务在复杂场景下难以处理依赖关系且有执行错误不回滚的限制，因此Lua脚本成为处理复杂业务逻辑的优选方案。  Redis事务（MULTI&#x2
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-21 15:24" pubdate>
+              2026-01-21
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/01/21/MySQL-MVCC/" target="_self">
           MySQL-MVCC
         </a>
@@ -681,60 +735,6 @@
             <i class="iconfont icon-date"></i>
             <time datetime="2025-12-12 14:11" pubdate>
               2025-12-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/MySQL/" class="category-chain-item">MySQL</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/12/11/MySQL%E6%97%A5%E5%BF%97/" target="_self">
-          MySQL日志
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/11/MySQL%E6%97%A5%E5%BF%97/" target="_self">
-        <div>
-          MySQL日志1. undo log1.1 undo log的实现在事务提交之前，每当InnoDB引擎对一条记录进行增、删、改操作时，要把操作之前的信息记录到undo log中。如果事务还没提交就发生了崩溃，那么就可以通过undo log回滚到之前的数据。 一条记录的每一次更新操作产生的undo log格式都有一个roll pointer指针和trx_id事务id：  通过trx_id可以知道是那
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-12-11 18:23" pubdate>
-              2025-12-11
             </time>
           </div>
         
