@@ -27,7 +27,7 @@
 <meta property="og:description" content="BM25算法原理BM25（Best Matching 25）是信息检索领域用来计算查询（Query）与文档（Document）之间相关性的核心算法。BM25 是在经典的 TF-IDF 基础上改进而来的，它主要解决了 TF-IDF 中的两个痛点：词频饱和度和文档长度归一化 1. TF-IDF1.1 TF-IDF 的两个核心组件TF-IDF 是由两部分相乘得来的： TF (Term Frequency">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-24T09:11:06.000Z">
-<meta property="article:modified_time" content="2026-03-24T09:15:07.273Z">
+<meta property="article:modified_time" content="2026-03-24T09:25:37.973Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          711 字
+          1.2k 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          6 分钟
+          11 分钟
         
       </span>
     
@@ -332,6 +332,34 @@
 <li><strong>词频线性增长问题</strong>：在 TF-IDF 中，一个词出现 100 次的权重是出现 1 次的 100 倍。但在实际检索中，出现 20 次和出现 100 次的相关性差别其实没那么大。</li>
 <li><strong>忽视文档长度</strong>：TF-IDF 对长文章有天然的“偏爱”，因为长文章更容易堆砌关键词。BM25 引入了长度归一化来解决这个问题。</li>
 </ol>
+<h2 id="2-BM25"><a href="#2-BM25" class="headerlink" title="2. BM25"></a>2. BM25</h2><h3 id="2-1-BM25的核心公式"><a href="#2-1-BM25的核心公式" class="headerlink" title="2.1 BM25的核心公式"></a>2.1 BM25的核心公式</h3><p>对于一个查询语句 $Q$，包含关键词 $q_1, q_2, …, q_n$，它与文档 $D$ 的相关性得分计算如下：</p>
+<p>$$Score(D, Q) &#x3D; \sum_{i&#x3D;1}^{n} IDF(q_i) \cdot \frac{f(q_i, D) \cdot (k_1 + 1)}{f(q_i, D) + k_1 \cdot (1 - b + b \cdot \frac{|D|}{avgdl})}$$</p>
+<p>其中：</p>
+<ul>
+<li><strong>$f(q_i, D)$</strong>：关键词 $q_i$ 在文档 $D$ 中出现的频率（TF）</li>
+<li><strong>$|D|$</strong>：文档 $D$ 的长度</li>
+<li><strong>$avgdl$</strong>：整个语料库中所有文档的平均长度</li>
+<li>$k_1$ 和 $b$：可调参数（通常取 $k_1 \in [1.2, 2.0]$，$b &#x3D; 0.75$）</li>
+<li>$IDF(q_i)$：逆文档频率</li>
+</ul>
+<hr>
+<h3 id="2-2-三大核心部分"><a href="#2-2-三大核心部分" class="headerlink" title="2.2 三大核心部分"></a>2.2 三大核心部分</h3><h4 id="逆文档频率IDF"><a href="#逆文档频率IDF" class="headerlink" title="逆文档频率IDF"></a>逆文档频率IDF</h4><p>BM25 的 IDF 部分与传统 TF-IDF 略有不同，旨在惩罚在大量文档中都出现的“常用词”：</p>
+<p>$$IDF(q_i) &#x3D; ln \big( 1 + \frac{N - n(q_i) + 0.5}{n(q_i) + 0.5} \big)$$</p>
+<p>其中$N$是总文档数，$n(q_i)$是包含关键词$q_i$的文档数。如果一个词在越多文档中出现，它的 IDF 值就越低，对得分的贡献越小</p>
+<h4 id="词频饱和度"><a href="#词频饱和度" class="headerlink" title="词频饱和度"></a>词频饱和度</h4><p>这是 BM25 对 TF-IDF 的重大改进。在 TF-IDF 中，词频越高，得分线性增长；但在 BM25 中，随着词频增加，得分的增长会趋于平缓。</p>
+<ul>
+<li><strong>逻辑</strong>：如果一个关键词在文章中出现了 100 次，它对相关性的贡献并不会比出现 20 次的文章高出 5 倍。</li>
+<li><strong>参数 $k_1$</strong>：控制这种饱和的速度。$k_1$ 越小，词频对得分的影响越快达到上限。</li>
+</ul>
+<h4 id="文档长度归一化"><a href="#文档长度归一化" class="headerlink" title="文档长度归一化"></a>文档长度归一化</h4><p><mark>长文章天然容易包含更多的关键词，这会导致它们在简单的 TF 计算中占便宜</mark>。BM25 通过引入<b>文档长度比率</b>来抵消这种偏见。</p>
+<ul>
+<li><strong>逻辑</strong>：如果一个短文档和一个长文档包含相同次数的关键词，短文档通常更相关（信息密度更高）。</li>
+<li><strong>参数 $b$</strong>：决定长度归一化的强度。<ul>
+<li>如果 $b&#x3D;1$，完全进行长度归一化。</li>
+<li>如果 $b&#x3D;0$，不考虑长度（退化回不带长度补偿的模式）。</li>
+</ul>
+</li>
+</ul>
 
                 
               </div>
