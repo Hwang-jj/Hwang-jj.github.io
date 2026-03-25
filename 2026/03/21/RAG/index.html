@@ -27,7 +27,7 @@
 <meta property="og:description" content="RAG1. Indexing索引构建1.1 文档分块chunking将一个大文档切成小段，每段包含一个相对独立的语义。分块的关键参数：  块大小chunk size：太小会导致语义不完整，太大会导致检索不精准 重叠overlap：防止语义信息在切块边界被硬生生地切断  如何选择合适的chunk size？ 根据embedding模型的能力：embedding会有其最大输入token的限制，切块大小">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-21T02:44:37.000Z">
-<meta property="article:modified_time" content="2026-03-21T07:32:18.026Z">
+<meta property="article:modified_time" content="2026-03-25T08:39:41.315Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          5k 字
+          5.6k 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          42 分钟
+          47 分钟
         
       </span>
     
@@ -571,6 +571,34 @@
 </ul>
 </li>
 </ol>
+<h2 id="6-RAG常见面试题"><a href="#6-RAG常见面试题" class="headerlink" title="6. RAG常见面试题"></a>6. RAG常见面试题</h2><h3 id="6-1-RAG向量数据库如何实现去重"><a href="#6-1-RAG向量数据库如何实现去重" class="headerlink" title="6.1 RAG向量数据库如何实现去重"></a>6.1 RAG向量数据库如何实现去重</h3><h4 id="入库前：基于-Hash-的硬去重（最常用）"><a href="#入库前：基于-Hash-的硬去重（最常用）" class="headerlink" title="入库前：基于 Hash 的硬去重（最常用）"></a>入库前：基于 Hash 的硬去重（最常用）</h4><p>这是最简单、性能损耗最低的方法。在将文本切块（Chunking）后、转化为向量（Embedding）前进行。</p>
+<ul>
+<li><strong>原理</strong>：对每一个文本切块计算一个唯一摘要（如 <strong>MD5</strong> 或 <strong>SHA-256</strong>）。</li>
+<li><strong>操作</strong>：<ol>
+<li>建立一个 <strong>布隆过滤器 (Bloom Filter)</strong> 或在缓存（如 Redis）中记录已处理文本的 Hash 值。</li>
+<li>如果新切块的 Hash 已存在，则直接跳过，不再调用 Embedding API（省钱省时）。</li>
+</ol>
+</li>
+<li><strong>局限性</strong>：只能识别<b>“完全一模一样”</b>的文本。哪怕只多了一个空格或标点，Hash 就会完全不同。</li>
+</ul>
+<h4 id="语义维度的“近似去重”（进阶）"><a href="#语义维度的“近似去重”（进阶）" class="headerlink" title="语义维度的“近似去重”（进阶）"></a>语义维度的“近似去重”（进阶）</h4><p>有时候文本并不完全相同，但语义高度重合（如：“如何重置密码”和“怎样更改我的密码”）。这种情况下，Hash 就失效了</p>
+<ul>
+<li><p><strong>方案 A：向量相似度预检</strong></p>
+<p>在插入新向量 $V_{new}$ 之前，先在库里做一次 <b>Top-1 检索</b>。如果最高相似度超过了阈值（例如 $0.98$），则认为重复，拒绝入库。</p>
+</li>
+<li><p><strong>方案 B：分布式离线清洗</strong></p>
+<p>如果是处理海量存量数据，通常会配合大数据工具（如 Spark&#x2F;Flink）使用 <strong>LSH (Locality Sensitive Hashing)</strong>。它能将相似的向量映射到同一个桶中，从而高效识别并剔除语义重复项。</p>
+</li>
+</ul>
+<h4 id="检索后的“动态去重”"><a href="#检索后的“动态去重”" class="headerlink" title="检索后的“动态去重”"></a>检索后的“动态去重”</h4><p>即使数据库里有少量重复，我们也可以在检索出来后、交给模型前做一次清洗。</p>
+<ul>
+<li><strong>Rerank 过滤</strong>：在使用重排序模型时，设定阈值，剔除掉那些得分极高且内容高度相似的后续节点。</li>
+<li><strong>最大边界关联 (MMR, Maximal Marginal Relevance)</strong>：这是一种经典的算法。它在选择检索结果时，不仅考虑“与问题的相关性”，还考虑“结果之间的多样性”。<ul>
+<li>公式逻辑：$MMR &#x3D; \arg\max_{D_i \in R \setminus S} [\lambda \cdot Sim(D_i, Q) - (1-\lambda) \cdot \max_{D_j \in S} Sim(D_i, D_j)]$</li>
+<li><strong>通俗解释</strong>：如果一个切块虽然和问题很像，但<mark>它和已经选入结果集的切块太像了，它的优先级就会被大幅降低</mark>。</li>
+</ul>
+</li>
+</ul>
 
                 
               </div>
