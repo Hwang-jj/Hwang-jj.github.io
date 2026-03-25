@@ -19,21 +19,23 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="BM25算法原理BM25（Best Matching 25）是信息检索领域用来计算查询（Query）与文档（Document）之间相关性的核心算法。BM25 是在经典的 TF-IDF 基础上改进而来的，它主要解决了 TF-IDF 中的两个痛点：词频饱和度和文档长度归一化 1. TF-IDF1.1 TF-IDF 的两个核心组件TF-IDF 是由两部分相乘得来的： TF (Term Frequency">
+    <meta name="description" content="SSE与WebSocket 引用：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;1314520xh&#x2F;p&#x2F;18805931  1. WebSocketWebSocket 是 HTML5 引入的 全双工通信协议，允许客户端和服务器之间保持持久连接，实现低延迟的双向通信 WebSocket特点：  全双工通信：客户端和服务器都可以主动发送数据 低延迟：：连接建立后，数据交换无需额外的 HTTP 头部，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="BM25算法原理">
-<meta property="og:url" content="http://example.com/2026/03/24/BM25%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:title" content="SSE与WebSocket">
+<meta property="og:url" content="http://example.com/2026/03/25/SSE%E4%B8%8EWebSocket/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="BM25算法原理BM25（Best Matching 25）是信息检索领域用来计算查询（Query）与文档（Document）之间相关性的核心算法。BM25 是在经典的 TF-IDF 基础上改进而来的，它主要解决了 TF-IDF 中的两个痛点：词频饱和度和文档长度归一化 1. TF-IDF1.1 TF-IDF 的两个核心组件TF-IDF 是由两部分相乘得来的： TF (Term Frequency">
+<meta property="og:description" content="SSE与WebSocket 引用：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;1314520xh&#x2F;p&#x2F;18805931  1. WebSocketWebSocket 是 HTML5 引入的 全双工通信协议，允许客户端和服务器之间保持持久连接，实现低延迟的双向通信 WebSocket特点：  全双工通信：客户端和服务器都可以主动发送数据 低延迟：：连接建立后，数据交换无需额外的 HTTP 头部，">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-03-24T09:11:06.000Z">
-<meta property="article:modified_time" content="2026-03-24T09:25:37.973Z">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603251458647.png">
+<meta property="article:published_time" content="2026-03-25T06:48:57.000Z">
+<meta property="article:modified_time" content="2026-03-25T06:58:29.270Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603251458647.png">
   
   
   
-  <title>BM25算法原理 - Kon4tsu Blog</title>
+  <title>SSE与WebSocket - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -203,7 +205,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="BM25算法原理"></span>
+            <span id="subtitle" data-typed-text="SSE与WebSocket"></span>
           
         </div>
 
@@ -214,8 +216,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-03-24 17:11" pubdate>
-          2026年3月24日 下午
+        <time datetime="2026-03-25 14:48" pubdate>
+          2026年3月25日 下午
         </time>
       </span>
     
@@ -226,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          478 字
         
       </span>
     
@@ -237,7 +239,7 @@
         
         
         
-          11 分钟
+          4 分钟
         
       </span>
     
@@ -274,92 +276,91 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">BM25算法原理</h1>
+            <h1 id="seo-header">SSE与WebSocket</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="BM25算法原理"><a href="#BM25算法原理" class="headerlink" title="BM25算法原理"></a>BM25算法原理</h1><p>BM25（Best Matching 25）是信息检索领域用来计算查询（Query）与文档（Document）之间相关性的核心算法。BM25 是在经典的 TF-IDF 基础上改进而来的，它主要解决了 TF-IDF 中的两个痛点：<b>词频饱和度</b>和<b>文档长度归一化</b></p>
-<h2 id="1-TF-IDF"><a href="#1-TF-IDF" class="headerlink" title="1. TF-IDF"></a>1. TF-IDF</h2><h3 id="1-1-TF-IDF-的两个核心组件"><a href="#1-1-TF-IDF-的两个核心组件" class="headerlink" title="1.1 TF-IDF 的两个核心组件"></a>1.1 TF-IDF 的两个核心组件</h3><p>TF-IDF 是由两部分相乘得来的：</p>
-<h4 id="TF-Term-Frequency-——-词频"><a href="#TF-Term-Frequency-——-词频" class="headerlink" title="TF (Term Frequency) —— 词频"></a><strong>TF (Term Frequency) —— 词频</strong></h4><ul>
-<li><p><strong>含义</strong>：某个词在当前文档中出现的频率。</p>
-</li>
-<li><p><strong>逻辑</strong>：一个词在文档中出现次数越多，说明它越能代表这篇文档的主题。</p>
-</li>
-<li><p><strong>公式</strong>：</p>
-<p>$$TF(t, d) &#x3D; \frac{\text{词 } t \text{ 在文档 } d \text{ 中出现的次数}}{\text{文档 } d \text{ 的总词数}}$$</p>
-</li>
-</ul>
-<h4 id="IDF-Inverse-Document-Frequency-——-逆文档频率"><a href="#IDF-Inverse-Document-Frequency-——-逆文档频率" class="headerlink" title="IDF (Inverse Document Frequency) —— 逆文档频率"></a><strong>IDF (Inverse Document Frequency) —— 逆文档频率</strong></h4><ul>
-<li><p><strong>含义</strong>：衡量一个词有多“稀有”。</p>
-</li>
-<li><p><strong>逻辑</strong>：如果一个词在语料库中的所有文档里都频繁出现（比如“的”、“是”、“我们”），那么它对于区分文档就没有什么贡献。相反，如果一个词只在极少数文档中出现，它的辨识度就极高。</p>
-</li>
-<li><p><strong>公式</strong>：</p>
-<p>$$IDF(t) &#x3D; \log\left(\frac{\text{语料库中的文档总数}}{\text{包含词 } t \text{ 的文档数} + 1}\right)$$</p>
-<p><em>注：分母加 1 是为了防止除以零（平滑处理）。</em></p>
-</li>
-</ul>
-<hr>
-<h3 id="1-2-最终计算公式"><a href="#1-2-最终计算公式" class="headerlink" title="1.2 最终计算公式"></a>1.2 最终计算公式</h3><p>$$TF\text{-}IDF &#x3D; TF \times IDF$$</p>
+                <h1 id="SSE与WebSocket"><a href="#SSE与WebSocket" class="headerlink" title="SSE与WebSocket"></a>SSE与WebSocket</h1><blockquote>
+<p>引用：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/1314520xh/p/18805931">https://www.cnblogs.com/1314520xh/p/18805931</a></p>
+</blockquote>
+<h2 id="1-WebSocket"><a href="#1-WebSocket" class="headerlink" title="1. WebSocket"></a>1. WebSocket</h2><p>WebSocket 是 HTML5 引入的 <b>全双工通信协议</b>，允许客户端和服务器之间保持持久连接，实现低延迟的双向通信</p>
+<p>WebSocket特点：</p>
 <ul>
-<li><strong>高 TF-IDF 值</strong>：表示该词在当前文档中出现次数多，且在其他文档中出现次数少。这通常是一个非常好的<strong>关键词</strong>。</li>
-<li><strong>低 TF-IDF 值</strong>：<ul>
-<li>如果 TF 低：词没怎么出现。</li>
-<li>如果 IDF 低：词太常见了（如停用词），不具备代表性。</li>
+<li><b>全双工通信</b>：客户端和服务器都可以主动发送数据</li>
+<li><b>低延迟</b>：：连接建立后，数据交换无需额外的 HTTP 头部，提高通信效率</li>
+<li><b>支持二进制数据</b>：可以发送文本（JSON）和二进制数据（Blob、ArrayBuffer）</li>
+<li><b>需要握手</b>：使用 HTTP 进行 <code>Upgrade: websocket</code> 协商，建立 WebSocket 连接</li>
 </ul>
-</li>
-</ul>
-<hr>
-<h3 id="1-3-一个直观的例子"><a href="#1-3-一个直观的例子" class="headerlink" title="1.3 一个直观的例子"></a>1.3 一个直观的例子</h3><p>假设你有一个包含 10,000 篇文章的图书馆：</p>
-<ol>
-<li><strong>场景 A</strong>：词语“<strong>原子能</strong>”在某篇 1,000 字的文章中出现了 10 次。<ul>
-<li>它的 TF 适中。</li>
-<li>由于“原子能”这个词很专业，全馆只有 10 篇文章提到它，它的 IDF 就会非常高。</li>
-<li><strong>结果</strong>：TF-IDF 很高，判定为该文的关键词。</li>
-</ul>
-</li>
-<li><strong>场景 B</strong>：词语“<strong>今天</strong>”在同一篇文章中也出现了 10 次。<ul>
-<li>它的 TF 和“原子能”一样。</li>
-<li>但全馆 10,000 篇文章几乎每篇都有“今天”，它的 IDF 接近 0。</li>
-<li><strong>结果</strong>：TF-IDF 很低，判定为无意义的通用词。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<h3 id="1-4-TF-IDF-的局限性（为什么后来有了-BM25？）"><a href="#1-4-TF-IDF-的局限性（为什么后来有了-BM25？）" class="headerlink" title="1.4 TF-IDF 的局限性（为什么后来有了 BM25？）"></a>1.4 TF-IDF 的局限性（为什么后来有了 BM25？）</h3><p>虽然 TF-IDF 很经典，但它有两个明显的短板，这正是 <strong>BM25</strong> 改进的地方：</p>
-<ol>
-<li><strong>词频线性增长问题</strong>：在 TF-IDF 中，一个词出现 100 次的权重是出现 1 次的 100 倍。但在实际检索中，出现 20 次和出现 100 次的相关性差别其实没那么大。</li>
-<li><strong>忽视文档长度</strong>：TF-IDF 对长文章有天然的“偏爱”，因为长文章更容易堆砌关键词。BM25 引入了长度归一化来解决这个问题。</li>
-</ol>
-<h2 id="2-BM25"><a href="#2-BM25" class="headerlink" title="2. BM25"></a>2. BM25</h2><h3 id="2-1-BM25的核心公式"><a href="#2-1-BM25的核心公式" class="headerlink" title="2.1 BM25的核心公式"></a>2.1 BM25的核心公式</h3><p>对于一个查询语句 $Q$，包含关键词 $q_1, q_2, …, q_n$，它与文档 $D$ 的相关性得分计算如下：</p>
-<p>$$Score(D, Q) &#x3D; \sum_{i&#x3D;1}^{n} IDF(q_i) \cdot \frac{f(q_i, D) \cdot (k_1 + 1)}{f(q_i, D) + k_1 \cdot (1 - b + b \cdot \frac{|D|}{avgdl})}$$</p>
-<p>其中：</p>
+<p>适用场景：</p>
 <ul>
-<li><strong>$f(q_i, D)$</strong>：关键词 $q_i$ 在文档 $D$ 中出现的频率（TF）</li>
-<li><strong>$|D|$</strong>：文档 $D$ 的长度</li>
-<li><strong>$avgdl$</strong>：整个语料库中所有文档的平均长度</li>
-<li>$k_1$ 和 $b$：可调参数（通常取 $k_1 \in [1.2, 2.0]$，$b &#x3D; 0.75$）</li>
-<li>$IDF(q_i)$：逆文档频率</li>
+<li>在线聊天应用IM</li>
+<li>实时游戏</li>
+<li>直播弹幕</li>
 </ul>
-<hr>
-<h3 id="2-2-三大核心部分"><a href="#2-2-三大核心部分" class="headerlink" title="2.2 三大核心部分"></a>2.2 三大核心部分</h3><h4 id="逆文档频率IDF"><a href="#逆文档频率IDF" class="headerlink" title="逆文档频率IDF"></a>逆文档频率IDF</h4><p>BM25 的 IDF 部分与传统 TF-IDF 略有不同，旨在惩罚在大量文档中都出现的“常用词”：</p>
-<p>$$IDF(q_i) &#x3D; ln \big( 1 + \frac{N - n(q_i) + 0.5}{n(q_i) + 0.5} \big)$$</p>
-<p>其中$N$是总文档数，$n(q_i)$是包含关键词$q_i$的文档数。如果一个词在越多文档中出现，它的 IDF 值就越低，对得分的贡献越小</p>
-<h4 id="词频饱和度"><a href="#词频饱和度" class="headerlink" title="词频饱和度"></a>词频饱和度</h4><p>这是 BM25 对 TF-IDF 的重大改进。在 TF-IDF 中，词频越高，得分线性增长；但在 BM25 中，随着词频增加，得分的增长会趋于平缓。</p>
+<h2 id="2-SSE（Server-Sent-Events）"><a href="#2-SSE（Server-Sent-Events）" class="headerlink" title="2. SSE（Server-Sent Events）"></a>2. SSE（Server-Sent Events）</h2><p>SSE 是基于 HTTP 的 <b>服务器推送技术</b>，允许服务器主动向客户端发送数据，但客户端无法主动向服务器发送消息</p>
+<p>SSE特点：</p>
 <ul>
-<li><strong>逻辑</strong>：如果一个关键词在文章中出现了 100 次，它对相关性的贡献并不会比出现 20 次的文章高出 5 倍。</li>
-<li><strong>参数 $k_1$</strong>：控制这种饱和的速度。$k_1$ 越小，词频对得分的影响越快达到上限。</li>
+<li><b>单向通信</b>：仅服务器可以推送数据，客户端不能主动发送</li>
+<li><b>基于 HTTP&#x2F;1.1 长连接</b>：使用 <code>EventSource</code> 监听服务器的推送数据</li>
+<li><b>仅支持文本传输</b>：只能传输 UTF-8 编码的文本，不支持二进制数据</li>
+<li><b>自动重连</b>：浏览器的 <code>EventSource</code> 组件自带断线重连功能</li>
 </ul>
-<h4 id="文档长度归一化"><a href="#文档长度归一化" class="headerlink" title="文档长度归一化"></a>文档长度归一化</h4><p><mark>长文章天然容易包含更多的关键词，这会导致它们在简单的 TF 计算中占便宜</mark>。BM25 通过引入<b>文档长度比率</b>来抵消这种偏见。</p>
+<p>适用场景：</p>
 <ul>
-<li><strong>逻辑</strong>：如果一个短文档和一个长文档包含相同次数的关键词，短文档通常更相关（信息密度更高）。</li>
-<li><strong>参数 $b$</strong>：决定长度归一化的强度。<ul>
-<li>如果 $b&#x3D;1$，完全进行长度归一化。</li>
-<li>如果 $b&#x3D;0$，不考虑长度（退化回不带长度补偿的模式）。</li>
+<li>新闻或社交媒体的实时更新</li>
+<li>服务器通知推送</li>
+<li>服务器日志监控</li>
+<li>大模型流式输出</li>
 </ul>
-</li>
-</ul>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603251458647.png" srcset="/img/loading.gif" lazyload alt="image-20260325145822448" style="zoom:50%;" />
+
+
+
+<h2 id="3-WebSocket与SSE对比"><a href="#3-WebSocket与SSE对比" class="headerlink" title="3. WebSocket与SSE对比"></a>3. WebSocket与SSE对比</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>WebSocket</th>
+<th>SSE（Server-Sent Events）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>通信模式</strong></td>
+<td>双向通信</td>
+<td>单向（服务器 → 客户端）</td>
+</tr>
+<tr>
+<td><strong>协议</strong></td>
+<td>独立协议（ws&#x2F;wss）</td>
+<td>HTTP（基于 HTTP&#x2F;1.1 长连接）</td>
+</tr>
+<tr>
+<td><strong>数据格式</strong></td>
+<td>文本 &amp; 二进制</td>
+<td>仅支持文本（UTF-8）</td>
+</tr>
+<tr>
+<td><strong>连接方式</strong></td>
+<td>需升级 HTTP 连接</td>
+<td>直接使用 HTTP 长连接</td>
+</tr>
+<tr>
+<td><strong>自动重连</strong></td>
+<td>需要手动实现</td>
+<td><code>EventSource</code> 自带重连</td>
+</tr>
+<tr>
+<td><strong>浏览器支持</strong></td>
+<td>现代浏览器都支持</td>
+<td>现代浏览器都支持（IE 不支持）</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>聊天、游戏、实时数据同步</td>
+<td>服务器通知、新闻推送、状态更新</td>
+</tr>
+</tbody></table>
 
                 
               </div>
@@ -378,7 +379,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/AI/" class="category-chain-item">AI</a>
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
   
   
 
@@ -398,8 +399,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>BM25算法原理</div>
-      <div>http://example.com/2026/03/24/BM25算法原理/</div>
+      <div>SSE与WebSocket</div>
+      <div>http://example.com/2026/03/25/SSE与WebSocket/</div>
     </div>
     <div class="license-meta">
       
@@ -411,7 +412,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年3月24日</div>
+          <div>2026年3月25日</div>
         </div>
       
       
@@ -443,18 +444,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/03/25/SSE%E4%B8%8EWebSocket/" title="SSE与WebSocket">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">SSE与WebSocket</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/03/24/%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BBANN%E7%AE%97%E6%B3%95%E6%8A%80%E6%9C%AF%E6%80%BB%E7%BB%93/" title="近似最近邻ANN算法技术总结">
-                        <span class="hidden-mobile">近似最近邻ANN算法技术总结</span>
+                      <a href="/2026/03/24/BM25%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86/" title="BM25算法原理">
+                        <span class="hidden-mobile">BM25算法原理</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -506,12 +501,6 @@
 
 
 
-  
-
-
-
-
-  
   
 
 
@@ -705,49 +694,6 @@
   });
 </script>
 
-
-  
-      <script>
-        if (!window.MathJax) {
-          window.MathJax = {
-            tex    : {
-              inlineMath: { '[+]': [['$', '$']] }
-            },
-            loader : {
-              load: ['ui/lazy']
-            },
-            options: {
-              renderActions: {
-                insertedScript: [200, () => {
-                  document.querySelectorAll('mjx-container').forEach(node => {
-                    let target = node.parentNode;
-                    if (target.nodeName.toLowerCase() === 'li') {
-                      target.parentNode.classList.add('has-jax');
-                    }
-                  });
-                }, '', false]
-              }
-            }
-          };
-        } else {
-          MathJax.startup.document.state(0);
-          MathJax.texReset();
-          MathJax.typeset();
-          MathJax.typesetPromise();
-        }
-
-        Fluid.events.registerRefreshCallback(function() {
-          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
-            MathJax.startup.document.state(0);
-            MathJax.texReset();
-            MathJax.typeset();
-            MathJax.typesetPromise();
-          }
-        });
-      </script>
-    
-
-  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script  src="/js/local-search.js" ></script>
 

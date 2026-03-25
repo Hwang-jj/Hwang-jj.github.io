@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>SSE与WebSocket</title>
+    <link href="/2026/03/25/SSE%E4%B8%8EWebSocket/"/>
+    <url>/2026/03/25/SSE%E4%B8%8EWebSocket/</url>
+    
+    <content type="html"><![CDATA[<h1 id="SSE与WebSocket"><a href="#SSE与WebSocket" class="headerlink" title="SSE与WebSocket"></a>SSE与WebSocket</h1><blockquote><p>引用：<a href="https://www.cnblogs.com/1314520xh/p/18805931">https://www.cnblogs.com/1314520xh/p/18805931</a></p></blockquote><h2 id="1-WebSocket"><a href="#1-WebSocket" class="headerlink" title="1. WebSocket"></a>1. WebSocket</h2><p>WebSocket 是 HTML5 引入的 <b>全双工通信协议</b>，允许客户端和服务器之间保持持久连接，实现低延迟的双向通信</p><p>WebSocket特点：</p><ul><li><b>全双工通信</b>：客户端和服务器都可以主动发送数据</li><li><b>低延迟</b>：：连接建立后，数据交换无需额外的 HTTP 头部，提高通信效率</li><li><b>支持二进制数据</b>：可以发送文本（JSON）和二进制数据（Blob、ArrayBuffer）</li><li><b>需要握手</b>：使用 HTTP 进行 <code>Upgrade: websocket</code> 协商，建立 WebSocket 连接</li></ul><p>适用场景：</p><ul><li>在线聊天应用IM</li><li>实时游戏</li><li>直播弹幕</li></ul><h2 id="2-SSE（Server-Sent-Events）"><a href="#2-SSE（Server-Sent-Events）" class="headerlink" title="2. SSE（Server-Sent Events）"></a>2. SSE（Server-Sent Events）</h2><p>SSE 是基于 HTTP 的 <b>服务器推送技术</b>，允许服务器主动向客户端发送数据，但客户端无法主动向服务器发送消息</p><p>SSE特点：</p><ul><li><b>单向通信</b>：仅服务器可以推送数据，客户端不能主动发送</li><li><b>基于 HTTP&#x2F;1.1 长连接</b>：使用 <code>EventSource</code> 监听服务器的推送数据</li><li><b>仅支持文本传输</b>：只能传输 UTF-8 编码的文本，不支持二进制数据</li><li><b>自动重连</b>：浏览器的 <code>EventSource</code> 组件自带断线重连功能</li></ul><p>适用场景：</p><ul><li>新闻或社交媒体的实时更新</li><li>服务器通知推送</li><li>服务器日志监控</li><li>大模型流式输出</li></ul><img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603251458647.png" alt="image-20260325145822448" style="zoom:50%;" /><h2 id="3-WebSocket与SSE对比"><a href="#3-WebSocket与SSE对比" class="headerlink" title="3. WebSocket与SSE对比"></a>3. WebSocket与SSE对比</h2><table><thead><tr><th>特性</th><th>WebSocket</th><th>SSE（Server-Sent Events）</th></tr></thead><tbody><tr><td><strong>通信模式</strong></td><td>双向通信</td><td>单向（服务器 → 客户端）</td></tr><tr><td><strong>协议</strong></td><td>独立协议（ws&#x2F;wss）</td><td>HTTP（基于 HTTP&#x2F;1.1 长连接）</td></tr><tr><td><strong>数据格式</strong></td><td>文本 &amp; 二进制</td><td>仅支持文本（UTF-8）</td></tr><tr><td><strong>连接方式</strong></td><td>需升级 HTTP 连接</td><td>直接使用 HTTP 长连接</td></tr><tr><td><strong>自动重连</strong></td><td>需要手动实现</td><td><code>EventSource</code> 自带重连</td></tr><tr><td><strong>浏览器支持</strong></td><td>现代浏览器都支持</td><td>现代浏览器都支持（IE 不支持）</td></tr><tr><td><strong>适用场景</strong></td><td>聊天、游戏、实时数据同步</td><td>服务器通知、新闻推送、状态更新</td></tr></tbody></table>]]></content>
+    
+    
+    <categories>
+      
+      <category>计算机网络</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>BM25算法原理</title>
     <link href="/2026/03/24/BM25%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86/"/>
     <url>/2026/03/24/BM25%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86/</url>
