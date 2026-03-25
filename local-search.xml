@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>从输入网址到网页呈现的全过程</title>
+    <link href="/2026/03/25/%E4%BB%8E%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E5%88%B0%E7%BD%91%E9%A1%B5%E5%91%88%E7%8E%B0%E7%9A%84%E5%85%A8%E8%BF%87%E7%A8%8B/"/>
+    <url>/2026/03/25/%E4%BB%8E%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E5%88%B0%E7%BD%91%E9%A1%B5%E5%91%88%E7%8E%B0%E7%9A%84%E5%85%A8%E8%BF%87%E7%A8%8B/</url>
+    
+    <content type="html"><![CDATA[<h1 id="从输入网址到网页呈现的全过程"><a href="#从输入网址到网页呈现的全过程" class="headerlink" title="从输入网址到网页呈现的全过程"></a>从输入网址到网页呈现的全过程</h1><p>当你在浏览器输入一个网址并回车，背后会经历一系列网络通信与数据处理步骤，最终将网页呈现出来。</p><p><strong>1. 解析域名（DNS解析）</strong> 浏览器首先检查本地缓存和 <em>hosts</em> 文件，若无匹配记录，则向本地DNS服务器发起查询。若本地DNS无缓存，会依次向根DNS服务器、顶级域DNS服务器、权威DNS服务器查询，最终获得目标服务器的 <strong>IP地址</strong>。此过程可能经过 <strong>递归查询</strong> 与 <strong>迭代查询</strong>，并将结果缓存以加速后续访问。</p><p><strong>2. 建立安全连接（HTTPS&#x2F;TLS握手）</strong> 若使用HTTPS，浏览器会先进行 <strong>TCP三次握手</strong> 建立连接，然后进行 <strong>TLS握手</strong>：</p><ul><li>客户端发送 <em>ClientHello</em>，声明支持的加密套件</li><li>服务器返回 <em>ServerHello</em> 和数字证书</li><li>客户端验证证书并生成会话密钥</li><li>双方使用密钥加密通信，确保数据机密性与完整性。</li></ul><p><strong>3. 传输层通信（TCP三次握手）</strong> TCP通过三次握手建立可靠连接：</p><ol><li>客户端发送 <em>SYN</em> 请求</li><li>服务器回应 <em>SYN+ACK</em></li><li>客户端发送 <em>ACK</em> 确认 连接建立后，HTTP数据才能传输。</li></ol><p><strong>4. 发送HTTP请求</strong> 浏览器构造HTTP请求报文，包括 <strong>请求行</strong>（方法、路径、协议版本）、<strong>请求头</strong>（Host、User-Agent等）、空行及可选的请求体（POST时使用）。请求通过TCP发送至服务器。</p><p><strong>5. 服务器处理与响应</strong> 服务器（可能经过Nginx等负载均衡）解析请求，执行后端逻辑（如数据库查询、业务处理），生成HTTP响应报文（状态行、响应头、响应体），并返回给浏览器。</p><p><strong>6. 浏览器接收与渲染</strong> 浏览器解析HTML构建 <strong>DOM树</strong>，解析CSS生成 <strong>CSSOM树</strong>，合并为 <strong>渲染树</strong> 并进行布局与绘制。遇到JS会暂停解析执行脚本，可能发起更多HTTP请求获取资源（CSS、JS、图片等）。</p><p><strong>7. 连接关闭（TCP四次挥手）</strong> 短连接模式下，数据传输完成后，客户端与服务器通过四次挥手释放TCP连接。</p><p><strong>8. 页面呈现完成</strong> 所有资源加载并渲染后，用户即可看到完整网页，整个过程通常在几百毫秒到数秒内完成。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>计算机网络</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>SSE与WebSocket</title>
     <link href="/2026/03/25/SSE%E4%B8%8EWebSocket/"/>
     <url>/2026/03/25/SSE%E4%B8%8EWebSocket/</url>

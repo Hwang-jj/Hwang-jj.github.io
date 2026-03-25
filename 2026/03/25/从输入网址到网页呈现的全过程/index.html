@@ -19,23 +19,21 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="SSE与WebSocket 引用：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;1314520xh&#x2F;p&#x2F;18805931  1. WebSocketWebSocket 是 HTML5 引入的 全双工通信协议，允许客户端和服务器之间保持持久连接，实现低延迟的双向通信 WebSocket特点：  全双工通信：客户端和服务器都可以主动发送数据 低延迟：：连接建立后，数据交换无需额外的 HTTP 头部，">
+    <meta name="description" content="从输入网址到网页呈现的全过程当你在浏览器输入一个网址并回车，背后会经历一系列网络通信与数据处理步骤，最终将网页呈现出来。 1. 解析域名（DNS解析） 浏览器首先检查本地缓存和 hosts 文件，若无匹配记录，则向本地DNS服务器发起查询。若本地DNS无缓存，会依次向根DNS服务器、顶级域DNS服务器、权威DNS服务器查询，最终获得目标服务器的 IP地址。此过程可能经过 递归查询 与 迭代查询，并">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SSE与WebSocket">
-<meta property="og:url" content="http://example.com/2026/03/25/SSE%E4%B8%8EWebSocket/index.html">
+<meta property="og:title" content="从输入网址到网页呈现的全过程">
+<meta property="og:url" content="http://example.com/2026/03/25/%E4%BB%8E%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E5%88%B0%E7%BD%91%E9%A1%B5%E5%91%88%E7%8E%B0%E7%9A%84%E5%85%A8%E8%BF%87%E7%A8%8B/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="SSE与WebSocket 引用：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;1314520xh&#x2F;p&#x2F;18805931  1. WebSocketWebSocket 是 HTML5 引入的 全双工通信协议，允许客户端和服务器之间保持持久连接，实现低延迟的双向通信 WebSocket特点：  全双工通信：客户端和服务器都可以主动发送数据 低延迟：：连接建立后，数据交换无需额外的 HTTP 头部，">
+<meta property="og:description" content="从输入网址到网页呈现的全过程当你在浏览器输入一个网址并回车，背后会经历一系列网络通信与数据处理步骤，最终将网页呈现出来。 1. 解析域名（DNS解析） 浏览器首先检查本地缓存和 hosts 文件，若无匹配记录，则向本地DNS服务器发起查询。若本地DNS无缓存，会依次向根DNS服务器、顶级域DNS服务器、权威DNS服务器查询，最终获得目标服务器的 IP地址。此过程可能经过 递归查询 与 迭代查询，并">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603251458647.png">
-<meta property="article:published_time" content="2026-03-25T06:48:57.000Z">
-<meta property="article:modified_time" content="2026-03-25T06:58:29.270Z">
+<meta property="article:published_time" content="2026-03-25T08:25:47.000Z">
+<meta property="article:modified_time" content="2026-03-25T08:26:26.715Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603251458647.png">
   
   
   
-  <title>SSE与WebSocket - Kon4tsu Blog</title>
+  <title>从输入网址到网页呈现的全过程 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -205,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="SSE与WebSocket"></span>
+            <span id="subtitle" data-typed-text="从输入网址到网页呈现的全过程"></span>
           
         </div>
 
@@ -216,7 +214,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-03-25 14:48" pubdate>
+        <time datetime="2026-03-25 16:25" pubdate>
           2026年3月25日 下午
         </time>
       </span>
@@ -228,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          478 字
+          605 字
         
       </span>
     
@@ -239,7 +237,7 @@
         
         
         
-          4 分钟
+          6 分钟
         
       </span>
     
@@ -276,91 +274,31 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">SSE与WebSocket</h1>
+            <h1 id="seo-header">从输入网址到网页呈现的全过程</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="SSE与WebSocket"><a href="#SSE与WebSocket" class="headerlink" title="SSE与WebSocket"></a>SSE与WebSocket</h1><blockquote>
-<p>引用：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/1314520xh/p/18805931">https://www.cnblogs.com/1314520xh/p/18805931</a></p>
-</blockquote>
-<h2 id="1-WebSocket"><a href="#1-WebSocket" class="headerlink" title="1. WebSocket"></a>1. WebSocket</h2><p>WebSocket 是 HTML5 引入的 <b>全双工通信协议</b>，允许客户端和服务器之间保持持久连接，实现低延迟的双向通信</p>
-<p>WebSocket特点：</p>
+                <h1 id="从输入网址到网页呈现的全过程"><a href="#从输入网址到网页呈现的全过程" class="headerlink" title="从输入网址到网页呈现的全过程"></a>从输入网址到网页呈现的全过程</h1><p>当你在浏览器输入一个网址并回车，背后会经历一系列网络通信与数据处理步骤，最终将网页呈现出来。</p>
+<p><strong>1. 解析域名（DNS解析）</strong> 浏览器首先检查本地缓存和 <em>hosts</em> 文件，若无匹配记录，则向本地DNS服务器发起查询。若本地DNS无缓存，会依次向根DNS服务器、顶级域DNS服务器、权威DNS服务器查询，最终获得目标服务器的 <strong>IP地址</strong>。此过程可能经过 <strong>递归查询</strong> 与 <strong>迭代查询</strong>，并将结果缓存以加速后续访问。</p>
+<p><strong>2. 建立安全连接（HTTPS&#x2F;TLS握手）</strong> 若使用HTTPS，浏览器会先进行 <strong>TCP三次握手</strong> 建立连接，然后进行 <strong>TLS握手</strong>：</p>
 <ul>
-<li><b>全双工通信</b>：客户端和服务器都可以主动发送数据</li>
-<li><b>低延迟</b>：：连接建立后，数据交换无需额外的 HTTP 头部，提高通信效率</li>
-<li><b>支持二进制数据</b>：可以发送文本（JSON）和二进制数据（Blob、ArrayBuffer）</li>
-<li><b>需要握手</b>：使用 HTTP 进行 <code>Upgrade: websocket</code> 协商，建立 WebSocket 连接</li>
+<li>客户端发送 <em>ClientHello</em>，声明支持的加密套件</li>
+<li>服务器返回 <em>ServerHello</em> 和数字证书</li>
+<li>客户端验证证书并生成会话密钥</li>
+<li>双方使用密钥加密通信，确保数据机密性与完整性。</li>
 </ul>
-<p>适用场景：</p>
-<ul>
-<li>在线聊天应用IM</li>
-<li>实时游戏</li>
-<li>直播弹幕</li>
-</ul>
-<h2 id="2-SSE（Server-Sent-Events）"><a href="#2-SSE（Server-Sent-Events）" class="headerlink" title="2. SSE（Server-Sent Events）"></a>2. SSE（Server-Sent Events）</h2><p>SSE 是基于 HTTP 的 <b>服务器推送技术</b>，允许服务器主动向客户端发送数据，但客户端无法主动向服务器发送消息</p>
-<p>SSE特点：</p>
-<ul>
-<li><b>单向通信</b>：仅服务器可以推送数据，客户端不能主动发送</li>
-<li><b>基于 HTTP&#x2F;1.1 长连接</b>：使用 <code>EventSource</code> 监听服务器的推送数据</li>
-<li><b>仅支持文本传输</b>：只能传输 UTF-8 编码的文本，不支持二进制数据</li>
-<li><b>自动重连</b>：浏览器的 <code>EventSource</code> 组件自带断线重连功能</li>
-</ul>
-<p>适用场景：</p>
-<ul>
-<li>新闻或社交媒体的实时更新</li>
-<li>服务器通知推送</li>
-<li>服务器日志监控</li>
-<li>大模型流式输出</li>
-</ul>
-<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202603251458647.png" srcset="/img/loading.gif" lazyload alt="image-20260325145822448" style="zoom:50%;" />
-
-
-
-<h2 id="3-WebSocket与SSE对比"><a href="#3-WebSocket与SSE对比" class="headerlink" title="3. WebSocket与SSE对比"></a>3. WebSocket与SSE对比</h2><table>
-<thead>
-<tr>
-<th>特性</th>
-<th>WebSocket</th>
-<th>SSE（Server-Sent Events）</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><strong>通信模式</strong></td>
-<td>双向通信</td>
-<td>单向（服务器 → 客户端）</td>
-</tr>
-<tr>
-<td><strong>协议</strong></td>
-<td>独立协议（ws&#x2F;wss）</td>
-<td>HTTP（基于 HTTP&#x2F;1.1 长连接）</td>
-</tr>
-<tr>
-<td><strong>数据格式</strong></td>
-<td>文本 &amp; 二进制</td>
-<td>仅支持文本（UTF-8）</td>
-</tr>
-<tr>
-<td><strong>连接方式</strong></td>
-<td>需升级 HTTP 连接</td>
-<td>直接使用 HTTP 长连接</td>
-</tr>
-<tr>
-<td><strong>自动重连</strong></td>
-<td>需要手动实现</td>
-<td><code>EventSource</code> 自带重连</td>
-</tr>
-<tr>
-<td><strong>浏览器支持</strong></td>
-<td>现代浏览器都支持</td>
-<td>现代浏览器都支持（IE 不支持）</td>
-</tr>
-<tr>
-<td><strong>适用场景</strong></td>
-<td>聊天、游戏、实时数据同步</td>
-<td>服务器通知、新闻推送、状态更新</td>
-</tr>
-</tbody></table>
+<p><strong>3. 传输层通信（TCP三次握手）</strong> TCP通过三次握手建立可靠连接：</p>
+<ol>
+<li>客户端发送 <em>SYN</em> 请求</li>
+<li>服务器回应 <em>SYN+ACK</em></li>
+<li>客户端发送 <em>ACK</em> 确认 连接建立后，HTTP数据才能传输。</li>
+</ol>
+<p><strong>4. 发送HTTP请求</strong> 浏览器构造HTTP请求报文，包括 <strong>请求行</strong>（方法、路径、协议版本）、<strong>请求头</strong>（Host、User-Agent等）、空行及可选的请求体（POST时使用）。请求通过TCP发送至服务器。</p>
+<p><strong>5. 服务器处理与响应</strong> 服务器（可能经过Nginx等负载均衡）解析请求，执行后端逻辑（如数据库查询、业务处理），生成HTTP响应报文（状态行、响应头、响应体），并返回给浏览器。</p>
+<p><strong>6. 浏览器接收与渲染</strong> 浏览器解析HTML构建 <strong>DOM树</strong>，解析CSS生成 <strong>CSSOM树</strong>，合并为 <strong>渲染树</strong> 并进行布局与绘制。遇到JS会暂停解析执行脚本，可能发起更多HTTP请求获取资源（CSS、JS、图片等）。</p>
+<p><strong>7. 连接关闭（TCP四次挥手）</strong> 短连接模式下，数据传输完成后，客户端与服务器通过四次挥手释放TCP连接。</p>
+<p><strong>8. 页面呈现完成</strong> 所有资源加载并渲染后，用户即可看到完整网页，整个过程通常在几百毫秒到数秒内完成。</p>
 
                 
               </div>
@@ -399,8 +337,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>SSE与WebSocket</div>
-      <div>http://example.com/2026/03/25/SSE与WebSocket/</div>
+      <div>从输入网址到网页呈现的全过程</div>
+      <div>http://example.com/2026/03/25/从输入网址到网页呈现的全过程/</div>
     </div>
     <div class="license-meta">
       
@@ -444,18 +382,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/03/25/%E4%BB%8E%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E5%88%B0%E7%BD%91%E9%A1%B5%E5%91%88%E7%8E%B0%E7%9A%84%E5%85%A8%E8%BF%87%E7%A8%8B/" title="从输入网址到网页呈现的全过程">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">从输入网址到网页呈现的全过程</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/03/24/BM25%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86/" title="BM25算法原理">
-                        <span class="hidden-mobile">BM25算法原理</span>
+                      <a href="/2026/03/25/SSE%E4%B8%8EWebSocket/" title="SSE与WebSocket">
+                        <span class="hidden-mobile">SSE与WebSocket</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
