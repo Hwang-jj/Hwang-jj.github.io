@@ -27,7 +27,7 @@
 <meta property="og:description" content="RAG1. Indexing索引构建1.1 文档分块chunking将一个大文档切成小段，每段包含一个相对独立的语义。分块的关键参数：  块大小chunk size：太小会导致语义不完整，太大会导致检索不精准 重叠overlap：防止语义信息在切块边界被硬生生地切断  如何选择合适的chunk size？ 根据embedding模型的能力：embedding会有其最大输入token的限制，切块大小">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-21T02:44:37.000Z">
-<meta property="article:modified_time" content="2026-03-25T08:39:41.315Z">
+<meta property="article:modified_time" content="2026-03-26T02:38:13.085Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          5.6k 字
+          6.1k 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          47 分钟
+          52 分钟
         
       </span>
     
@@ -599,6 +599,61 @@
 </ul>
 </li>
 </ul>
+<h3 id="6-2-RAG文档发生局部更新时，如何做增量索引而不是全量重建？"><a href="#6-2-RAG文档发生局部更新时，如何做增量索引而不是全量重建？" class="headerlink" title="6.2 RAG文档发生局部更新时，如何做增量索引而不是全量重建？"></a>6.2 RAG文档发生局部更新时，如何做增量索引而不是全量重建？</h3><p>系统之所以能“只处理变动部分”，是因为它在后台（可以是关系型数据库如mysql）维护了一张极其详细的清单。这张清单记录了每个文档切分后的每一个分片的情况。假设你有一个文档 <code>A.txt</code>，内容是“第一段、第二段、第三段”。第一次索引时，清单长这样：</p>
+<table>
+<thead>
+<tr>
+<th><strong>文档 ID</strong></th>
+<th><strong>分片序号</strong></th>
+<th><strong>分片内容哈希 (指纹)</strong> ⚠️关键！</th>
+<th><strong>向量库 ID</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Doc_A</code></td>
+<td>Chunk_1</td>
+<td><code>h1</code> (对应“第一段”)</td>
+<td><code>Vec_001</code></td>
+</tr>
+<tr>
+<td><code>Doc_A</code></td>
+<td>Chunk_2</td>
+<td><code>h2</code> (对应“第二段”)</td>
+<td><code>Vec_002</code></td>
+</tr>
+<tr>
+<td><code>Doc_A</code></td>
+<td>Chunk_3</td>
+<td><code>h3</code> (对应“第三段”)</td>
+<td><code>Vec_003</code></td>
+</tr>
+</tbody></table>
+<p>当把第二段进行了修改，其他没变，系统会对修改后的 <code>A.txt</code> 重新切片，并计算每个新分片的哈希值（指纹）：</p>
+<ul>
+<li>新分片 1 的哈希：<code>h1</code>（没变）</li>
+<li>新分片 2 的哈希：<code>h2_new</code>（<b>变了</b>）</li>
+<li>新分片 3 的哈希：<code>h3</code>（没变）</li>
+</ul>
+<p>系统拿着这些新指纹去查那张清单：</p>
+<ol>
+<li>分片 1 (<code>h1</code>)：清单里有 <code>h1</code> 且属于 <code>Doc_A</code>。<b>结论</b>： 完全一样，跳过，不调 Embedding 接口。</li>
+<li>分片 2 (<code>h2_new</code>)：清单里没有这个指纹。<b>结论</b>： 这是新内容。</li>
+<li>分片 3 (<code>h3</code>)：清单里有 <code>h3</code>。<b>结论</b>： 没变，跳过。</li>
+</ol>
+<p>系统只对“分片 2”执行两个操作：</p>
+<ol>
+<li>调用 Embedding 模型，把 <code>h2_new</code> 变成向量。</li>
+<li>去向量数据库里，把 <code>Vec_002</code> 的位置更新为新向量，或者删掉 <code>Vec_002</code> 插入新向量。</li>
+<li>更新清单，把 <code>h2</code> 替换为 <code>h2_new</code>。</li>
+</ol>
+<h4 id="为什么有时候“局部修改”会失效？"><a href="#为什么有时候“局部修改”会失效？" class="headerlink" title="为什么有时候“局部修改”会失效？"></a>为什么有时候“局部修改”会失效？</h4><p>你可能会问：“我只改了一个字，为什么系统还是重新处理了整个文档？”</p>
+<p>这通常是因为<b>分片偏移（Chunk Shifting）</b>： 如果你在文档的<strong>第一行</strong>插入了一个词，导致后面所有的文字都往后挪了。如果你使用的是“固定长度分片”（比如每 500 字一丢），那么：</p>
+<ul>
+<li>旧的 Chunk 1 变成了 [1-500] 字</li>
+<li>新的 Chunk 1 变成了 [新增词 + 1-499] 字</li>
+<li>导致后面<mark>所有分片的指纹全部变了</mark></li>
+</ul>
+<p><mark>这就是为什么“智能分片”（如按段落、按标题切分）对增量索引至关重要的原因</mark>——它能保证局部变动不影响其他部分的指纹。</p>
 
                 
               </div>
