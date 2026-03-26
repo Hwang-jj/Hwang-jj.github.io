@@ -27,7 +27,7 @@
 <meta property="og:description" content="RAG1. Indexing索引构建1.1 文档分块chunking将一个大文档切成小段，每段包含一个相对独立的语义。分块的关键参数：  块大小chunk size：太小会导致语义不完整，太大会导致检索不精准 重叠overlap：防止语义信息在切块边界被硬生生地切断  如何选择合适的chunk size？ 根据embedding模型的能力：embedding会有其最大输入token的限制，切块大小">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-21T02:44:37.000Z">
-<meta property="article:modified_time" content="2026-03-26T02:39:42.083Z">
+<meta property="article:modified_time" content="2026-03-26T03:04:09.074Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          6.1k 字
+          6.4k 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          52 分钟
+          54 分钟
         
       </span>
     
@@ -654,6 +654,67 @@
 <li>导致后面<mark>所有分片的指纹全部变了</mark></li>
 </ul>
 <p><mark>这就是为什么“智能分片”（如按段落、按标题切分）对增量索引至关重要的原因</mark>——它能保证局部变动不影响其他部分的指纹。</p>
+<h3 id="6-3-向量相似度计算"><a href="#6-3-向量相似度计算" class="headerlink" title="6.3 向量相似度计算"></a>6.3 向量相似度计算</h3><ul>
+<li><strong>余弦相似度(Cosine Similarity)</strong>：$cosine(A, B) &#x3D; \frac{A \cdot B}{\lVert A \rVert \cdot \lVert B \rVert}$</li>
+<li><strong>点积(Dot Product)</strong>：$dot(A, B) &#x3D; A \cdot B &#x3D; \sum\limits_{i&#x3D;1}^n A_iB_i$</li>
+<li><strong>欧氏距离(Euclidean Distance)</strong>：$euclidean(A, B) &#x3D; \sqrt{\sum\limits_{i&#x3D;1}^n(A_i-B_i)^2}$</li>
+<li><strong>曼哈顿距离(Manhattan Distance)</strong>：$manhattan(A, B) &#x3D; \sum\limits_{i&#x3D;1}^n \vert A_i - B_i \vert$</li>
+<li><strong>雅卡尔指数(Jaccard)</strong>：$jaccard(A, B) &#x3D; \frac{\vert A \cap B \vert}{\vert A \cup B \vert}$</li>
+<li><strong>皮尔逊相关系数(Pearson Correlation)</strong>：$pearson(A, B) &#x3D; \frac{Cov(A, B)}{\sigma_A \cdot \sigma_B}$</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>方法</strong></th>
+<th><strong>适用场景</strong></th>
+<th><strong>计算效率</strong></th>
+<th><strong>鲁棒性</strong></th>
+<th><strong>特点</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>余弦相似度(Cosine Similarity)</strong></td>
+<td>文本、高维稀疏数据</td>
+<td>高</td>
+<td>中</td>
+<td>忽略向量长度，专注方向一致性</td>
+</tr>
+<tr>
+<td><strong>点积(Dot Product)</strong></td>
+<td>推荐系统（显式评分</td>
+<td>高</td>
+<td>低</td>
+<td>受向量长度影响，需归一化</td>
+</tr>
+<tr>
+<td><strong>欧氏距离(Euclidean Distance)</strong></td>
+<td>图像、聚类</td>
+<td>中</td>
+<td>高</td>
+<td>衡量绝对距离，对尺度敏感</td>
+</tr>
+<tr>
+<td><strong>曼哈顿距离(Manhattan Distance)</strong></td>
+<td>异常检测、稀疏特征</td>
+<td>中</td>
+<td>高</td>
+<td>对异常值鲁棒</td>
+</tr>
+<tr>
+<td><strong>雅卡尔指数(Jaccard)</strong></td>
+<td>集合、标签匹配</td>
+<td>高</td>
+<td>高</td>
+<td>适用于二进制数据或集合</td>
+</tr>
+<tr>
+<td><strong>皮尔逊相关系数(Pearson Correlation)</strong></td>
+<td>评分预测、连续变量相关性分析</td>
+<td>中</td>
+<td>中</td>
+<td>消除均值影响，衡量线性相关性（范围[-1,1]）</td>
+</tr>
+</tbody></table>
 
                 
               </div>
