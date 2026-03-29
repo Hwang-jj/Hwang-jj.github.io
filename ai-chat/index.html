@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kon4tsu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="API 设置         后端地址                               保存                  请填写可访问的 FastAPI 地址。           &lt;div class&#x3D;&quot;rag-card&quot;&gt;     &lt;div class&#x3D;&quot;rag-card-head">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI问答">
+<meta property="og:url" content="http://example.com/ai-chat/index.html">
+<meta property="og:site_name" content="Kon4tsu Blog">
+<meta property="og:description" content="API 设置         后端地址                               保存                  请填写可访问的 FastAPI 地址。           &lt;div class&#x3D;&quot;rag-card&quot;&gt;     &lt;div class&#x3D;&quot;rag-card-head">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-29T07:10:00.000Z">
+<meta property="article:modified_time" content="2026-03-29T07:11:24.460Z">
+<meta property="article:author" content="Kon4tsu">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>AI问答 - Kon4tsu Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/macpanel.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kon4tsu&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="AI问答"></span>
+          
+        </div>
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div id="board"
+          >
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+<article class="page-content">
+  <div id="rag-app" data-default-api-base="http://127.0.0.1:8000">
+  <div class="rag-shell">
+    <aside class="rag-sidebar">
+      <div class="rag-card">
+        <h2>API 设置</h2>
+        <label class="rag-label" for="api-base-input">后端地址</label>
+        <div class="rag-inline">
+          <input id="api-base-input" class="rag-input" type="text" placeholder="https://your-rag-api.example.com" />
+          <button id="save-api-base" class="rag-button rag-button-secondary" type="button">保存</button>
+        </div>
+        <p id="api-status" class="rag-muted">请填写可访问的 FastAPI 地址。</p>
+      </div>
+
+<pre><code class="hljs">  &lt;div class=&quot;rag-card&quot;&gt;
+    &lt;div class=&quot;rag-card-head&quot;&gt;
+      &lt;h2&gt;会话&lt;/h2&gt;
+      &lt;button id=&quot;new-conversation&quot; class=&quot;rag-button&quot; type=&quot;button&quot;&gt;新建&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div id=&quot;conversation-list&quot; class=&quot;conversation-list&quot;&gt;&lt;/div&gt;
+    &lt;button id=&quot;delete-conversation&quot; class=&quot;rag-button rag-button-danger&quot; type=&quot;button&quot;&gt;删除当前会话&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;rag-card&quot;&gt;
+    &lt;h2&gt;上传文档&lt;/h2&gt;
+    &lt;input id=&quot;upload-input&quot; class=&quot;rag-input&quot; type=&quot;file&quot; accept=&quot;.md&quot; multiple /&gt;
+    &lt;button id=&quot;upload-button&quot; class=&quot;rag-button&quot; type=&quot;button&quot;&gt;写入知识库&lt;/button&gt;
+    &lt;p id=&quot;upload-status&quot; class=&quot;rag-muted&quot;&gt;支持批量上传 Markdown 文件。&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/aside&gt;
+
+&lt;section class=&quot;rag-main&quot;&gt;
+  &lt;div class=&quot;rag-header&quot;&gt;
+    &lt;div&gt;
+      &lt;p class=&quot;rag-eyebrow&quot;&gt;RAG Assistant&lt;/p&gt;
+      &lt;h1 id=&quot;conversation-title&quot;&gt;AI问答&lt;/h1&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;rag-muted&quot;&gt;支持多轮对话、流式输出和资料来源展示&lt;/p&gt;
+  &lt;/div&gt;
+
+  &lt;div id=&quot;message-list&quot; class=&quot;message-list&quot;&gt;&lt;/div&gt;
+
+  &lt;form id=&quot;chat-form&quot; class=&quot;chat-form&quot;&gt;
+    &lt;textarea id=&quot;chat-input&quot; class=&quot;rag-textarea&quot; rows=&quot;3&quot; placeholder=&quot;输入你的问题，系统会先检索博客知识库再回答&quot;&gt;&lt;/textarea&gt;
+    &lt;div class=&quot;rag-inline rag-inline-end&quot;&gt;
+      &lt;button id=&quot;send-button&quot; class=&quot;rag-button&quot; type=&quot;submit&quot;&gt;发送&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+&lt;/section&gt;
+</code></pre>
+  </div>
+</div>
+
+<link rel="stylesheet" href="/ai-chat/chat.css">
+<script src="/ai-chat/chat.js" defer></script>
+
+
+  
+
+</article>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
