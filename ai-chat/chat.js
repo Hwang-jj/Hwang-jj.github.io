@@ -55,7 +55,7 @@
   function renderMarkdown(text) {
     const raw = String(text || "");
     if (!window.marked) {
-      return messageToHtmlFallback(raw);
+      return renderBasicMarkdown(raw);
     }
 
     window.marked.setOptions({
@@ -72,6 +72,66 @@
 
   function messageToHtmlFallback(text) {
     return escapeHtml(text).replace(/\n/g, "<br>");
+  }
+
+  function renderInlineMarkdown(text) {
+    return escapeHtml(text)
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  }
+
+  function renderBasicMarkdown(text) {
+    const normalized = String(text || "").replace(/\r\n/g, "\n");
+    const blocks = normalized.split(/\n{2,}/);
+
+    return blocks
+      .map((block) => {
+        const trimmed = block.trim();
+        if (!trimmed) return "";
+
+        if (trimmed.startsWith("```") && trimmed.endsWith("```")) {
+          const code = trimmed.replace(/^```[^\n]*\n?/, "").replace(/\n?```$/, "");
+          return `<pre><code>${escapeHtml(code)}</code></pre>`;
+        }
+
+        if (/^(\s*[-*]\s+.+\n?)+$/m.test(trimmed)) {
+          const items = trimmed
+            .split("\n")
+            .map((line) => line.replace(/^\s*[-*]\s+/, "").trim())
+            .filter(Boolean)
+            .map((line) => `<li>${renderInlineMarkdown(line)}</li>`)
+            .join("");
+          return `<ul>${items}</ul>`;
+        }
+
+        if (/^(\s*\d+\.\s+.+\n?)+$/m.test(trimmed)) {
+          const items = trimmed
+            .split("\n")
+            .map((line) => line.replace(/^\s*\d+\.\s+/, "").trim())
+            .filter(Boolean)
+            .map((line) => `<li>${renderInlineMarkdown(line)}</li>`)
+            .join("");
+          return `<ol>${items}</ol>`;
+        }
+
+        if (trimmed.startsWith(">")) {
+          const quote = trimmed
+            .split("\n")
+            .map((line) => line.replace(/^\s*>\s?/, ""))
+            .join("<br>");
+          return `<blockquote>${renderInlineMarkdown(quote)}</blockquote>`;
+        }
+
+        const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
+        if (headingMatch) {
+          const level = headingMatch[1].length;
+          return `<h${level}>${renderInlineMarkdown(headingMatch[2])}</h${level}>`;
+        }
+
+        return `<p>${renderInlineMarkdown(trimmed).replace(/\n/g, "<br>")}</p>`;
+      })
+      .join("");
   }
 
   function previewText(text) {
