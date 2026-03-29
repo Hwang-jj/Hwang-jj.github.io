@@ -19,15 +19,15 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="API 设置         后端地址                               保存                  请填写可访问的 FastAPI 地址。           &lt;div class&#x3D;&quot;rag-card&quot;&gt;     &lt;div class&#x3D;&quot;rag-card-head">
+    <meta name="description" content="API 设置         后端地址                               保存                  请填写可访问的 FastAPI 地址。                                   会话           新建                           删除当前会话">
 <meta property="og:type" content="website">
 <meta property="og:title" content="AI问答">
 <meta property="og:url" content="http://example.com/ai-chat/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="API 设置         后端地址                               保存                  请填写可访问的 FastAPI 地址。           &lt;div class&#x3D;&quot;rag-card&quot;&gt;     &lt;div class&#x3D;&quot;rag-card-head">
+<meta property="og:description" content="API 设置         后端地址                               保存                  请填写可访问的 FastAPI 地址。                                   会话           新建                           删除当前会话">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-29T07:10:00.000Z">
-<meta property="article:modified_time" content="2026-03-29T07:11:24.460Z">
+<meta property="article:modified_time" content="2026-03-29T07:16:52.783Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -225,55 +225,55 @@
                 
 
 <article class="page-content">
-  <div id="rag-app" data-default-api-base="http://127.0.0.1:8000">
+  
+<div id="rag-app" data-default-api-base="http://127.0.0.1:8000">
   <div class="rag-shell">
     <aside class="rag-sidebar">
       <div class="rag-card">
         <h2>API 设置</h2>
         <label class="rag-label" for="api-base-input">后端地址</label>
         <div class="rag-inline">
-          <input id="api-base-input" class="rag-input" type="text" placeholder="https://your-rag-api.example.com" />
+          <input id="api-base-input" class="rag-input" type="text" placeholder="https://your-rag-api.example.com">
           <button id="save-api-base" class="rag-button rag-button-secondary" type="button">保存</button>
         </div>
         <p id="api-status" class="rag-muted">请填写可访问的 FastAPI 地址。</p>
       </div>
 
-<pre><code class="hljs">  &lt;div class=&quot;rag-card&quot;&gt;
-    &lt;div class=&quot;rag-card-head&quot;&gt;
-      &lt;h2&gt;会话&lt;/h2&gt;
-      &lt;button id=&quot;new-conversation&quot; class=&quot;rag-button&quot; type=&quot;button&quot;&gt;新建&lt;/button&gt;
-    &lt;/div&gt;
-    &lt;div id=&quot;conversation-list&quot; class=&quot;conversation-list&quot;&gt;&lt;/div&gt;
-    &lt;button id=&quot;delete-conversation&quot; class=&quot;rag-button rag-button-danger&quot; type=&quot;button&quot;&gt;删除当前会话&lt;/button&gt;
-  &lt;/div&gt;
+      <div class="rag-card">
+        <div class="rag-card-head">
+          <h2>会话</h2>
+          <button id="new-conversation" class="rag-button" type="button">新建</button>
+        </div>
+        <div id="conversation-list" class="conversation-list"></div>
+        <button id="delete-conversation" class="rag-button rag-button-danger" type="button">删除当前会话</button>
+      </div>
 
-  &lt;div class=&quot;rag-card&quot;&gt;
-    &lt;h2&gt;上传文档&lt;/h2&gt;
-    &lt;input id=&quot;upload-input&quot; class=&quot;rag-input&quot; type=&quot;file&quot; accept=&quot;.md&quot; multiple /&gt;
-    &lt;button id=&quot;upload-button&quot; class=&quot;rag-button&quot; type=&quot;button&quot;&gt;写入知识库&lt;/button&gt;
-    &lt;p id=&quot;upload-status&quot; class=&quot;rag-muted&quot;&gt;支持批量上传 Markdown 文件。&lt;/p&gt;
-  &lt;/div&gt;
-&lt;/aside&gt;
+      <div class="rag-card">
+        <h2>上传文档</h2>
+        <input id="upload-input" class="rag-input" type="file" accept=".md" multiple>
+        <button id="upload-button" class="rag-button" type="button">写入知识库</button>
+        <p id="upload-status" class="rag-muted">支持批量上传 Markdown 文件。</p>
+      </div>
+    </aside>
 
-&lt;section class=&quot;rag-main&quot;&gt;
-  &lt;div class=&quot;rag-header&quot;&gt;
-    &lt;div&gt;
-      &lt;p class=&quot;rag-eyebrow&quot;&gt;RAG Assistant&lt;/p&gt;
-      &lt;h1 id=&quot;conversation-title&quot;&gt;AI问答&lt;/h1&gt;
-    &lt;/div&gt;
-    &lt;p class=&quot;rag-muted&quot;&gt;支持多轮对话、流式输出和资料来源展示&lt;/p&gt;
-  &lt;/div&gt;
+    <section class="rag-main">
+      <div class="rag-header">
+        <div>
+          <p class="rag-eyebrow">RAG Assistant</p>
+          <h1 id="conversation-title">AI问答</h1>
+        </div>
+        <p class="rag-muted">支持多轮对话、流式输出和资料来源展示</p>
+      </div>
 
-  &lt;div id=&quot;message-list&quot; class=&quot;message-list&quot;&gt;&lt;/div&gt;
+      <div id="message-list" class="message-list"></div>
 
-  &lt;form id=&quot;chat-form&quot; class=&quot;chat-form&quot;&gt;
-    &lt;textarea id=&quot;chat-input&quot; class=&quot;rag-textarea&quot; rows=&quot;3&quot; placeholder=&quot;输入你的问题，系统会先检索博客知识库再回答&quot;&gt;&lt;/textarea&gt;
-    &lt;div class=&quot;rag-inline rag-inline-end&quot;&gt;
-      &lt;button id=&quot;send-button&quot; class=&quot;rag-button&quot; type=&quot;submit&quot;&gt;发送&lt;/button&gt;
-    &lt;/div&gt;
-  &lt;/form&gt;
-&lt;/section&gt;
-</code></pre>
+      <form id="chat-form" class="chat-form">
+        <textarea id="chat-input" class="rag-textarea" rows="3" placeholder="输入你的问题，系统会先检索博客知识库再回答"></textarea>
+        <div class="rag-inline rag-inline-end">
+          <button id="send-button" class="rag-button" type="submit">发送</button>
+        </div>
+      </form>
+    </section>
   </div>
 </div>
 
