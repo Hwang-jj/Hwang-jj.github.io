@@ -192,7 +192,51 @@
   color: #0f172a;
   line-height: 1.72;
   word-break: break-word;
-  white-space: pre-wrap;
+}
+
+.message-content p,
+.message-content ol,
+.message-content ul,
+.message-content pre,
+.message-content blockquote {
+  margin: 0 0 14px;
+}
+
+.message-content ol,
+.message-content ul {
+  padding-left: 28px;
+}
+
+.message-content li + li {
+  margin-top: 6px;
+}
+
+.message-content code {
+  padding: 0.15em 0.35em;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.06);
+  font-size: 0.92em;
+}
+
+.message-content pre {
+  overflow-x: auto;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.message-content pre code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.message-content blockquote {
+  border-left: 4px solid rgba(15, 118, 110, 0.35);
+  margin-left: 0;
+  padding-left: 14px;
+  color: #334155;
 }
 
 .source-panel {

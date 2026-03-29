@@ -52,7 +52,25 @@
       .replace(/'/g, "&#39;");
   }
 
-  function messageToHtml(text) {
+  function renderMarkdown(text) {
+    const raw = String(text || "");
+    if (!window.marked) {
+      return messageToHtmlFallback(raw);
+    }
+
+    window.marked.setOptions({
+      breaks: true,
+      gfm: true,
+    });
+
+    const rendered = window.marked.parse(raw);
+    if (window.DOMPurify) {
+      return window.DOMPurify.sanitize(rendered);
+    }
+    return rendered;
+  }
+
+  function messageToHtmlFallback(text) {
     return escapeHtml(text).replace(/\n/g, "<br>");
   }
 
@@ -124,7 +142,7 @@
       article.className = `message ${message.role}`;
       article.innerHTML = `
         <div class="message-role">${message.role === "user" ? "你" : "AI 助手"}</div>
-        <div class="message-content">${messageToHtml(message.content || "")}</div>
+        <div class="message-content">${renderMarkdown(message.content || "")}</div>
       `;
 
       if (Array.isArray(message.sources) && message.sources.length > 0) {
@@ -150,7 +168,7 @@
         <div class="source-title">${escapeHtml(
           `${source.index || index + 1}. ${source.source || "unknown"}`
         )}</div>
-        <div class="source-preview">${messageToHtml(previewText(source.content || ""))}</div>
+        <div class="source-preview">${messageToHtmlFallback(previewText(source.content || ""))}</div>
       `;
       wrapper.appendChild(item);
     });
