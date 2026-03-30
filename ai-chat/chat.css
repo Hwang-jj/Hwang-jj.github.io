@@ -180,12 +180,45 @@
 }
 
 .message-role {
-  margin-bottom: 8px;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #0f766e;
+}
+
+.message-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.message-intent {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #0f172a;
+  background: rgba(148, 163, 184, 0.18);
+}
+
+.message-intent-rag {
+  background: rgba(14, 165, 233, 0.14);
+  color: #0369a1;
+}
+
+.message-intent-history {
+  background: rgba(245, 158, 11, 0.16);
+  color: #b45309;
+}
+
+.message-intent-chitchat {
+  background: rgba(16, 185, 129, 0.16);
+  color: #047857;
 }
 
 .message-content {
@@ -243,6 +276,13 @@
   margin-top: 16px;
   border-top: 1px dashed rgba(15, 23, 42, 0.12);
   padding-top: 14px;
+}
+
+@media (max-width: 640px) {
+  .message-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 .source-panel summary {

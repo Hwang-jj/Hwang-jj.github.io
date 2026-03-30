@@ -186,6 +186,13 @@
     });
   }
 
+  function getIntentLabel(intent) {
+    if (intent === "rag") return "RAG 检索";
+    if (intent === "history") return "历史回顾";
+    if (intent === "chitchat") return "闲聊直答";
+    return "";
+  }
+
   function renderMessages() {
     const conversation = getActiveConversation();
     els.messageList.innerHTML = "";
@@ -200,8 +207,19 @@
     conversation.messages.forEach((message) => {
       const article = document.createElement("article");
       article.className = `message ${message.role}`;
+      const intentLabel =
+        message.role === "assistant" ? getIntentLabel(message.intent) : "";
       article.innerHTML = `
-        <div class="message-role">${message.role === "user" ? "你" : "AI 助手"}</div>
+        <div class="message-head">
+          <div class="message-role">${message.role === "user" ? "你" : "AI 助手"}</div>
+          ${
+            intentLabel
+              ? `<span class="message-intent message-intent-${escapeHtml(
+                  String(message.intent || "")
+                )}">${escapeHtml(intentLabel)}</span>`
+              : ""
+          }
+        </div>
         <div class="message-content">${renderMarkdown(message.content || "")}</div>
       `;
 
@@ -378,7 +396,12 @@
     setLoading(true);
     appendLocalMessage({ role: "user", content: question, sources: [] });
 
-    const assistantMessage = { role: "assistant", content: "", sources: [] };
+    const assistantMessage = {
+      role: "assistant",
+      content: "",
+      intent: null,
+      sources: [],
+    };
     appendLocalMessage(assistantMessage);
 
     try {
@@ -387,11 +410,15 @@
         if (event.type === "sources") {
           assistantMessage.sources = event.sources || [];
           renderMessages();
+        } else if (event.type === "intent") {
+          assistantMessage.intent = event.intent || null;
+          renderMessages();
         } else if (event.type === "chunk") {
           assistantMessage.content += event.content || "";
           renderMessages();
         } else if (event.type === "done") {
           assistantMessage.content = event.answer || assistantMessage.content;
+          assistantMessage.intent = event.intent || assistantMessage.intent;
           break;
         } else if (event.type === "error") {
           throw new Error(event.message || "流式输出失败");
