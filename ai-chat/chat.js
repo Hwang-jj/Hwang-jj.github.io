@@ -361,6 +361,14 @@
     els.chatInput.style.height = `${Math.min(els.chatInput.scrollHeight, 280)}px`;
   }
 
+  async function submitCurrentInput() {
+    const question = els.chatInput.value.trim();
+    if (!question || state.loading) return;
+    els.chatInput.value = "";
+    syncTextareaHeight();
+    await sendMessage(question);
+  }
+
   async function streamChat(question) {
     const response = await request(
       `/api/conversations/${state.activeConversationId}/chat/stream`,
@@ -474,24 +482,23 @@
     els.deleteConversation.addEventListener("click", deleteCurrentConversation);
     els.uploadButton.addEventListener("click", uploadFiles);
     els.chatInput.addEventListener("input", syncTextareaHeight);
-    els.chatInput.addEventListener("keydown", async (event) => {
-      if (event.key === "Enter" && !event.shiftKey) {
+    els.chatInput.addEventListener(
+      "keydown",
+      async (event) => {
+        const isEnter =
+          event.key === "Enter" || event.code === "Enter" || event.keyCode === 13;
+        if (!isEnter || event.shiftKey || event.isComposing || event.keyCode === 229) {
+          return;
+        }
         event.preventDefault();
-        if (state.loading) return;
-        const question = els.chatInput.value.trim();
-        if (!question) return;
-        els.chatInput.value = "";
-        syncTextareaHeight();
-        await sendMessage(question);
-      }
-    });
+        event.stopPropagation();
+        await submitCurrentInput();
+      },
+      true
+    );
     els.chatForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const question = els.chatInput.value.trim();
-      if (!question) return;
-      els.chatInput.value = "";
-      syncTextareaHeight();
-      await sendMessage(question);
+      await submitCurrentInput();
     });
 
     if (!state.apiBase) {
