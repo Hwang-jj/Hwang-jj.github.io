@@ -124,6 +124,7 @@ html[data-user-color-scheme="dark"] #rag-app {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  align-self: start;
 }
 
 .rag-card,
@@ -142,14 +143,9 @@ html[data-user-color-scheme="dark"] #rag-app {
 }
 
 .rag-card {
-  position: sticky;
-  top: 92px;
-  padding: 20px;
-}
-
-.rag-sidebar .rag-card + .rag-card {
-  top: auto;
   position: relative;
+  padding: 20px;
+  overflow: hidden;
 }
 
 .rag-card h2,
@@ -204,6 +200,26 @@ html[data-user-color-scheme="dark"] #rag-app {
 }
 
 .rag-inline {
+  flex-wrap: nowrap;
+}
+
+.rag-card .rag-inline {
+  align-items: stretch;
+}
+
+.rag-card .rag-inline .rag-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+}
+
+.rag-card .rag-inline .rag-button {
+  flex: 0 0 auto;
+  min-width: 92px;
+}
+
+.chat-form .rag-inline,
+.chat-form-actions {
   flex-wrap: wrap;
 }
 
@@ -640,13 +656,6 @@ html[data-user-color-scheme="dark"] #rag-app {
     grid-template-columns: 1fr;
   }
 
-  .rag-card,
-  .chat-form {
-    position: relative;
-    top: auto;
-    bottom: auto;
-  }
-
   .rag-header {
     flex-direction: column;
     align-items: flex-start;
@@ -688,6 +697,11 @@ html[data-user-color-scheme="dark"] #rag-app {
   .rag-inline {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .rag-card .rag-inline .rag-input,
+  .rag-card .rag-inline .rag-button {
+    width: 100%;
   }
 
   .chat-shortcut {

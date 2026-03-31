@@ -10,6 +10,8 @@
     conversations: [],
     activeConversationId: null,
     loading: false,
+    composing: false,
+    compositionEndedAt: 0,
   };
 
   const els = {
@@ -369,6 +371,12 @@
     await sendMessage(question);
   }
 
+  function isImeComposing(event) {
+    if (state.composing) return true;
+    if (event && (event.isComposing || event.keyCode === 229)) return true;
+    return Date.now() - state.compositionEndedAt < 180;
+  }
+
   async function streamChat(question) {
     const response = await request(
       `/api/conversations/${state.activeConversationId}/chat/stream`,
@@ -482,12 +490,26 @@
     els.deleteConversation.addEventListener("click", deleteCurrentConversation);
     els.uploadButton.addEventListener("click", uploadFiles);
     els.chatInput.addEventListener("input", syncTextareaHeight);
+    els.chatInput.addEventListener("compositionstart", () => {
+      state.composing = true;
+    });
+    els.chatInput.addEventListener("compositionend", () => {
+      state.composing = false;
+      state.compositionEndedAt = Date.now();
+    });
     els.chatInput.addEventListener(
       "keydown",
       async (event) => {
         const isEnter =
           event.key === "Enter" || event.code === "Enter" || event.keyCode === 13;
-        if (!isEnter || event.shiftKey || event.isComposing || event.keyCode === 229) {
+        if (
+          !isEnter ||
+          event.shiftKey ||
+          event.ctrlKey ||
+          event.metaKey ||
+          event.altKey ||
+          isImeComposing(event)
+        ) {
           return;
         }
         event.preventDefault();
