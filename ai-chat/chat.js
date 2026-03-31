@@ -196,6 +196,10 @@
   function renderMessages() {
     const conversation = getActiveConversation();
     els.messageList.innerHTML = "";
+    els.messageList.classList.toggle(
+      "is-empty",
+      !conversation || !Array.isArray(conversation.messages) || conversation.messages.length === 0
+    );
 
     if (!conversation) {
       els.conversationTitle.textContent = "AI问答";
@@ -348,6 +352,13 @@
     els.chatInput.disabled = loading;
     els.newConversation.disabled = loading;
     els.deleteConversation.disabled = loading;
+    els.chatForm.classList.toggle("is-loading", loading);
+    els.sendButton.textContent = loading ? "生成中..." : "发送";
+  }
+
+  function syncTextareaHeight() {
+    els.chatInput.style.height = "auto";
+    els.chatInput.style.height = `${Math.min(els.chatInput.scrollHeight, 280)}px`;
   }
 
   async function streamChat(question) {
@@ -438,6 +449,7 @@
 
   async function bootstrap() {
     els.apiBaseInput.value = state.apiBase;
+    syncTextareaHeight();
 
     els.saveApiBase.addEventListener("click", async () => {
       state.apiBase = normalizeApiBase(els.apiBaseInput.value.trim());
@@ -461,11 +473,24 @@
     els.newConversation.addEventListener("click", createConversation);
     els.deleteConversation.addEventListener("click", deleteCurrentConversation);
     els.uploadButton.addEventListener("click", uploadFiles);
+    els.chatInput.addEventListener("input", syncTextareaHeight);
+    els.chatInput.addEventListener("keydown", async (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        if (state.loading) return;
+        const question = els.chatInput.value.trim();
+        if (!question) return;
+        els.chatInput.value = "";
+        syncTextareaHeight();
+        await sendMessage(question);
+      }
+    });
     els.chatForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const question = els.chatInput.value.trim();
       if (!question) return;
       els.chatInput.value = "";
+      syncTextareaHeight();
       await sendMessage(question);
     });
 

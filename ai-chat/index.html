@@ -19,15 +19,15 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="API 设置         后端地址                               保存                  请填写可访问的 FastAPI 地址。                                   会话           新建                           删除当前会话">
+    <meta name="description" content="Connect         API 设置         连接你的 FastAPI 服务后，就可以进行流式问答、会话管理和知识库检索。         后端地址                               保存                  请填写可访问的 FastAPI 地址。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="AI问答">
 <meta property="og:url" content="http://example.com/ai-chat/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="API 设置         后端地址                               保存                  请填写可访问的 FastAPI 地址。                                   会话           新建                           删除当前会话">
+<meta property="og:description" content="Connect         API 设置         连接你的 FastAPI 服务后，就可以进行流式问答、会话管理和知识库检索。         后端地址                               保存                  请填写可访问的 FastAPI 地址。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-29T07:10:00.000Z">
-<meta property="article:modified_time" content="2026-03-30T06:40:31.805Z">
+<meta property="article:modified_time" content="2026-03-31T03:07:41.699Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -242,7 +242,9 @@
   <div class="rag-shell">
     <aside class="rag-sidebar">
       <div class="rag-card">
+        <p class="rag-card-kicker">Connect</p>
         <h2>API 设置</h2>
+        <p class="rag-card-description">连接你的 FastAPI 服务后，就可以进行流式问答、会话管理和知识库检索。</p>
         <label class="rag-label" for="api-base-input">后端地址</label>
         <div class="rag-inline">
           <input id="api-base-input" class="rag-input" type="text" placeholder="https://your-rag-api.example.com">
@@ -253,15 +255,21 @@
 
       <div class="rag-card">
         <div class="rag-card-head">
-          <h2>会话</h2>
+          <div>
+            <p class="rag-card-kicker">History</p>
+            <h2>会话</h2>
+          </div>
           <button id="new-conversation" class="rag-button" type="button">新建</button>
         </div>
+        <p class="rag-card-description">保留多轮对话上下文，随时切回历史问题继续追问。</p>
         <div id="conversation-list" class="conversation-list"></div>
         <button id="delete-conversation" class="rag-button rag-button-danger" type="button">删除当前会话</button>
       </div>
 
       <div class="rag-card">
+        <p class="rag-card-kicker">Knowledge</p>
         <h2>上传文档</h2>
+        <p class="rag-card-description">支持批量导入 Markdown 文档，写入向量知识库后即可用于检索增强回答。</p>
         <input id="upload-input" class="rag-input" type="file" accept=".md" multiple>
         <button id="upload-button" class="rag-button" type="button">写入知识库</button>
         <p id="upload-status" class="rag-muted">支持批量上传 Markdown 文件。</p>
@@ -270,18 +278,31 @@
 
     <section class="rag-main">
       <div class="rag-header">
-        <div>
+        <div class="rag-header-copy">
           <p class="rag-eyebrow">RAG Assistant</p>
           <h1 id="conversation-title">AI问答</h1>
+          <p class="rag-lead">把文档检索、多轮上下文和闲聊直答放进同一条工作流里，让回答既快又有依据。</p>
         </div>
-        <p class="rag-muted">支持意图路由、多轮对话、流式输出和资料来源展示</p>
+        <div class="rag-header-meta" aria-label="页面能力">
+          <span class="rag-chip">流式输出</span>
+          <span class="rag-chip">意图路由</span>
+          <span class="rag-chip">来源可追溯</span>
+        </div>
       </div>
 
-      <div id="message-list" class="message-list"></div>
+      <div id="message-list" class="message-list" aria-live="polite"></div>
 
       <form id="chat-form" class="chat-form">
+        <div class="chat-form-head">
+          <div>
+            <p class="rag-card-kicker">Compose</p>
+            <h2>开始提问</h2>
+          </div>
+          <p class="chat-shortcut"><kbd>Enter</kbd> 发送，<kbd>Shift</kbd> + <kbd>Enter</kbd> 换行</p>
+        </div>
         <textarea id="chat-input" class="rag-textarea" rows="3" placeholder="输入你的问题，系统会先判断走 RAG 检索、历史回顾，还是闲聊直答"></textarea>
-        <div class="rag-inline rag-inline-end">
+        <div class="rag-inline rag-inline-end chat-form-actions">
+          <p class="chat-helper">适合提问文档总结、事实查询、知识串联和上下文追问。</p>
           <button id="send-button" class="rag-button" type="submit">发送</button>
         </div>
       </form>
