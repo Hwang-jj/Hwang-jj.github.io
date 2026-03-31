@@ -130,8 +130,7 @@ html[data-user-color-scheme="dark"] #rag-app {
 .rag-card,
 .rag-header,
 .chat-form,
-.message,
-.message-list.is-empty::before {
+.message {
   border: 1px solid var(--rag-line);
   border-radius: 28px;
   background:
@@ -416,15 +415,12 @@ html[data-user-color-scheme="dark"] #rag-app {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-height: 320px;
+  min-height: 24px;
 }
 
-.message-list.is-empty::before {
-  content: "连接后端后即可开始对话。你可以先配置 API 地址、上传 Markdown 文档，然后在下方提问。";
-  display: block;
-  padding: 34px 30px;
-  color: var(--rag-text-soft);
-  line-height: 1.8;
+.message-list.is-empty {
+  min-height: 0;
+  margin-bottom: -2px;
 }
 
 .message {
@@ -675,8 +671,7 @@ html[data-user-color-scheme="dark"] #rag-app {
   .rag-card,
   .rag-header,
   .chat-form,
-  .message,
-  .message-list.is-empty::before {
+  .message {
     border-radius: 22px;
   }
 
