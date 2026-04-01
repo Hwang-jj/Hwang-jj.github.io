@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>为什么mysql默认隔离级别是RR而不是RC</title>
+    <link href="/2026/04/01/%E4%B8%BA%E4%BB%80%E4%B9%88mysql%E9%BB%98%E8%AE%A4%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E6%98%AFRR%E8%80%8C%E4%B8%8D%E6%98%AFRC/"/>
+    <url>/2026/04/01/%E4%B8%BA%E4%BB%80%E4%B9%88mysql%E9%BB%98%E8%AE%A4%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E6%98%AFRR%E8%80%8C%E4%B8%8D%E6%98%AFRC/</url>
+    
+    <content type="html"><![CDATA[<h1 id="为什么mysql默认隔离级别是RR而不是RC"><a href="#为什么mysql默认隔离级别是RR而不是RC" class="headerlink" title="为什么mysql默认隔离级别是RR而不是RC"></a>为什么mysql默认隔离级别是RR而不是RC</h1><p>在 MySQL 的早期版本中，Binlog只有一种格式：<b>statement</b>，即记录 SQL 语句本身。</p><h2 id="1-RC-级别下的“幻读”导致主从数据不一致"><a href="#1-RC-级别下的“幻读”导致主从数据不一致" class="headerlink" title="1. RC 级别下的“幻读”导致主从数据不一致"></a>1. RC 级别下的“幻读”导致主从数据不一致</h2><p>在 RC 隔离级别下，Binlog 记录的顺序是按照事务提交的先后顺序排列的，而不是 SQL 执行的先后顺序。</p><p>假设有两个事务同时操作：</p><ul><li><b>事务 A</b>：<code>DELETE FROM users WHERE age &lt; 20;</code>（未提交）</li><li><b>事务 B</b>：<code>INSERT INTO users (name, age) VALUES (&#39;Tom&#39;, 15); COMMIT;</code></li><li><b>事务 A</b>：<code>COMMIT;</code></li></ul><p><b>在主库（Master）上的结果</b>： 事务 A 执行时，由于是 RC 级别，它只能删除执行那一刻已存在的数据。Tom 是在 A 执行中途插入的，所以 Tom <strong>不会</strong>被删除。最终主库里留下了 Tom 这条记录。</p><p><b>在从库（Slave）上的结果</b>： 从库根据 Binlog 顺序回放：先执行 <code>INSERT</code>，再执行 <code>DELETE</code>。结果从库中的 Tom 被删除了。</p><p><b>结论</b>： 这种情况下，主库有数据，从库没数据，导致了严重的数据漂移。</p><h2 id="2-RR-级别如何解决？"><a href="#2-RR-级别如何解决？" class="headerlink" title="2. RR 级别如何解决？"></a>2. RR 级别如何解决？</h2><p>MySQL 的 RR 级别引入了 <b>间隙锁（Gap Lock）</b>。 在上述场景中，当事务 A 执行 <code>DELETE</code> 语句时，RR 级别不仅会锁住符合条件的行，还会锁住 <code>age &lt; 20</code> 这个范围的“间隙”。此时事务 B 的 <code>INSERT</code> 会被阻塞，直到事务 A 提交。</p><p>这样 Binlog 中记录的顺序就会变成：<code>DELETE</code> 先完成并记录，<code>INSERT</code> 后记录。主从逻辑完全一致。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>MySQL</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>从输入网址到网页呈现的全过程</title>
     <link href="/2026/03/25/%E4%BB%8E%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E5%88%B0%E7%BD%91%E9%A1%B5%E5%91%88%E7%8E%B0%E7%9A%84%E5%85%A8%E8%BF%87%E7%A8%8B/"/>
     <url>/2026/03/25/%E4%BB%8E%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E5%88%B0%E7%BD%91%E9%A1%B5%E5%91%88%E7%8E%B0%E7%9A%84%E5%85%A8%E8%BF%87%E7%A8%8B/</url>
