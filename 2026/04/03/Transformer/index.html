@@ -63,7 +63,7 @@
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202604030929437.webp">
 <meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202604030929438.gif">
 <meta property="article:published_time" content="2026-04-03T01:28:42.000Z">
-<meta property="article:modified_time" content="2026-04-03T01:41:37.824Z">
+<meta property="article:modified_time" content="2026-04-03T02:11:40.784Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202604030929403.png">
@@ -347,7 +347,7 @@
 
 <h4 id="2-1-2-Word-Embedding"><a href="#2-1-2-Word-Embedding" class="headerlink" title="2.1.2 Word Embedding"></a>2.1.2 Word Embedding</h4><p>One-Hot 的形式看上去很简洁，也挺美，但劣势在于它很<strong>稀疏</strong>，而且还可能很<strong>长</strong>。比如词汇表如果有 10k 个词，那么一个词向量的长度就需要达到 10k，而其中却仅有一个位置是1，其余全是0，太“浪费”！</p>
 <p>更重要的是，这种方式无法体现出<b>词与词之间的关系</b>。比如 “爱” 和 “喜欢” 这两个词，它们的意思是相近的，但基于 one-hot 编码后的结果取决于它们在词汇表中的位置，无法体现出它们之间的关系。</p>
-<p>因此，我们需要另一种词的表示方法，能够体现词与词之间的关系，使得<mark>意思相近的词有相近的表示结果</mark>，这种方法即 <b>Word Embedding</b>。那么应该如何设计这种方法呢？最方便的途径是设计一个**可学习的权重矩阵 W，**将词向量与这个矩阵进行点乘，即得到新的表示结果。</p>
+<p>因此，我们需要另一种词的表示方法，能够体现词与词之间的关系，使得<mark>意思相近的词有相近的表示结果</mark>，这种方法即 <b>Word Embedding</b>。那么应该如何设计这种方法呢？最方便的途径是设计一个<b>可学习的权重矩阵 W</b>，将词向量与这个矩阵进行点乘，即得到新的表示结果。</p>
 <p>假设 “爱” 和 “喜欢” 这两个词经过 one-hot 后分别表示为 10000 和 00001，权重矩阵设计如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">[ w00, w01, w02<br>  w10, w11, w12<br>  w20, w21, w22<br>  w30, w31, w32<br>  w40, w41, w42 ]<br></code></pre></td></tr></table></figure>
 
@@ -663,6 +663,12 @@
 
 
 
+  
+  
+
+
+
+
 
 
 
@@ -851,6 +857,49 @@
   });
 </script>
 
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script  src="/js/local-search.js" ></script>
 
