@@ -19,21 +19,21 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Transformer长文本遗忘根源1. 物理层面的“硬限制”：Context Window（上下文窗口）Transformer 模型在设计时，必须预先定义一个最大序列长度（Max Sequence Length）。  定额容器： 想象对话是一个杯子，Transformer 的上下文窗口就是杯子的容量（比如 4k、32k 或 128k tokens）。当对话内容超过这个容量时，为了存入新的话语，系">
+    <meta name="description" content="agent模型如何判断需要使用工具模型判别是否需要调用工具Function Calling，主要经历以下三个核心阶段： 1. 语义匹配与意图识别 (Semantic Matching)当你向模型提供工具时，你实际上是把工具的 Schema（结构定义） 放入了上下文（Context）中。  工具描述的重要性： 每个工具都有名称和详细描述（例如：get_weather 的描述是“获取特定城市的实时天气">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Transformer长文本遗忘根源">
-<meta property="og:url" content="http://example.com/2026/04/03/Transformer%E9%95%BF%E6%96%87%E6%9C%AC%E9%81%97%E5%BF%98%E6%A0%B9%E6%BA%90/index.html">
+<meta property="og:title" content="agent模型如何判断需要使用工具">
+<meta property="og:url" content="http://example.com/2026/04/03/agent%E6%A8%A1%E5%9E%8B%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E9%9C%80%E8%A6%81%E4%BD%BF%E7%94%A8%E5%B7%A5%E5%85%B7/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="Transformer长文本遗忘根源1. 物理层面的“硬限制”：Context Window（上下文窗口）Transformer 模型在设计时，必须预先定义一个最大序列长度（Max Sequence Length）。  定额容器： 想象对话是一个杯子，Transformer 的上下文窗口就是杯子的容量（比如 4k、32k 或 128k tokens）。当对话内容超过这个容量时，为了存入新的话语，系">
+<meta property="og:description" content="agent模型如何判断需要使用工具模型判别是否需要调用工具Function Calling，主要经历以下三个核心阶段： 1. 语义匹配与意图识别 (Semantic Matching)当你向模型提供工具时，你实际上是把工具的 Schema（结构定义） 放入了上下文（Context）中。  工具描述的重要性： 每个工具都有名称和详细描述（例如：get_weather 的描述是“获取特定城市的实时天气">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-04-03T11:38:30.000Z">
-<meta property="article:modified_time" content="2026-04-03T11:57:22.146Z">
+<meta property="article:published_time" content="2026-04-03T12:11:19.000Z">
+<meta property="article:modified_time" content="2026-04-03T12:21:11.259Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Transformer长文本遗忘根源 - Kon4tsu Blog</title>
+  <title>agent模型如何判断需要使用工具 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -215,7 +215,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Transformer长文本遗忘根源"></span>
+            <span id="subtitle" data-typed-text="agent模型如何判断需要使用工具"></span>
           
         </div>
 
@@ -226,7 +226,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-04-03 19:38" pubdate>
+        <time datetime="2026-04-03 20:11" pubdate>
           2026年4月3日 晚上
         </time>
       </span>
@@ -238,7 +238,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          947 字
+          844 字
         
       </span>
     
@@ -286,50 +286,49 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Transformer长文本遗忘根源</h1>
+            <h1 id="seo-header">agent模型如何判断需要使用工具</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="Transformer长文本遗忘根源"><a href="#Transformer长文本遗忘根源" class="headerlink" title="Transformer长文本遗忘根源"></a>Transformer长文本遗忘根源</h1><h2 id="1-物理层面的“硬限制”：Context-Window（上下文窗口）"><a href="#1-物理层面的“硬限制”：Context-Window（上下文窗口）" class="headerlink" title="1. 物理层面的“硬限制”：Context Window（上下文窗口）"></a>1. 物理层面的“硬限制”：Context Window（上下文窗口）</h2><p>Transformer 模型在设计时，必须预先定义一个<b>最大序列长度</b>（Max Sequence Length）。</p>
+                <h1 id="agent模型如何判断需要使用工具"><a href="#agent模型如何判断需要使用工具" class="headerlink" title="agent模型如何判断需要使用工具"></a>agent模型如何判断需要使用工具</h1><p>模型判别是否需要调用工具Function Calling，主要经历以下三个核心阶段：</p>
+<h2 id="1-语义匹配与意图识别-Semantic-Matching"><a href="#1-语义匹配与意图识别-Semantic-Matching" class="headerlink" title="1. 语义匹配与意图识别 (Semantic Matching)"></a>1. 语义匹配与意图识别 (Semantic Matching)</h2><p>当你向模型提供工具时，你实际上是把工具的 <b>Schema（结构定义）</b> 放入了上下文（Context）中。</p>
 <ul>
-<li><b>定额容器</b>： 想象对话是一个杯子，Transformer 的上下文窗口就是杯子的容量（比如 4k、32k 或 128k tokens）。当对话内容超过这个容量时，为了存入新的话语，系统必须“倒掉”旧的内容。</li>
-<li><b>截断策略</b>： 大多数 Agent 框架（如 LangChain）在超出限制时，会采取简单的<b>滑动窗口截断</b>（丢弃最早的对话）或<b>总结压缩</b>。一旦早期的关键信息（比如用户的姓名、最初提出的核心需求）被丢弃，Agent 表现出来的就是“失忆”。</li>
+<li><b>工具描述的重要性</b>： 每个工具都有名称和详细描述（例如：<code>get_weather</code> 的描述是“获取特定城市的实时天气”）。</li>
+<li><b>向量空间对齐</b>： 模型会将用户的输入（如“上海现在冷吗？”）与工具库中的描述进行语义对比。当模型发现其内部知识无法准确回答（比如实时信息），而某个工具的描述高度匹配时，它就会产生“调用”的倾向。</li>
 </ul>
-<hr>
-<h2 id="2-数学层面的“昂贵代价”：-O-n-2-复杂度"><a href="#2-数学层面的“昂贵代价”：-O-n-2-复杂度" class="headerlink" title="2. 数学层面的“昂贵代价”：$O(n^2)$ 复杂度"></a>2. 数学层面的“昂贵代价”：$O(n^2)$ 复杂度</h2><p>为什么不能无限制地增加窗口大小？这涉及 Transformer 核心机制——<b>自注意力机制（Self-Attention）</b>。</p>
+<h2 id="2-专门的指令微调-SFT-RLHF"><a href="#2-专门的指令微调-SFT-RLHF" class="headerlink" title="2. 专门的指令微调 (SFT &amp; RLHF)"></a>2. 专门的指令微调 (SFT &amp; RLHF)</h2><p>现代模型（如 Gemini, GPT-4）在训练阶段就经历了大量的<b>函数调用任务微调（Supervised Fine-Tuning）</b>。</p>
 <ul>
-<li><p><b>全量计算</b>： 在标准的自注意力机制中，每一个输入的 token 都要与之前所有的 token 进行关联计算。这意味着计算量和内存占用是随序列长度 $n$ 的<b>平方级别</b>增长的（即 $O(n^2)$）。</p>
+<li><b>模式识别</b>： <mark>训练数据中包含大量“用户问题 -&gt; 思考 -&gt; 输出 JSON 格式工具调用”的示例</mark>。</li>
+<li><b>输出逻辑</b>： 模型学习到，当遇到特定类型的请求时，不应该直接输出自然语言回复，而应该<mark>输出一种特殊的 Stop Sequence（停止符）或特定格式的文本（通常是 JSON），以此来触发系统的工具执行模块</mark>。</li>
+</ul>
+<h2 id="3-参数提取与逻辑完整性"><a href="#3-参数提取与逻辑完整性" class="headerlink" title="3. 参数提取与逻辑完整性"></a>3. 参数提取与逻辑完整性</h2><p>模型不仅要判断“要不要用”，还要判断“怎么用”。</p>
+<ul>
+<li>它会扫描用户的话语，提取出工具所需的参数（参数抽取）。</li>
+<li><b>例</b>： 如果用户说“帮我订一张票”，模型会识别出缺少“目的地”和“时间”。此时它可能不会立即调用工具，而是先追问你信息；或者如果信息齐全，它会直接生成符合 Schema 的调用代码。</li>
+</ul>
+<h2 id="4-Function-Calling-的工作流程"><a href="#4-Function-Calling-的工作流程" class="headerlink" title="4. Function Calling 的工作流程"></a>4. Function Calling 的工作流程</h2><ol>
+<li><p>用户输入： “帮我查一下今天北京的空气质量。”</p>
+</li>
+<li><p>模型推理： 模型分析发现自己的训练数据中没有今天的实时数据，但上下文中有个 <code>get_air_quality(city)</code> 函数。</p>
+</li>
+<li><p>生成调用： 模型停止生成普通文本，转而输出结构化数据：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs JSON"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;function&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;get_air_quality&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;parameters&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;city&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Beijing&quot;</span> <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>系统执行： 你的后台程序（Agent 框架）截获这个 JSON，替模型运行函数，并拿到结果（如：“AQI 45, 优”）。</p>
+</li>
+<li><p>最终回复： 系统将结果回传给模型，模型再翻译成人话：“今天北京的空气质量非常好，AQI 只有 45，很适合出门。”</p>
+</li>
+</ol>
+<h2 id="5-为什么有时候模型会“乱调用”或“不调用”？"><a href="#5-为什么有时候模型会“乱调用”或“不调用”？" class="headerlink" title="5. 为什么有时候模型会“乱调用”或“不调用”？"></a>5. 为什么有时候模型会“乱调用”或“不调用”？</h2><p>这种现象通常被称为 幻觉 或 决策失败，原因通常有三：</p>
+<ul>
+<li><b>描述模糊</b>： 如果你的工具描述写得不清楚，模型无法准确判断该工具的用途。</li>
+<li><b>模型能力瓶颈</b>： 参数量较小的模型逻辑推理能力较弱，容易在复杂的逻辑链中迷失。</li>
+<li><b>提示词冲突</b>： 系统提示词（System Prompt）如果对工具使用限制过多（或过少），会干扰模型的判断。</li>
+</ul>
 <blockquote>
-<p>预测下一个输出的token，需要使用当前token的Q，与之前所有token的K、V进行计算，每次都要重复算一遍之前算过的K、V，<mark>KV Cache就是通过将之前token的K、V缓存起来减少了这些重复的计算</mark></p>
+<p>技术细节：在底层，模型其实是在预测下一个 Token。当模型预测到“最合理的下一个片段”是一个符合函数调用格式的字符时，它就进入了调用模式。</p>
 </blockquote>
-</li>
-<li><p><b>KV Cache 压力</b>： 为了加速推理，模型会缓存之前的键（Key）和值（Value）。对话越长，这个 KV Cache 就越大，对显存的消耗呈指数级上升。这种计算成本的制约，导致模型在处理极长对话时，必须做出某种权衡。</p>
-</li>
-</ul>
-<hr>
-<h2 id="3-注意力分配的“失焦”：Lost-in-the-Middle（迷失中段）"><a href="#3-注意力分配的“失焦”：Lost-in-the-Middle（迷失中段）" class="headerlink" title="3. 注意力分配的“失焦”：Lost in the Middle（迷失中段）"></a>3. 注意力分配的“失焦”：Lost in the Middle（迷失中段）</h2><p>即使对话内容还没超出窗口上限，模型也可能“忘记”中间的内容。这在学术界被称为 <b>“Lost in the Middle” </b>现象。</p>
-<ul>
-<li><p><b>头尾偏好</b>： 研究发现，Transformer 驱动的大模型对序列<b>开头</b>（通常包含系统提示词）和<b>结尾</b>（最新的指令）的信息捕捉最敏感。</p>
-<blockquote>
-<p>LLM是基于人类产生的文本数据训练的，而人类的写作习惯具有天然的结构性偏置：</p>
-<ul>
-<li><b>首因效应 (Primacy Effect)</b>： 文章的开头通常包含标题、摘要、引言或主旨句。这是信息密度最高的地方。</li>
-<li><b>近因效应 (Recency Effect)</b>： 文章的结尾通常包含总结、结论或最新的更新。</li>
-<li><b>中间的“注水”</b>： 文章的中间部分通常是论证过程、细节描述或铺垫。</li>
-</ul>
-<p>导致在预训练（Pre-training）和微调（SFT）阶段，模型学到了一种隐式的捷径——“答案通常在开头或结尾”。这种数据分布的偏差被刻入了模型的参数中，导致它在推理时天然地降低了对中间内容的关注度。</p>
-</blockquote>
-</li>
-<li><p><b>注意力稀释</b>： 随着对话轮数增加，注意力矩阵中的权重被分摊到了大量琐碎的对话细节中。早期重要的上下文在多层注意力计算后，信号会逐渐变弱（衰减），被淹没在后续的噪声里。</p>
-</li>
-</ul>
-<hr>
-<h2 id="4-位置编码的“陌生感”：Extrapolation（外推性问题）"><a href="#4-位置编码的“陌生感”：Extrapolation（外推性问题）" class="headerlink" title="4. 位置编码的“陌生感”：Extrapolation（外推性问题）"></a>4. 位置编码的“陌生感”：Extrapolation（外推性问题）</h2><p>Transformer 依靠<b>位置编码</b>（Position Embedding）来理解词序。</p>
-<ul>
-<li><b>训练与预测的脱节</b>： 如果一个模型是在 4k 长度的数据上训练的，当你强行让它处理 8k 的对话时，它会遇到从未见过的“位置下标”。</li>
-<li><b>逻辑混乱</b>： 即使使用了旋转位置编码（RoPE）等技术增强了外推性，但在超出训练长度后，模型对远距离 token 之间的关系理解力仍会大幅下降，导致逻辑断层。</li>
-</ul>
 
                 
               </div>
@@ -368,8 +367,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Transformer长文本遗忘根源</div>
-      <div>http://example.com/2026/04/03/Transformer长文本遗忘根源/</div>
+      <div>agent模型如何判断需要使用工具</div>
+      <div>http://example.com/2026/04/03/agent模型如何判断需要使用工具/</div>
     </div>
     <div class="license-meta">
       
@@ -413,18 +412,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/04/03/agent%E6%A8%A1%E5%9E%8B%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E9%9C%80%E8%A6%81%E4%BD%BF%E7%94%A8%E5%B7%A5%E5%85%B7/" title="agent模型如何判断需要使用工具">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">agent模型如何判断需要使用工具</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/04/03/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AA%97%E5%8F%A3%E5%AF%B9agent%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%BD%B1%E5%93%8D/" title="大模型上下文窗口对agent系统的影响">
-                        <span class="hidden-mobile">大模型上下文窗口对agent系统的影响</span>
+                      <a href="/2026/04/03/Transformer%E9%95%BF%E6%96%87%E6%9C%AC%E9%81%97%E5%BF%98%E6%A0%B9%E6%BA%90/" title="Transformer长文本遗忘根源">
+                        <span class="hidden-mobile">Transformer长文本遗忘根源</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
