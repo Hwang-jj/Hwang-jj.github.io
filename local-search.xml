@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>大模型微调Fine-tuning</title>
+    <link href="/2026/04/03/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BE%AE%E8%B0%83Fine-tuning/"/>
+    <url>/2026/04/03/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BE%AE%E8%B0%83Fine-tuning/</url>
+    
+    <content type="html"><![CDATA[<h1 id="大模型微调Fine-tuning"><a href="#大模型微调Fine-tuning" class="headerlink" title="大模型微调Fine-tuning"></a>大模型微调Fine-tuning</h1><p><b>大模型微调（Fine-tuning）</b> 是指在一个已经预训练好的大语言模型（Base Model）基础上，使用特定领域的数据集进行二次训练，以调整模型的参数，使其在特定任务或特定领域表现得更好。</p><h3 id="什么是大模型微调？"><a href="#什么是大模型微调？" class="headerlink" title="什么是大模型微调？"></a>什么是大模型微调？</h3><p>如果把预训练（Pre-training）比作一个学生在学校接受<b>通识教育</b>（学习各科知识，具备理解语言、逻辑推理的能力），那么微调（Fine-tuning）就是这个学生在毕业后进入<b>职业培训</b>（学习特定行业的专业知识，如法律、医学或特定公司的业务流程）。</p><h3 id="为什么需要微调？"><a href="#为什么需要微调？" class="headerlink" title="为什么需要微调？"></a><strong>为什么需要微调？</strong></h3><ol><li><b>领域专业化</b>：通用模型（如 GPT-4, Llama 3）虽然强大，但在极专业的领域（如中医处方、法律文书）可能表现不够精准。</li><li><b>格式与风格对齐</b>：让模型输出符合特定格式（如 JSON、特定的回复风格）。</li><li><b>节省推理成本</b>：通过微调较小的模型，使其在特定任务上达到甚至超过未微调大模型的表现。</li></ol><h2 id="主流微调技术分类"><a href="#主流微调技术分类" class="headerlink" title="主流微调技术分类"></a>主流微调技术分类</h2><p>目前的技术主要分为两类：<b>全参数微调</b>和<b>参数高效微调（PEFT）</b></p><h3 id="1-全参数微调-Full-Fine-tuning-FFT"><a href="#1-全参数微调-Full-Fine-tuning-FFT" class="headerlink" title="1. 全参数微调 (Full Fine-tuning, FFT)"></a>1. 全参数微调 (Full Fine-tuning, FFT)</h3><p>对模型的所有参数进行更新。这种方法效果最好，但对算力要求极高（显存需求是模型参数量的数倍），且容易产生“灾难性遗忘”（模型学会了新知识，却忘掉了预训练时的通用能力）。</p><h3 id="2-参数高效微调-Parameter-Efficient-Fine-tuning-PEFT"><a href="#2-参数高效微调-Parameter-Efficient-Fine-tuning-PEFT" class="headerlink" title="2. 参数高效微调 (Parameter-Efficient Fine-tuning, PEFT)"></a>2. 参数高效微调 (Parameter-Efficient Fine-tuning, PEFT)</h3><p>这是目前工业界最主流的技术，目标是<strong>只训练极少数参数</strong>，就能达到接近全量微调的效果。</p><ul><li><p><b>LoRA (Low-Rank Adaptation)</b>： 目前最火的技术。它不改变原模型的权重 $W_0$，而是在旁边增加一个旁路支路，通过两个低秩矩阵 $A$ 和 $B$ 的乘积来模拟权重的变化。</p><p>数学表示为：</p><p>$$W &#x3D; W_0 + \Delta W &#x3D; W_0 + BA$$</p><p>由于旁路矩阵的参数量极小（通常不到原模型的 1%），极大地降低了显存需求。</p></li><li><p><b>QLoRA</b>： LoRA 的进化版。引入了 4-bit 量化技术，让普通消费级显卡（如 RTX 3090&#x2F;4090）也能微调百亿甚至千亿参数的大模型。</p></li><li><p><b>Prompt Tuning &#x2F; Prefix Tuning</b>： 不改模型参数，而是在输入层（或每一层）添加一段可学习的“连续向量”（虚拟 Token）。训练时只更新这些虚拟 Token。</p></li><li><p><b>Adapter Tuning</b>： 在模型的 Transformer 层中插入一些小型网络层（Adapter）。微调时只训练这些 Adapter。</p></li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>AI</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Transformer</title>
     <link href="/2026/04/03/Transformer/"/>
     <url>/2026/04/03/Transformer/</url>
