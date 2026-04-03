@@ -19,21 +19,21 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="大模型上下文窗口对agent系统的影响随着模型上下文从几千 token 扩展到百万级别，Agent 的设计模式发生了显著变化 正面影响 更强大的“原生”长期记忆 深度对话保留： Agent 可以记住更长的对话历史，无需复杂的总结（Summarization）或截断策略，能够更好地维持角色的连贯性和任务的一致性。 跨文档关联： 在处理复杂任务（如代码库重构或长篇法律分析）时，Agent 可以将整个项">
+    <meta name="description" content="Transformer长文本遗忘根源1. 物理层面的“硬限制”：Context Window（上下文窗口）Transformer 模型在设计时，必须预先定义一个最大序列长度（Max Sequence Length）。  定额容器： 想象对话是一个杯子，Transformer 的上下文窗口就是杯子的容量（比如 4k、32k 或 128k tokens）。当对话内容超过这个容量时，为了存入新的话语，系">
 <meta property="og:type" content="article">
-<meta property="og:title" content="大模型上下文窗口对agent系统的影响">
-<meta property="og:url" content="http://example.com/2026/04/03/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AA%97%E5%8F%A3%E5%AF%B9agent%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%BD%B1%E5%93%8D/index.html">
+<meta property="og:title" content="Transformer长文本遗忘根源">
+<meta property="og:url" content="http://example.com/2026/04/03/Transformer%E9%95%BF%E6%96%87%E6%9C%AC%E9%81%97%E5%BF%98%E6%A0%B9%E6%BA%90/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="大模型上下文窗口对agent系统的影响随着模型上下文从几千 token 扩展到百万级别，Agent 的设计模式发生了显著变化 正面影响 更强大的“原生”长期记忆 深度对话保留： Agent 可以记住更长的对话历史，无需复杂的总结（Summarization）或截断策略，能够更好地维持角色的连贯性和任务的一致性。 跨文档关联： 在处理复杂任务（如代码库重构或长篇法律分析）时，Agent 可以将整个项">
+<meta property="og:description" content="Transformer长文本遗忘根源1. 物理层面的“硬限制”：Context Window（上下文窗口）Transformer 模型在设计时，必须预先定义一个最大序列长度（Max Sequence Length）。  定额容器： 想象对话是一个杯子，Transformer 的上下文窗口就是杯子的容量（比如 4k、32k 或 128k tokens）。当对话内容超过这个容量时，为了存入新的话语，系">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-04-03T07:42:26.000Z">
-<meta property="article:modified_time" content="2026-04-03T07:46:53.905Z">
+<meta property="article:published_time" content="2026-04-03T11:38:30.000Z">
+<meta property="article:modified_time" content="2026-04-03T11:57:22.146Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>大模型上下文窗口对agent系统的影响 - Kon4tsu Blog</title>
+  <title>Transformer长文本遗忘根源 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -215,7 +215,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="大模型上下文窗口对agent系统的影响"></span>
+            <span id="subtitle" data-typed-text="Transformer长文本遗忘根源"></span>
           
         </div>
 
@@ -226,8 +226,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-04-03 15:42" pubdate>
-          2026年4月3日 下午
+        <time datetime="2026-04-03 19:38" pubdate>
+          2026年4月3日 晚上
         </time>
       </span>
     
@@ -238,7 +238,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          765 字
+          947 字
         
       </span>
     
@@ -249,7 +249,7 @@
         
         
         
-          7 分钟
+          8 分钟
         
       </span>
     
@@ -286,50 +286,50 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">大模型上下文窗口对agent系统的影响</h1>
+            <h1 id="seo-header">Transformer长文本遗忘根源</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="大模型上下文窗口对agent系统的影响"><a href="#大模型上下文窗口对agent系统的影响" class="headerlink" title="大模型上下文窗口对agent系统的影响"></a>大模型上下文窗口对agent系统的影响</h1><p>随着模型上下文从几千 token 扩展到百万级别，Agent 的设计模式发生了显著变化</p>
-<h2 id="正面影响"><a href="#正面影响" class="headerlink" title="正面影响"></a>正面影响</h2><ol>
-<li><b>更强大的“原生”长期记忆</b><ul>
-<li><b>深度对话保留</b>： Agent 可以记住更长的对话历史，无需复杂的总结（Summarization）或截断策略，能够更好地维持角色的连贯性和任务的一致性。</li>
-<li><b>跨文档关联</b>： 在处理复杂任务（如代码库重构或长篇法律分析）时，Agent 可以将整个项目的文件全部塞进上下文，实现跨文件的逻辑推理。</li>
+                <h1 id="Transformer长文本遗忘根源"><a href="#Transformer长文本遗忘根源" class="headerlink" title="Transformer长文本遗忘根源"></a>Transformer长文本遗忘根源</h1><h2 id="1-物理层面的“硬限制”：Context-Window（上下文窗口）"><a href="#1-物理层面的“硬限制”：Context-Window（上下文窗口）" class="headerlink" title="1. 物理层面的“硬限制”：Context Window（上下文窗口）"></a>1. 物理层面的“硬限制”：Context Window（上下文窗口）</h2><p>Transformer 模型在设计时，必须预先定义一个<b>最大序列长度</b>（Max Sequence Length）。</p>
+<ul>
+<li><b>定额容器</b>： 想象对话是一个杯子，Transformer 的上下文窗口就是杯子的容量（比如 4k、32k 或 128k tokens）。当对话内容超过这个容量时，为了存入新的话语，系统必须“倒掉”旧的内容。</li>
+<li><b>截断策略</b>： 大多数 Agent 框架（如 LangChain）在超出限制时，会采取简单的<b>滑动窗口截断</b>（丢弃最早的对话）或<b>总结压缩</b>。一旦早期的关键信息（比如用户的姓名、最初提出的核心需求）被丢弃，Agent 表现出来的就是“失忆”。</li>
 </ul>
-</li>
-<li><b>简化 RAG（检索增强生成）流程</b><ul>
-<li><b>从“检索”转向“填充”</b>： 传统的 RAG 需要复杂的向量数据库、召回算法和重排序。在大上下文时代，对于中等规模的文档，可以直接将全文放入上下文，避免了检索阶段的“信息丢失”或“切片偏差”。</li>
-<li><b>高精度理解</b>： 模型直接阅读全文，比阅读检索出来的碎片化片段更能理解上下文的语义脉络。</li>
-</ul>
-</li>
-<li><b>支持更复杂的推理链与工具调用</b><ul>
-<li><b>ReAct 循环扩展</b>： Agent 在执行复杂任务时需要多次调用工具（Tool Use），每次调用的输入、输出和思考过程都会占用空间。更大的窗口允许 Agent 进行数十轮的“思考-行动-观察”循环而不丢失最初的目标。</li>
-<li><b>容纳海量 API 文档</b>： Agent 能够同时学习和参考成百上千个 API 的定义，从而具备操作更复杂系统的能力。</li>
-</ul>
-</li>
-</ol>
 <hr>
-<h2 id="负面挑战"><a href="#负面挑战" class="headerlink" title="负面挑战"></a>负面挑战</h2><ol>
-<li><b>Lost in the Middle效应</b><ul>
-<li><b>注意力分配不均</b>： 研究表明，模型对上下文开头和结尾的信息记忆最深刻，而存放在长文本<b>中间</b>的关键细节最容易被忽略。这会导致 Agent 在处理超长任务时出现“间歇性失忆”。</li>
-</ul>
+<h2 id="2-数学层面的“昂贵代价”：-O-n-2-复杂度"><a href="#2-数学层面的“昂贵代价”：-O-n-2-复杂度" class="headerlink" title="2. 数学层面的“昂贵代价”：$O(n^2)$ 复杂度"></a>2. 数学层面的“昂贵代价”：$O(n^2)$ 复杂度</h2><p>为什么不能无限制地增加窗口大小？这涉及 Transformer 核心机制——<b>自注意力机制（Self-Attention）</b>。</p>
+<ul>
+<li><p><b>全量计算</b>： 在标准的自注意力机制中，每一个输入的 token 都要与之前所有的 token 进行关联计算。这意味着计算量和内存占用是随序列长度 $n$ 的<b>平方级别</b>增长的（即 $O(n^2)$）。</p>
+<blockquote>
+<p>预测下一个输出的token，需要使用当前token的Q，与之前所有token的K、V进行计算，每次都要重复算一遍之前算过的K、V，<mark>KV Cache就是通过将之前token的K、V缓存起来减少了这些重复的计算</mark></p>
+</blockquote>
 </li>
-<li><b>推理延迟（Latency）与成本（Cost）激增</b><ul>
-<li><b>响应变慢</b>： 处理的 Token 越多，首字延迟（TTFT）和整体推理时间就越长。对于追求实时响应的 Agent 来说，这是致命的。</li>
-<li><b>算力昂贵</b>： 大多数 LLM API 按 Token 计费。如果每一轮对话都带着几十万 Token 的背景，Agent 的运行成本会呈指数级上升。</li>
-</ul>
+<li><p><b>KV Cache 压力</b>： 为了加速推理，模型会缓存之前的键（Key）和值（Value）。对话越长，这个 KV Cache 就越大，对显存的消耗呈指数级上升。这种计算成本的制约，导致模型在处理极长对话时，必须做出某种权衡。</p>
 </li>
-<li><b>噪声干扰与幻觉风险</b><ul>
-<li><b>信噪比下降</b>： 当上下文中充斥着大量无关信息时，模型可能会受到干扰，从错误的信息中提取逻辑，导致“一本正经地胡说八道”。</li>
-<li><b>指令遵循能力退化</b>： 在极端长的文本中，模型可能会“忘记”最开始设置的系统提示词（System Prompt）约束。</li>
 </ul>
-</li>
-<li><b>过度依赖导致的架构退化</b><ul>
-<li><b>忽略工程优化</b>： 开发者可能因为窗口大而放弃对 RAG 检索精度的优化，或者放弃对 Agent 任务的模块化拆分。一旦任务复杂度超过窗口极限，系统会因为缺乏结构化管理而彻底崩溃。</li>
+<hr>
+<h2 id="3-注意力分配的“失焦”：Lost-in-the-Middle（迷失中段）"><a href="#3-注意力分配的“失焦”：Lost-in-the-Middle（迷失中段）" class="headerlink" title="3. 注意力分配的“失焦”：Lost in the Middle（迷失中段）"></a>3. 注意力分配的“失焦”：Lost in the Middle（迷失中段）</h2><p>即使对话内容还没超出窗口上限，模型也可能“忘记”中间的内容。这在学术界被称为 <b>“Lost in the Middle” </b>现象。</p>
+<ul>
+<li><p><b>头尾偏好</b>： 研究发现，Transformer 驱动的大模型对序列<b>开头</b>（通常包含系统提示词）和<b>结尾</b>（最新的指令）的信息捕捉最敏感。</p>
+<blockquote>
+<p>LLM是基于人类产生的文本数据训练的，而人类的写作习惯具有天然的结构性偏置：</p>
+<ul>
+<li><b>首因效应 (Primacy Effect)</b>： 文章的开头通常包含标题、摘要、引言或主旨句。这是信息密度最高的地方。</li>
+<li><b>近因效应 (Recency Effect)</b>： 文章的结尾通常包含总结、结论或最新的更新。</li>
+<li><b>中间的“注水”</b>： 文章的中间部分通常是论证过程、细节描述或铺垫。</li>
 </ul>
+<p>导致在预训练（Pre-training）和微调（SFT）阶段，模型学到了一种隐式的捷径——“答案通常在开头或结尾”。这种数据分布的偏差被刻入了模型的参数中，导致它在推理时天然地降低了对中间内容的关注度。</p>
+</blockquote>
 </li>
-</ol>
+<li><p><b>注意力稀释</b>： 随着对话轮数增加，注意力矩阵中的权重被分摊到了大量琐碎的对话细节中。早期重要的上下文在多层注意力计算后，信号会逐渐变弱（衰减），被淹没在后续的噪声里。</p>
+</li>
+</ul>
+<hr>
+<h2 id="4-位置编码的“陌生感”：Extrapolation（外推性问题）"><a href="#4-位置编码的“陌生感”：Extrapolation（外推性问题）" class="headerlink" title="4. 位置编码的“陌生感”：Extrapolation（外推性问题）"></a>4. 位置编码的“陌生感”：Extrapolation（外推性问题）</h2><p>Transformer 依靠<b>位置编码</b>（Position Embedding）来理解词序。</p>
+<ul>
+<li><b>训练与预测的脱节</b>： 如果一个模型是在 4k 长度的数据上训练的，当你强行让它处理 8k 的对话时，它会遇到从未见过的“位置下标”。</li>
+<li><b>逻辑混乱</b>： 即使使用了旋转位置编码（RoPE）等技术增强了外推性，但在超出训练长度后，模型对远距离 token 之间的关系理解力仍会大幅下降，导致逻辑断层。</li>
+</ul>
 
                 
               </div>
@@ -368,8 +368,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>大模型上下文窗口对agent系统的影响</div>
-      <div>http://example.com/2026/04/03/大模型上下文窗口对agent系统的影响/</div>
+      <div>Transformer长文本遗忘根源</div>
+      <div>http://example.com/2026/04/03/Transformer长文本遗忘根源/</div>
     </div>
     <div class="license-meta">
       
@@ -413,18 +413,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/04/03/Transformer%E9%95%BF%E6%96%87%E6%9C%AC%E9%81%97%E5%BF%98%E6%A0%B9%E6%BA%90/" title="Transformer长文本遗忘根源">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Transformer长文本遗忘根源</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/04/03/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BE%AE%E8%B0%83Fine-tuning/" title="大模型微调Fine-tuning">
-                        <span class="hidden-mobile">大模型微调Fine-tuning</span>
+                      <a href="/2026/04/03/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AA%97%E5%8F%A3%E5%AF%B9agent%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%BD%B1%E5%93%8D/" title="大模型上下文窗口对agent系统的影响">
+                        <span class="hidden-mobile">大模型上下文窗口对agent系统的影响</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

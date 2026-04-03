@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>Transformer长文本遗忘根源</title>
+    <link href="/2026/04/03/Transformer%E9%95%BF%E6%96%87%E6%9C%AC%E9%81%97%E5%BF%98%E6%A0%B9%E6%BA%90/"/>
+    <url>/2026/04/03/Transformer%E9%95%BF%E6%96%87%E6%9C%AC%E9%81%97%E5%BF%98%E6%A0%B9%E6%BA%90/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Transformer长文本遗忘根源"><a href="#Transformer长文本遗忘根源" class="headerlink" title="Transformer长文本遗忘根源"></a>Transformer长文本遗忘根源</h1><h2 id="1-物理层面的“硬限制”：Context-Window（上下文窗口）"><a href="#1-物理层面的“硬限制”：Context-Window（上下文窗口）" class="headerlink" title="1. 物理层面的“硬限制”：Context Window（上下文窗口）"></a>1. 物理层面的“硬限制”：Context Window（上下文窗口）</h2><p>Transformer 模型在设计时，必须预先定义一个<b>最大序列长度</b>（Max Sequence Length）。</p><ul><li><b>定额容器</b>： 想象对话是一个杯子，Transformer 的上下文窗口就是杯子的容量（比如 4k、32k 或 128k tokens）。当对话内容超过这个容量时，为了存入新的话语，系统必须“倒掉”旧的内容。</li><li><b>截断策略</b>： 大多数 Agent 框架（如 LangChain）在超出限制时，会采取简单的<b>滑动窗口截断</b>（丢弃最早的对话）或<b>总结压缩</b>。一旦早期的关键信息（比如用户的姓名、最初提出的核心需求）被丢弃，Agent 表现出来的就是“失忆”。</li></ul><hr><h2 id="2-数学层面的“昂贵代价”：-O-n-2-复杂度"><a href="#2-数学层面的“昂贵代价”：-O-n-2-复杂度" class="headerlink" title="2. 数学层面的“昂贵代价”：$O(n^2)$ 复杂度"></a>2. 数学层面的“昂贵代价”：$O(n^2)$ 复杂度</h2><p>为什么不能无限制地增加窗口大小？这涉及 Transformer 核心机制——<b>自注意力机制（Self-Attention）</b>。</p><ul><li><p><b>全量计算</b>： 在标准的自注意力机制中，每一个输入的 token 都要与之前所有的 token 进行关联计算。这意味着计算量和内存占用是随序列长度 $n$ 的<b>平方级别</b>增长的（即 $O(n^2)$）。</p><blockquote><p>预测下一个输出的token，需要使用当前token的Q，与之前所有token的K、V进行计算，每次都要重复算一遍之前算过的K、V，<mark>KV Cache就是通过将之前token的K、V缓存起来减少了这些重复的计算</mark></p></blockquote></li><li><p><b>KV Cache 压力</b>： 为了加速推理，模型会缓存之前的键（Key）和值（Value）。对话越长，这个 KV Cache 就越大，对显存的消耗呈指数级上升。这种计算成本的制约，导致模型在处理极长对话时，必须做出某种权衡。</p></li></ul><hr><h2 id="3-注意力分配的“失焦”：Lost-in-the-Middle（迷失中段）"><a href="#3-注意力分配的“失焦”：Lost-in-the-Middle（迷失中段）" class="headerlink" title="3. 注意力分配的“失焦”：Lost in the Middle（迷失中段）"></a>3. 注意力分配的“失焦”：Lost in the Middle（迷失中段）</h2><p>即使对话内容还没超出窗口上限，模型也可能“忘记”中间的内容。这在学术界被称为 <b>“Lost in the Middle” </b>现象。</p><ul><li><p><b>头尾偏好</b>： 研究发现，Transformer 驱动的大模型对序列<b>开头</b>（通常包含系统提示词）和<b>结尾</b>（最新的指令）的信息捕捉最敏感。</p><blockquote><p>LLM是基于人类产生的文本数据训练的，而人类的写作习惯具有天然的结构性偏置：</p><ul><li><b>首因效应 (Primacy Effect)</b>： 文章的开头通常包含标题、摘要、引言或主旨句。这是信息密度最高的地方。</li><li><b>近因效应 (Recency Effect)</b>： 文章的结尾通常包含总结、结论或最新的更新。</li><li><b>中间的“注水”</b>： 文章的中间部分通常是论证过程、细节描述或铺垫。</li></ul><p>导致在预训练（Pre-training）和微调（SFT）阶段，模型学到了一种隐式的捷径——“答案通常在开头或结尾”。这种数据分布的偏差被刻入了模型的参数中，导致它在推理时天然地降低了对中间内容的关注度。</p></blockquote></li><li><p><b>注意力稀释</b>： 随着对话轮数增加，注意力矩阵中的权重被分摊到了大量琐碎的对话细节中。早期重要的上下文在多层注意力计算后，信号会逐渐变弱（衰减），被淹没在后续的噪声里。</p></li></ul><hr><h2 id="4-位置编码的“陌生感”：Extrapolation（外推性问题）"><a href="#4-位置编码的“陌生感”：Extrapolation（外推性问题）" class="headerlink" title="4. 位置编码的“陌生感”：Extrapolation（外推性问题）"></a>4. 位置编码的“陌生感”：Extrapolation（外推性问题）</h2><p>Transformer 依靠<b>位置编码</b>（Position Embedding）来理解词序。</p><ul><li><b>训练与预测的脱节</b>： 如果一个模型是在 4k 长度的数据上训练的，当你强行让它处理 8k 的对话时，它会遇到从未见过的“位置下标”。</li><li><b>逻辑混乱</b>： 即使使用了旋转位置编码（RoPE）等技术增强了外推性，但在超出训练长度后，模型对远距离 token 之间的关系理解力仍会大幅下降，导致逻辑断层。</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>AI</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>大模型上下文窗口对agent系统的影响</title>
     <link href="/2026/04/03/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AA%97%E5%8F%A3%E5%AF%B9agent%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%BD%B1%E5%93%8D/"/>
     <url>/2026/04/03/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AA%97%E5%8F%A3%E5%AF%B9agent%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%BD%B1%E5%93%8D/</url>
