@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>agent领域常见术语</title>
+    <link href="/2026/04/05/agent%E9%A2%86%E5%9F%9F%E5%B8%B8%E8%A7%81%E6%9C%AF%E8%AF%AD/"/>
+    <url>/2026/04/05/agent%E9%A2%86%E5%9F%9F%E5%B8%B8%E8%A7%81%E6%9C%AF%E8%AF%AD/</url>
+    
+    <content type="html"><![CDATA[<h1 id="agent领域常见术语"><a href="#agent领域常见术语" class="headerlink" title="agent领域常见术语"></a>agent领域常见术语</h1><h2 id="Tool"><a href="#Tool" class="headerlink" title="Tool"></a>Tool</h2><p>本质上就是一个带了description的function，在上下文中带上这些function的json schema，使得llm能够根据需要，向后端发起<b>结构化的请求</b>调用这些function（这个从意图识别到生成结构化工具调用请求的过程就是<b>function calling</b>）</p><p>缺点是每个function的功能比较单一，通常只能用来做一件事情，而且每次都需要把所有tool的json schema加载到上下文中，很容易撑爆上下文窗口，解决方式可以不带上所有的tool，只在上下文里加载一些常用的tool，和一个专门用来recommend tool的tool（套娃），当不知道用什么tool时，让它来帮忙推荐</p><h2 id="MCP"><a href="#MCP" class="headerlink" title="MCP"></a>MCP</h2><p>在没有mcp之前，各家模型如果要调用同一个tool，那就得给不同的模型针对同一个tool，做不同的实现，因为各家模型的实现不一样。有了mcp之后，各家模型都对这个mcp协议做了适配，tool可以托管到远程的mcp server中去，只要支持这个mcp协议的模型都可以用到它所提供的tool，然后通过mcp server向本地的mcp client暴露tool，实现tool的调用</p><h2 id="Skill"><a href="#Skill" class="headerlink" title="Skill"></a>Skill</h2><p>相比于tool单一的功能而言，skill更像是一组封装起来的功能集合，skill通过对一组复杂功能的逻辑编排，形成一个明确的执行流程，类似一个SOP。举个例子：当我们封装好一个用户负反馈分析的skill，这个skill可能先并行调用多个工具，从不同渠道去拉取用户负反馈评价，然后对所有来源的数据进行清洗与预处理，然后再调用工具将处理后的数据写入表格，对表格里的数据进行聚合统计，最终生成一份报告</p><p>一个skill包含以下几个部分：<b>metadata</b>记录了skill的元数据，如name、description等信息，<b>instruction</b>记录了这个skill具体的执行流程，同时instruction里又可以包含reference、scripts两部分，其中reference可以实现<b>按需加载</b>另外的文档（比如说只有当输入的数据中出现了钱相关的内容，才加载财务相关的文档），scripts可以实现<b>按需调用</b>另外的函数（比如说只有当输入中出现了上传相关的内容，才调用upload function进行上传）</p><p>相比于tool需要将每个tool的完整json schema加载到上下文中，skill只需要将metadata加载到上下文，当需要用到的时候再把整个skill加载进来（因此需要保证metadata的description写得详尽），大大减少了token消耗，这就是<b>渐进式披露</b></p><h2 id="rules"><a href="#rules" class="headerlink" title="rules"></a>rules</h2><p>rules本质上就是一段始终生效的静态 Prompt 片段，自动拼接到每次对话的 System Prompt 中，每次对话都加载，无需手动触发，常用来说明编码规范、项目约定、命名风格、技术栈约束</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>AI</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Harness Engineering</title>
     <link href="/2026/04/04/Harness%20Engineering/"/>
     <url>/2026/04/04/Harness%20Engineering/</url>
