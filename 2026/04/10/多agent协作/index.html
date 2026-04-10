@@ -19,23 +19,21 @@
   <meta name="author" content="Kon4tsu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="agent领域常见术语Tool本质上就是一个带了description的function，在上下文中带上这些function的json schema，使得llm能够根据需要，向后端发起结构化的请求调用这些function（这个从意图识别到生成结构化工具调用请求的过程就是function calling） 缺点是每个function的功能比较单一，通常只能用来做一件事情，而且每次都需要把所有tool">
+    <meta name="description" content="多agent协作1. Agent通信A2AA2A 协议是专门为 AI 智能体间高效、确定性协作而设计的通信规范。它要求 Agent 在相互交互时，收起“高情商”的自然语言废话，转而使用高度结构化、带有严格校验规则的数据载体（如定义了 Schema 的 JSON、XML 或特定的状态流转指令）。A2A是最直接的一种通信模式，即一个agent直接调用另一个agent。每个agent都可以被视为一个独立">
 <meta property="og:type" content="article">
-<meta property="og:title" content="agent领域常见术语">
-<meta property="og:url" content="http://example.com/2026/04/05/agent%E9%A2%86%E5%9F%9F%E5%B8%B8%E8%A7%81%E6%9C%AF%E8%AF%AD/index.html">
+<meta property="og:title" content="多agent协作">
+<meta property="og:url" content="http://example.com/2026/04/10/%E5%A4%9Aagent%E5%8D%8F%E4%BD%9C/index.html">
 <meta property="og:site_name" content="Kon4tsu Blog">
-<meta property="og:description" content="agent领域常见术语Tool本质上就是一个带了description的function，在上下文中带上这些function的json schema，使得llm能够根据需要，向后端发起结构化的请求调用这些function（这个从意图识别到生成结构化工具调用请求的过程就是function calling） 缺点是每个function的功能比较单一，通常只能用来做一件事情，而且每次都需要把所有tool">
+<meta property="og:description" content="多agent协作1. Agent通信A2AA2A 协议是专门为 AI 智能体间高效、确定性协作而设计的通信规范。它要求 Agent 在相互交互时，收起“高情商”的自然语言废话，转而使用高度结构化、带有严格校验规则的数据载体（如定义了 Schema 的 JSON、XML 或特定的状态流转指令）。A2A是最直接的一种通信模式，即一个agent直接调用另一个agent。每个agent都可以被视为一个独立">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202604061613922.jpg">
-<meta property="article:published_time" content="2026-04-05T07:22:31.000Z">
-<meta property="article:modified_time" content="2026-04-06T08:14:54.979Z">
+<meta property="article:published_time" content="2026-04-10T06:46:54.000Z">
+<meta property="article:modified_time" content="2026-04-10T06:59:12.256Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202604061613922.jpg">
   
   
   
-  <title>agent领域常见术语 - Kon4tsu Blog</title>
+  <title>多agent协作 - Kon4tsu Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -217,7 +215,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="agent领域常见术语"></span>
+            <span id="subtitle" data-typed-text="多agent协作"></span>
           
         </div>
 
@@ -228,8 +226,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-04-05 15:22" pubdate>
-          2026年4月5日 下午
+        <time datetime="2026-04-10 14:46" pubdate>
+          2026年4月10日 下午
         </time>
       </span>
     
@@ -240,7 +238,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          748 字
+          506 字
         
       </span>
     
@@ -251,7 +249,7 @@
         
         
         
-          7 分钟
+          5 分钟
         
       </span>
     
@@ -288,20 +286,20 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">agent领域常见术语</h1>
+            <h1 id="seo-header">多agent协作</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="agent领域常见术语"><a href="#agent领域常见术语" class="headerlink" title="agent领域常见术语"></a>agent领域常见术语</h1><h2 id="Tool"><a href="#Tool" class="headerlink" title="Tool"></a>Tool</h2><p>本质上就是一个带了description的function，在上下文中带上这些function的json schema，使得llm能够根据需要，向后端发起<b>结构化的请求</b>调用这些function（这个从意图识别到生成结构化工具调用请求的过程就是<b>function calling</b>）</p>
-<p>缺点是每个function的功能比较单一，通常只能用来做一件事情，而且每次都需要把所有tool的json schema加载到上下文中，很容易撑爆上下文窗口，解决方式可以不带上所有的tool，只在上下文里加载一些常用的tool，和一个专门用来recommend tool的tool（套娃），当不知道用什么tool时，让它来帮忙推荐</p>
-<h2 id="MCP"><a href="#MCP" class="headerlink" title="MCP"></a>MCP</h2><p>在没有mcp之前，各家模型如果要调用同一个tool，那就得给不同的模型针对同一个tool，做不同的实现，因为各家模型的实现不一样。有了mcp之后，各家模型都对这个mcp协议做了适配，tool可以托管到远程的mcp server中去，只要支持这个mcp协议的模型都可以用到它所提供的tool，然后通过mcp server向本地的mcp host暴露tool，实现tool的调用</p>
-<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202604061613922.jpg" srcset="/img/loading.gif" lazyload alt="6bee5ef498adcbd714b306b98219e72e" style="zoom:50%;" />
-
-<h2 id="Skill"><a href="#Skill" class="headerlink" title="Skill"></a>Skill</h2><p>相比于tool单一的功能而言，skill更像是一组封装起来的功能集合，skill通过对一组复杂功能的逻辑编排，形成一个明确的执行流程，类似一个SOP。举个例子：当我们封装好一个用户负反馈分析的skill，这个skill可能先并行调用多个工具，从不同渠道去拉取用户负反馈评价，然后对所有来源的数据进行清洗与预处理，然后再调用工具将处理后的数据写入表格，对表格里的数据进行聚合统计，最终生成一份报告</p>
-<p>一个skill包含以下几个部分：<b>metadata</b>记录了skill的元数据，如name、description等信息，<b>instruction</b>记录了这个skill具体的执行流程，同时instruction里又可以包含reference、scripts两部分，其中reference可以实现<b>按需加载</b>另外的文档（比如说只有当输入的数据中出现了钱相关的内容，才加载财务相关的文档），scripts可以实现<b>按需调用</b>另外的函数（比如说只有当输入中出现了上传相关的内容，才调用upload function进行上传）</p>
-<p>相比于tool需要将每个tool的完整json schema加载到上下文中，skill只需要将metadata加载到上下文，当需要用到的时候再把整个skill加载进来（因此需要保证metadata的description写得详尽），大大减少了token消耗，这就是<b>渐进式披露</b></p>
-<h2 id="rules"><a href="#rules" class="headerlink" title="rules"></a>rules</h2><p>rules本质上就是一段始终生效的静态 Prompt 片段，自动拼接到每次对话的 System Prompt 中，每次对话都加载，无需手动触发，常用来说明编码规范、项目约定、命名风格、技术栈约束</p>
+                <h1 id="多agent协作"><a href="#多agent协作" class="headerlink" title="多agent协作"></a>多agent协作</h1><h2 id="1-Agent通信"><a href="#1-Agent通信" class="headerlink" title="1. Agent通信"></a>1. Agent通信</h2><h3 id="A2A"><a href="#A2A" class="headerlink" title="A2A"></a>A2A</h3><p>A2A 协议是专门为 AI 智能体间高效、确定性协作而设计的通信规范。它要求 Agent 在相互交互时，收起“高情商”的自然语言废话，转而<mark>使用高度结构化、带有严格校验规则的数据载体</mark>（如定义了 Schema 的 JSON、XML 或特定的状态流转指令）。A2A是最直接的一种通信模式，即一个agent直接调用另一个agent。每个agent都可以被视为一个独立服务，当某个agent需要其他能力时，会向对应agent发起请求并等待返回结果。</p>
+<p>不过，当系统规模增大时，A2A可能会变得复杂，因为每个agent之间需要互相知道对方的地址和接口，一旦agent数量增加，系统复杂性也会随之增加。</p>
+<h3 id="Message-Bus"><a href="#Message-Bus" class="headerlink" title="Message Bus"></a>Message Bus</h3><p>消息总线是一种更加解耦的通信方式。本质上就是基于一个<b>消息队列</b>，生产者agent向这个消息队列发布一个事件，订阅了这个事件的agent则能够自动接收任务并执行。</p>
+<h3 id="Shared-Memory"><a href="#Shared-Memory" class="headerlink" title="Shared Memory"></a>Shared Memory</h3><p>Shared Memory核心思想是<mark>多个agent共享同一份状态数据</mark>。agent之间通过读取和更新共享状态来实现协作。这种方式需要注意并发控制问题。</p>
+<h2 id="2-多agent架构"><a href="#2-多agent架构" class="headerlink" title="2. 多agent架构"></a>2. 多agent架构</h2><p>当前多agent系统有两种典型架构模式：层级架构、群体架构。</p>
+<ul>
+<li>层级架构：存在一个上层agent负责整体任务的规划与调度，多个下层agent负责执行具体任务。这种架构<mark>适合处理具有明确流程结构的任务</mark></li>
+<li>群体架构：群体架构中没有明显的中心控制节点，多个agent以相对平等的方式进行协作。这种模式<mark>更适合开放性任务，如头脑风暴、创意生成等</mark>。不过这种架构在工程实现上更加复杂，需要设计更加完善的通信机制与协作规则。</li>
+</ul>
 
                 
               </div>
@@ -340,8 +338,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>agent领域常见术语</div>
-      <div>http://example.com/2026/04/05/agent领域常见术语/</div>
+      <div>多agent协作</div>
+      <div>http://example.com/2026/04/10/多agent协作/</div>
     </div>
     <div class="license-meta">
       
@@ -353,7 +351,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年4月5日</div>
+          <div>2026年4月10日</div>
         </div>
       
       
@@ -385,18 +383,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/04/10/%E5%A4%9Aagent%E5%8D%8F%E4%BD%9C/" title="多agent协作">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">多agent协作</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/04/04/Harness%20Engineering/" title="Harness Engineering">
-                        <span class="hidden-mobile">Harness Engineering</span>
+                      <a href="/2026/04/05/agent%E9%A2%86%E5%9F%9F%E5%B8%B8%E8%A7%81%E6%9C%AF%E8%AF%AD/" title="agent领域常见术语">
+                        <span class="hidden-mobile">agent领域常见术语</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
