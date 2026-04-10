@@ -26,10 +26,12 @@
 <meta property="og:site_name" content="Kon4tsu Blog">
 <meta property="og:description" content="大模型微调Fine-tuning大模型微调（Fine-tuning） 是指在一个已经预训练好的大语言模型（Base Model）基础上，使用特定领域的数据集进行二次训练，以调整模型的参数，使其在特定任务或特定领域表现得更好。 什么是大模型微调？如果把预训练（Pre-training）比作一个学生在学校接受通识教育（学习各科知识，具备理解语言、逻辑推理的能力），那么微调（Fine-tuning）就是">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202604101053934.png">
 <meta property="article:published_time" content="2026-04-03T02:59:13.000Z">
-<meta property="article:modified_time" content="2026-04-03T03:03:55.407Z">
+<meta property="article:modified_time" content="2026-04-10T03:15:07.441Z">
 <meta property="article:author" content="Kon4tsu">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202604101053934.png">
   
   
   
@@ -238,7 +240,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          663 字
+          836 字
         
       </span>
     
@@ -249,7 +251,7 @@
         
         
         
-          6 分钟
+          7 分钟
         
       </span>
     
@@ -302,17 +304,17 @@
 <h3 id="1-全参数微调-Full-Fine-tuning-FFT"><a href="#1-全参数微调-Full-Fine-tuning-FFT" class="headerlink" title="1. 全参数微调 (Full Fine-tuning, FFT)"></a>1. 全参数微调 (Full Fine-tuning, FFT)</h3><p>对模型的所有参数进行更新。这种方法效果最好，但对算力要求极高（显存需求是模型参数量的数倍），且容易产生“灾难性遗忘”（模型学会了新知识，却忘掉了预训练时的通用能力）。</p>
 <h3 id="2-参数高效微调-Parameter-Efficient-Fine-tuning-PEFT"><a href="#2-参数高效微调-Parameter-Efficient-Fine-tuning-PEFT" class="headerlink" title="2. 参数高效微调 (Parameter-Efficient Fine-tuning, PEFT)"></a>2. 参数高效微调 (Parameter-Efficient Fine-tuning, PEFT)</h3><p>这是目前工业界最主流的技术，目标是<strong>只训练极少数参数</strong>，就能达到接近全量微调的效果。</p>
 <ul>
-<li><p><b>LoRA (Low-Rank Adaptation)</b>： 目前最火的技术。它不改变原模型的权重 $W_0$，而是在旁边增加一个旁路支路，通过两个低秩矩阵 $A$ 和 $B$ 的乘积来模拟权重的变化。</p>
+<li><p><b>LoRA (Low-Rank Adaptation)</b>： 目前最火的技术。它不改变原模型的权重 $W_0\in \mathbb{R}^{d \times d}$，而是在旁边增加一个旁路支路，通过两个低秩矩阵 $A \in \mathbb{R}^{r \times d}$ 和 $B \in \mathbb{R}^{d \times r}$ 的乘积来模拟权重的变化，其中$r$很小。</p>
 <p>数学表示为：</p>
 <p>$$W &#x3D; W_0 + \Delta W &#x3D; W_0 + BA$$</p>
-<p>由于旁路矩阵的参数量极小（通常不到原模型的 1%），极大地降低了显存需求。</p>
+<p>由于旁路矩阵的参数量极小（通常不到原模型的 1%，只需$2 \times d \times r$的参数量，相比于一个完整的$r \times r$小得多），极大地降低了显存需求。训练完成后，将增量权重直接加到原始权重上，推理时无需额外计算开销。</p>
 </li>
-<li><p><b>QLoRA</b>： LoRA 的进化版。引入了 4-bit 量化技术，让普通消费级显卡（如 RTX 3090&#x2F;4090）也能微调百亿甚至千亿参数的大模型。</p>
+<li><p><b>QLoRA</b>： 虽然LoRA通过低秩分解减少了微调参数，但是当面对超大参数模型时，大模型的原始权重和激活仍会占用大量的显存。引入了 4-bit 量化技术，<mark>将模型权重从从原始的16-bit表示，压缩到了4-bit表示，显存占用减少了约4倍，且对精度影响极小</mark>，让普通消费级显卡（如 RTX 3090&#x2F;4090）也能微调百亿甚至千亿参数的大模型。</p>
 </li>
-<li><p><b>Prompt Tuning &#x2F; Prefix Tuning</b>： 不改模型参数，而是在输入层（或每一层）添加一段可学习的“连续向量”（虚拟 Token）。训练时只更新这些虚拟 Token。</p>
+<li><p><b>Prompt Tuning &#x2F; Prefix Tuning</b>： 不改模型参数，而是在<mark>输入层（或每一层）添加一段可学习的“连续向量”</mark>（虚拟 Token）。训练时只更新这些虚拟 Token。</p>
 </li>
-<li><p><b>Adapter Tuning</b>： 在模型的 Transformer 层中插入一些小型网络层（Adapter）。微调时只训练这些 Adapter。</p>
-</li>
+<li><p><b>Adapter Tuning</b>： 在模型的 Transformer 层中插入一些小型网络层（Adapter）。微调时只训练这些 Adapter。虽然减少了训练参数，但是带来了推理延迟。</p>
+<img src="https://hwangjj-image-gallery.oss-cn-shenzhen.aliyuncs.com/imgs/202604101053934.png" srcset="/img/loading.gif" lazyload alt="image-20260410105309533" style="zoom:50%;" /></li>
 </ul>
 
                 
